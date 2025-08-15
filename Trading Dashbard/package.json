@@ -1,0 +1,34 @@
+{
+  "name": "trading-dashboard-voice-portable",
+  "version": "1.0.0",
+  "productName": "Trading Dashboard (Portable, Offline)",
+  "description": "Portable EXE that bundles your Netlify dashboard offline by fetching the latest HTML before build.",
+  "main": "main.js",
+  "author": "You",
+  "license": "MIT",
+  "scripts": {
+    "start": "electron .",
+    "fetch:html": "node tools/fetch-html.js",
+    "portable": "node tools/fetch-html.js && electron-builder --win portable"
+  },
+  "devDependencies": {
+    "electron": "^29.0.0",
+    "electron-builder": "^24.13.3"
+  },
+  "build": {
+    "appId": "com.example.tradingdashboardvoice.portable",
+    "files": [
+      "main.js",
+      "preload.js",
+      "index.html",
+      "README.md",
+      "config.json"
+    ],
+    "win": {
+      "target": "portable"
+    },
+    "portable": {
+      "artifactName": "Trading Dashboard (Portable, Offline) ${version}.exe"
+    }
+  }
+}
