@@ -1,0 +1,5 @@
+[build]
+# No build step for a plain HTML/JS site
+command = ""
+# Serve files from the repo root (where index.html is)
+publish = "."
