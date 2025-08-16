@@ -198,7 +198,30 @@ canvas{background:#0b1220;border:1px solid #1f2937;border-radius:12px;padding:8p
     const controls = document.querySelector('header.controls');
     const shim = document.getElementById('topShim');
     const wrap = document.querySelector('.wrap');
-    if(!header || !controls || !
+    if(!header || !controls || !shim || !wrap) return;
+    const warnH = (warn && warn.style.display!=='none') ? warn.offsetHeight : 0;
+    const H = (header.offsetHeight || 120) + warnH;
+    const C = (controls.offsetHeight || 64);
+    document.documentElement.style.setProperty('--headerHpx', H+'px');
+    document.documentElement.style.setProperty('--controlsHpx', C+'px');
+    shim.style.height = (H + C + 16) + 'px';
+    wrap.style.marginTop = '8px';
+  }
+  ['load','resize'].forEach(evt=>window.addEventListener(evt,setOffsets));
+  document.addEventListener('readystatechange', setOffsets);
+  setTimeout(setOffsets,100); setTimeout(setOffsets,400);
+  // Watch the DOM in case heights shift after load
+  const mo=new MutationObserver(setOffsets); mo.observe(document.body,{subtree:true,childList:true,attributes:true});
+})();
+
+// ===== Helpers =====
+const log=(m)=>{const el=document.getElementById('vLog'); if(!el) return; el.textContent+=(new Date()).toLocaleTimeString()+': '+m+'\n'; el.scrollTop=el.scrollHeight;};
+const setStatus=(s)=>{const n=document.getElementById('vStatus'); if(n) n.textContent=s;};
+const setNote=(s)=>{const n=document.getElementById('vNote'); if(n) n.textContent=s;};
+function fmt(x){return Number(x).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});}
+function signed(x){const s=Number(x);const c=s>=0?'good':'bad';return `<span class="pillstat ${c}">${s>=0
+	
+
 	
 
 	
