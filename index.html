@@ -1,3 +1,12 @@
+
+
+	
+
+	
+
+	
+
+	
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -12,7 +21,7 @@
 *{box-sizing:border-box}
 html{scroll-behavior:smooth;scroll-padding-top:calc(var(--headerHpx) + var(--controlsHpx) + 16px)}
 body{margin:0;font-family:system-ui,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--text)}
-/* Top Chrome-required banner (hidden by default) */
+/* Chrome-required banner (hidden by default) */
 .topwarn{display:none;position:fixed;top:0;left:0;right:0;z-index:70;background:#7c2d12;color:#fff;border-bottom:1px solid #78350f}
 .topwarn .inner{max-width:1100px;margin:0 auto;padding:10px 16px;display:flex;gap:10px;align-items:center;justify-content:space-between}
 .topwarn button{background:#111827;border:1px solid #f59e0b;color:#fff;border-radius:999px;padding:6px 10px;cursor:pointer}
@@ -25,16 +34,24 @@ body{margin:0;font-family:system-ui,Segoe UI,Roboto,Arial,sans-serif;background:
              linear-gradient(90deg,#000 50%,#fff 0);
   box-shadow:0 6px 18px rgba(255,255,255,.08)}
 .title{font-size:40px;font-weight:800;letter-spacing:.4px;color:#fff;text-shadow:0 2px 12px rgba(0,0,0,.6)}
-/* Controls */
-header.controls{position:sticky;top:var(--headerHpx);z-index:50;display:flex;flex-wrap:wrap;align-items:center;gap:10px;justify-content:space-between;padding:10px 16px;background:rgba(15,23,42,.94);backdrop-filter:blur(6px);border-bottom:1px solid #1f2937;box-shadow:0 6px 14px rgba(0,0,0,.35)}
+/* Controls (now fixed, not sticky) */
+header.controls{
+  position:fixed; top:var(--headerHpx); left:0; right:0; z-index:50;
+  display:flex;flex-wrap:wrap;align-items:center;gap:10px;justify-content:space-between;
+  padding:10px 16px;background:rgba(15,23,42,.94);
+  backdrop-filter:blur(6px);border-bottom:1px solid #1f2937;
+  box-shadow:0 6px 14px rgba(0,0,0,.35)
+}
 .pill{display:inline-flex;align-items:center;gap:6px;border:1px solid #334155;background:#0b1220;color:#cbd5e1;border-radius:999px;padding:6px 10px;font-size:12px}
 button{background:var(--accent);color:#fff;border:none;border-radius:10px;padding:10px 14px;cursor:pointer}
 button.ghost{background:#0b1220;color:#fff;border:1px solid #374151}
 button.danger{background:#ef4444}
 button[disabled]{opacity:.6;cursor:not-allowed}
 select,input{background:#0b1220;color:#e5e7eb;border:1px solid #374151;border-radius:10px;padding:10px}
+/* Spacer that reserves room for fixed header + controls */
+#topShim{height:0}
 /* Body */
-.wrap{max-width:1100px;margin:calc(var(--headerHpx) + var(--controlsHpx) + 24px) auto 18px auto;padding:0 16px}
+.wrap{max-width:1100px;margin:8px auto 18px auto;padding:0 16px}
 .grid{display:grid;grid-template-columns:1.2fr .8fr;gap:16px}
 .card{background:var(--card);border:1px solid #1f2937;border-radius:14px;padding:14px;box-shadow:0 10px 30px rgba(0,0,0,.25)}
 h2{margin:6px 0 12px 0;color:#d1fae5}
@@ -58,7 +75,7 @@ canvas{background:#0b1220;border:1px solid #1f2937;border-radius:12px;padding:8p
 </head>
 <body>
 
-<!-- Chrome-required banner (auto-shows if SR unsupported) -->
+<!-- Chrome warning banner -->
 <div class="topwarn" id="browserWarn">
   <div class="inner">
     <div>⚠️ Voice features require the <strong>Chrome</strong> browser (or Microsoft Edge). Please open this site in Chrome for full functionality.</div>
@@ -103,9 +120,12 @@ canvas{background:#0b1220;border:1px solid #1f2937;border-radius:12px;padding:8p
     <label class="pill"><input type="checkbox" id="liveFill" checked> Live fill</label>
     <span class="pill" id="envPill">env: ?</span>
     <label class="pill"><input type="checkbox" id="ttsToggle" checked> 🔈 Speak on review & save</label>
-    <span class="pill">ZTP v3.3</span>
+    <span class="pill">ZTP v3.4</span>
   </div>
 </header>
+
+<!-- Spacer so content sits below fixed bars -->
+<div id="topShim" aria-hidden="true"></div>
 
 <!-- Main -->
 <div class="wrap">
@@ -174,34 +194,38 @@ canvas{background:#0b1220;border:1px solid #1f2937;border-radius:12px;padding:8p
     <h2>Commissions Over Time</h2>
     <canvas id="commChart" height="180"></canvas>
   </div>
-  <div class="footerVer">ZTP v3.3</div>
+  <div class="footerVer">ZTP v3.4</div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-// ==== Layout: prevent header overlap (dynamic heights) ====
+// ===== Layout: measure bars and set spacer =====
 (function adjustOffsets(){
   function setOffsets(){
     const warn = document.getElementById('browserWarn');
     const warnH = (warn && getComputedStyle(warn).display!=='none') ? warn.offsetHeight : 0;
     const header = document.querySelector('.banner');
     const controls = document.querySelector('header.controls');
-    if(!header || !controls) return;
+    const shim = document.getElementById('topShim');
+    const wrap = document.querySelector('.wrap');
+    if(!header || !controls || !shim || !wrap) return;
+
     const H = (header.offsetHeight || 120) + warnH;
-    const C = controls.offsetHeight || 64;
+    const C = (controls.offsetHeight || 64);
+
     document.documentElement.style.setProperty('--headerHpx', H+'px');
     document.documentElement.style.setProperty('--controlsHpx', C+'px');
-    const wrap = document.querySelector('.wrap');
-    if(wrap) wrap.style.marginTop = (H + C + 24) + 'px';
+
+    shim.style.height = (H + C + 16) + 'px';
+    wrap.style.marginTop = '8px';
   }
-  window.addEventListener('load', setOffsets);
+  ['load','resize'].forEach(evt=>window.addEventListener(evt,setOffsets));
   document.addEventListener('readystatechange', setOffsets);
-  setTimeout(setOffsets, 100);
-  setTimeout(setOffsets, 400);
-  window.addEventListener('resize', setOffsets);
+  setTimeout(setOffsets,100);
+  setTimeout(setOffsets,400);
 })();
 
-// ==== Helpers ====
+// ===== Helpers =====
 const log=(m)=>{const el=document.getElementById('vLog'); if(!el) return; el.textContent+=(new Date()).toLocaleTimeString()+': '+m+'\n'; el.scrollTop=el.scrollHeight;};
 const setStatus=(s)=>{const n=document.getElementById('vStatus'); if(n) n.textContent=s;};
 const setNote=(s)=>{const n=document.getElementById('vNote'); if(n) n.textContent=s;};
@@ -210,7 +234,7 @@ function signed(x){const s=Number(x);const c=s>=0?'good':'bad';return `<span cla
 function parseNum(v){const n=Number(v);return isFinite(n)?n:0;}
 function computeDurationMin(entryD,entryT,exitD,exitT){if(!entryT||!exitT)return'';const sd=entryD||new Date().toISOString().slice(0,10);const ed=exitD||sd;const start=new Date(sd+'T'+entryT);const end=new Date(ed+'T'+exitT);const ms=end-start;if(!isFinite(ms))return'';return Math.max(0,Math.round(ms/60000));}
 
-// ==== Storage & global commission ====
+// ===== Storage & global commission =====
 const storeKey='zt_trades_v1',gcRateKey='zt_gc_rate',gcAutoKey='zt_gc_auto';
 let trades=[]; try{trades=JSON.parse(localStorage.getItem(storeKey)||'[]');}catch{trades=[];}
 function saveTrades(v){try{localStorage.setItem(storeKey,JSON.stringify(v));}catch{}}
@@ -222,7 +246,7 @@ let gcRate=loadGcRate(),gcAuto=loadGcAuto(),lastAutoCommission=null;
 function computeCommissionFromGlobal(qty){if(!gcAuto)return null;if(gcRate==null||!isFinite(gcRate))return null;const q=Number(qty);if(!isFinite(q)||q<=0)return null;return gcRate*2*q;}
 function maybeAutoFillCommission(){const e=document.getElementById('commission'),q=document.getElementById('qty');if(!e||!q)return;const calc=computeCommissionFromGlobal(q.value);if(calc!=null){const cur=e.value;if(cur===''||(lastAutoCommission!=null&&Number(cur)===Number(lastAutoCommission))){e.value=calc.toFixed(2);lastAutoCommission=calc;}}}
 
-// ==== KPIs & charts ====
+// ===== KPIs & charts =====
 function filterByRange(arr,range){
   if(range==='all')return[...arr];
   const now=new Date();const start=new Date(now);
@@ -320,14 +344,14 @@ function refreshChips(){
   document.addEventListener('input',(e)=>{ if(e.target && e.target.id===id) refreshChips();});
 });
 
-// ==== Voice (with Chrome-required banner) ====
+// ===== Voice with Chrome banner & robust toggling =====
 const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
 const voiceBtn=document.getElementById('voiceBtn'),voiceDot=document.getElementById('voiceDot'),keepAlive=document.getElementById('keepAlive'),primeBtn=document.getElementById('primeMicBtn');
 const envPill=document.getElementById('envPill');
 document.getElementById('vEngine').textContent=SR?(window.SpeechRecognition?'SpeechRecognition':'webkitSpeechRecognition'):'None';
 envPill.textContent=(window.isSecureContext?'HTTPS':'NOT-HTTPS')+' · SR:'+(SR?'yes':'no');
 
-/* Show warning banner if SR is not supported (i.e., non-Chrome contexts) */
+/* Show warning banner if SR not supported */
 (function chromeBanner(){
   const banner=document.getElementById('browserWarn');
   const dismiss=document.getElementById('dismissWarn');
@@ -335,7 +359,7 @@ envPill.textContent=(window.isSecureContext?'HTTPS':'NOT-HTTPS')+' · SR:'+(SR?'
   if(!SR && banner){
     if(localStorage.getItem(key)!=='1'){
       banner.style.display='block';
-      dismiss?.addEventListener('click',()=>{banner.style.display='none';localStorage.setItem(key,'1');});
+      dismiss?.addEventListener('click',()=>{banner.style.display='none';localStorage.setItem(key,'1'); window.dispatchEvent(new Event('resize'));});
     }
   }
 })();
@@ -346,12 +370,15 @@ if(!SR){
   document.getElementById('vNote').textContent = 'Voice not available here. Open in Chrome/Edge over HTTPS for dictation.';
 }
 
+// mic permission state into log
+navigator.permissions?.query?.({name:'microphone'}).then(p=>{ log('Mic permission state: '+p.state); });
+
 let rec=null,listening=false,wantListen=false,lastResultAt=0,watchdogId=null;
 let draft={date:'',symbol:'',direction:'',qty:'',entry:'',exit:'',commission:'',entryTime:'',exitTime:'',duration:''};
 
 async function primeMic(){
   try{const s=await navigator.mediaDevices.getUserMedia({audio:true}); s.getTracks().forEach(t=>t.stop()); log('Mic primed.'); return true;}
-  catch(e){log('Mic permission error: '+e.name+' '+e.message); alert('Allow microphone in Site settings, then reload.'); return false;}
+  catch(e){log('Mic permission error: '+e.name+' '+e.message); alert('Allow microphone (lock icon → Site settings → Microphone: Allow), then reload.'); return false;}
 }
 if(primeBtn) primeBtn.onclick=primeMic;
 
@@ -359,8 +386,8 @@ function startRecognizer(){
   if(!SR){return;}
   if(rec){try{rec.onresult=rec.onend=rec.onerror=null;rec.stop();}catch{}rec=null;}
   rec=new SR(); rec.lang=document.getElementById('lang').value||'en-US'; rec.interimResults=true; rec.continuous=true;
-  rec.onstart=()=>{listening=true;setStatus('listening');voiceDot.classList.add('live');log('onstart');lastResultAt=Date.now();};
-  rec.onend=()=>{listening=false;voiceDot.classList.remove('live');setStatus('idle');log('onend');if(wantListen&&keepAlive.checked){setTimeout(()=>{log('auto-restart (onend)');startRecognizer();},600);}};
+  rec.onstart=()=>{listening=true;window.__zt_listening__=true;setStatus('listening');voiceDot.classList.add('live');log('onstart');lastResultAt=Date.now();};
+  rec.onend=()=>{listening=false;window.__zt_listening__=false;voiceDot.classList.remove('live');setStatus('idle');log('onend');if(wantListen&&keepAlive.checked){setTimeout(()=>{log('auto-restart (onend)');startRecognizer();},600);}};
   rec.onerror=(e)=>{log('onerror '+(e.error||'')+': '+(e.message||''));if(wantListen&&keepAlive.checked&&['aborted','no-speech','audio-capture','network'].includes(e.error||'')){try{rec.stop();}catch{}setTimeout(()=>{log('auto-restart after error');startRecognizer();},800);}if((e.error||'')==='not-allowed'){wantListen=false;alert('Microphone blocked.');}};
   rec.onresult=(ev)=>{
     for(let i=ev.resultIndex;i<ev.results.length;i++){
@@ -375,8 +402,15 @@ function startRecognizer(){
   if(watchdogId)clearInterval(watchdogId);
   watchdogId=setInterval(()=>{if(wantListen&&keepAlive.checked&&listening){const idle=Date.now()-lastResultAt;if(idle>20000){log('watchdog idle → restarting');try{rec.stop();}catch{}startRecognizer();}}},5000);
 }
-function stopRecognizer(){wantListen=false;if(watchdogId){clearInterval(watchdogId);watchdogId=null;}if(rec){try{rec.stop();}catch{}}listening=false;setStatus('idle');voiceDot.classList.remove('live');log('stopped');}
-if(voiceBtn) voiceBtn.onclick=async()=>{ if(!SR) return; if(wantListen){stopRecognizer();return;} const ok=await primeMic(); if(!ok)return; wantListen=true; setStatus('starting'); startRecognizer(); };
+function stopRecognizer(){wantListen=false;if(watchdogId){clearInterval(watchdogId);watchdogId=null;}if(rec){try{rec.stop();}catch{}}listening=false;window.__zt_listening__=false;setStatus('idle');voiceDot.classList.remove('live');log('stopped');}
+
+// NEW: robust voice button toggler (always primes mic first)
+if (voiceBtn) voiceBtn.onclick = async () => {
+  const SRok = !!(window.SpeechRecognition||window.webkitSpeechRecognition);
+  if (!SRok) { alert('Voice requires Chrome or Microsoft Edge.'); return; }
+  const ok = await primeMic(); if (!ok) return;
+  if (window.__zt_listening__) { stopRecognizer(); } else { wantListen=true; setStatus('starting'); startRecognizer(); }
+};
 
 function summarizeDraft(){
   return `Draft: ${draft.symbol||'[symbol]'} ${draft.direction||'[dir]'} qty ${draft.qty||'[qty]'}, entry ${draft.entry||'[entry]'}, exit ${draft.exit||'[exit]'}${draft.entryTime?(', entry time '+draft.entryTime):''}${draft.exitTime?(', exit time '+draft.exitTime):''}${draft.date?(', date '+draft.date):''}.`;
@@ -403,9 +437,9 @@ function parseDatePhrase(t){
   let m=t.match(/\b(\d{4})-(\d{2})-(\d{2})\b/); if(m){return `${m[1]}-${m[2]}-${m[3]}`;}
   m=t.match(/\b(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})\b/);
   if(m){let y=m[3]; if(y.length===2){y=(+y<70?'20'+y:'19'+y);} const mm=String(+m[1]).padStart(2,'0'); const dd=String(+m[2]).padStart(2,'0'); return `${y}-${mm}-${dd}`;}
-  const monthRegex=new RegExp(`\b(${MONTHS.join('|')})\s+(\d{1,2})(?:,\s*(\d{4}))?`);
+  const monthRegex=new RegExp(`\\b(${MONTHS.join('|')})\\s+(\\d{1,2})(?:,\\s*(\\d{4}))?`);
   m=t.match(monthRegex); if(m){const month=String(MONTHS.indexOf(m[1])+1).padStart(2,'0'); const day=String(+m[2]).padStart(2,'0'); const year=m[3]||String(new Date().getFullYear()); return `${year}-${month}-${day}`;}
-  const dayMonthRegex=new RegExp(`\b(\d{1,2})\s+(${MONTHS.join('|')})(?:,\s*(\d{4}))?`);
+  const dayMonthRegex=new RegExp(`\\b(\\d{1,2})\\s+(${MONTHS.join('|')})(?:,\\s*(\\d{4}))?`);
   m=t.match(dayMonthRegex); if(m){const month=String(MONTHS.indexOf(m[2])+1).padStart(2,'0'); const day=String(+m[1]).padStart(2,'0'); const year=m[3]||String(new Date().getFullYear()); return `${year}-${month}-${day}`;}
   return null;
 }
@@ -426,13 +460,62 @@ function handleUtteranceLive(raw,isFinal){
   const mExit=t.match(/\bexit\b(?:\s+price)?(?:\s+at)?\s+(\d+(?:\.\d+)?)/); if(mExit){ draft.exit=mExit[1]; changed=true; }
   const mComm=t.match(/\bcommission\b\s+(\d+(?:\.\d+)?)/); if(mComm){ draft.commission=mComm[1]; changed=true; }
   const mET=t.match(/\bentry\s*time\s+(\d{1,2}[:\.]?\d{2}(?:\s?[ap]m)?)/); if(mET){ const v=toTime24(mET[1]); if(v){ draft.entryTime=v; changed=true; } }
-  const mXT=t.match(/\bexit\s*time\s+(\d{1,2}[:\.
-	
+  const mXT=t.match(/\bexit\s*time\s+(\d{1,2}[:\.]?\d{2}(?:\s?[ap]m)?)/); if(mXT){ const v=toTime24(mXT[1]); if(v){ draft.exitTime=v; changed=true; } }
+  const mDate=t.match(/\bdate\b(.*)$/); if(mDate){ const parsed=parseDatePhrase(mDate[1]); if(parsed){ draft.date=parsed; changed=true; } }
+  if(changed && document.getElementById('liveFill').checked){ applyDraftToForm(); setNote('Fields updated from voice. Say “review” then “confirm”.'); }
+}
 
-	
+// ===== UI wiring =====
+document.getElementById('rangeSelect').addEventListener('change',render);
+document.getElementById('importBtn').addEventListener('click',()=>document.getElementById('importFile').click());
+document.getElementById('exportBtn').addEventListener('click',()=>{
+  const rows=[['date','symbol','direction','qty','entry','exit','commission','entryTime','exitTime','duration','points','gross','net']];
+  for(const t of trades){rows.push([t.date,t.symbol,t.direction,t.qty,t.entry,t.exit,t.commission,t.entryTime,t.exitTime,t.duration,t.points,t.gross,t.net]);}
+  const csv=rows.map(r=>r.join(',')).join('\n');
+  const blob=new Blob([csv],{type:'text/csv'}); const url=URL.createObjectURL(blob);
+  const a=document.createElement('a'); a.href=url; a.download='trades.csv'; a.click(); URL.revokeObjectURL(url);
+});
+document.getElementById('importFile').addEventListener('change',(e)=>{
+  const f=e.target.files?.[0]; if(!f) return;
+  const reader=new FileReader();
+  reader.onload=()=>{ try{
+    const lines=String(reader.result).split(/\r?\n/).filter(Boolean);
+    const hdr=lines.shift().split(',');
+    const idx=(k)=>hdr.indexOf(k);
+    const out=[];
+    for(const line of lines){
+      const c=line.split(',');
+      const t={date:c[idx('date')],symbol:c[idx('symbol')],direction:c[idx('direction')],qty:+c[idx('qty')],entry:+c[idx('entry')],exit:+c[idx('exit')],commission:+c[idx('commission')],entryTime:c[idx('entryTime')],exitTime:c[idx('exitTime')],duration:+c[idx('duration')],points:+c[idx('points')],gross:+c[idx('gross')],net:+c[idx('net')]};
+      out.push(t);
+    }
+    trades=out; saveTrades(trades); render();
+  }catch(err){alert('Import failed: '+err.message);}};
+  reader.readAsText(f);
+});
+document.getElementById('addBtn').addEventListener('click',()=>{
+  const obj={date:document.getElementById('date').value,symbol:document.getElementById('symbol').value,direction:document.getElementById('direction').value,qty:document.getElementById('qty').value,entry:document.getElementById('entry').value,exit:document.getElementById('exit').value,commission:document.getElementById('commission').value,entryTime:document.getElementById('entryTime').value,exitTime:document.getElementById('exitTime').value,duration:document.getElementById('duration').value};
+  addTrade(obj);
+});
+document.getElementById('clearFormBtn').addEventListener('click',()=>{
+  ['date','symbol','direction','qty','entry','exit','commission','entryTime','exitTime','duration'].forEach(id=>{
+    const el=document.getElementById(id); if(!el) return;
+    if(el.tagName==='SELECT'){el.selectedIndex=0;} else {el.value='';}
+  });
+  refreshChips();
+});
+document.getElementById('wipeBtn').addEventListener('click',()=>{
+  if(confirm('Delete ALL trades?')){trades=[];saveTrades(trades);render();}
+});
 
-	
+// ===== Init =====
+document.getElementById('envPill').textContent=(window.isSecureContext?'HTTPS':'NOT-HTTPS')+' · SR:'+((window.SpeechRecognition||window.webkitSpeechRecognition)?'yes':'no');
+if(gcRate!=null){ const el=document.getElementById('gcRateInput'); if(el) el.value=gcRate.toFixed(2); }
+document.getElementById('gcAutoToggle').checked = loadGcAuto();
+document.getElementById('gcRateInput').addEventListener('input',()=>{ const v=Number(gcRateInput.value); if(isFinite(v)){ gcRate=v; saveGcRate(gcRate); maybeAutoFillCommission(); }});
+document.getElementById('gcAutoToggle').addEventListener('change',()=>{ const on=gcAutoToggle.checked; saveGcAuto(on); gcAuto=on; maybeAutoFillCommission(); });
 
-	
-
+refreshChips(); render();
+</script>
+</body>
+</html>
 	
