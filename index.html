@@ -12,7 +12,7 @@
 *{box-sizing:border-box}
 html{scroll-behavior:smooth;scroll-padding-top:calc(var(--headerHpx) + var(--controlsHpx) + 16px)}
 body{margin:0;font-family:system-ui,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--text)}
-/* Chrome-required banner (hidden by default) */
+/* Chrome-required banner */
 .topwarn{display:none;position:fixed;top:0;left:0;right:0;z-index:70;background:#7c2d12;color:#fff;border-bottom:1px solid #78350f}
 .topwarn .inner{max-width:1100px;margin:0 auto;padding:10px 16px;display:flex;gap:10px;align-items:center;justify-content:space-between}
 .topwarn button{background:#111827;border:1px solid #f59e0b;color:#fff;border-radius:999px;padding:6px 10px;cursor:pointer}
@@ -25,7 +25,7 @@ body{margin:0;font-family:system-ui,Segoe UI,Roboto,Arial,sans-serif;background:
              linear-gradient(90deg,#000 50%,#fff 0);
   box-shadow:0 6px 18px rgba(255,255,255,.08)}
 .title{font-size:40px;font-weight:800;letter-spacing:.4px;color:#fff;text-shadow:0 2px 12px rgba(0,0,0,.6)}
-/* Controls (now fixed, not sticky) */
+/* Controls (fixed) */
 header.controls{
   position:fixed; top:var(--headerHpx); left:0; right:0; z-index:50;
   display:flex;flex-wrap:wrap;align-items:center;gap:10px;justify-content:space-between;
@@ -111,7 +111,7 @@ canvas{background:#0b1220;border:1px solid #1f2937;border-radius:12px;padding:8p
     <label class="pill"><input type="checkbox" id="liveFill" checked> Live fill</label>
     <span class="pill" id="envPill">env: ?</span>
     <label class="pill"><input type="checkbox" id="ttsToggle" checked> 🔈 Speak on review & save</label>
-    <span class="pill">ZTP v3.4</span>
+    <span class="pill">ZTP v3.5</span>
   </div>
 </header>
 
@@ -147,7 +147,7 @@ canvas{background:#0b1220;border:1px solid #1f2937;border-radius:12px;padding:8p
       </div>
       <div style="margin-top:8px;color:#93c5fd">
         Engine: <span id="vEngine">?</span> — Status: <span id="vStatus">idle</span> —
-        <span id="vNote">Say “symbol ES, long, qty 1, entry 5000, exit 5010, date today … review … confirm”.</span>
+        <span id="vNote">Say: “symbol ES, long, qty 1, entry 5000, exit 5010, date today … review … confirm”.</span>
       </div>
       <pre id="vLog" style="margin-top:8px"></pre>
     </div>
@@ -185,330 +185,22 @@ canvas{background:#0b1220;border:1px solid #1f2937;border-radius:12px;padding:8p
     <h2>Commissions Over Time</h2>
     <canvas id="commChart" height="180"></canvas>
   </div>
-  <div class="footerVer">ZTP v3.4</div>
+  <div class="footerVer">ZTP v3.5</div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-// ===== Layout: measure bars and set spacer =====
-(function adjustOffsets(){
+// ===== Layout: measure bars, set spacer, keep it correct on changes =====
+(function layoutGuard(){
   function setOffsets(){
     const warn = document.getElementById('browserWarn');
-    const warnH = (warn && getComputedStyle(warn).display!=='none') ? warn.offsetHeight : 0;
     const header = document.querySelector('.banner');
     const controls = document.querySelector('header.controls');
     const shim = document.getElementById('topShim');
     const wrap = document.querySelector('.wrap');
-    if(!header || !controls || !shim || !wrap) return;
+    if(!header || !controls || !
+	
 
-    const H = (header.offsetHeight || 120) + warnH;
-    const C = (controls.offsetHeight || 64);
-
-    document.documentElement.style.setProperty('--headerHpx', H+'px');
-    document.documentElement.style.setProperty('--controlsHpx', C+'px');
-
-    shim.style.height = (H + C + 16) + 'px';
-    wrap.style.marginTop = '8px';
-  }
-  ['load','resize'].forEach(evt=>window.addEventListener(evt,setOffsets));
-  document.addEventListener('readystatechange', setOffsets);
-  setTimeout(setOffsets,100);
-  setTimeout(setOffsets,400);
-})();
-
-// ===== Helpers =====
-const log=(m)=>{const el=document.getElementById('vLog'); if(!el) return; el.textContent+=(new Date()).toLocaleTimeString()+': '+m+'\n'; el.scrollTop=el.scrollHeight;};
-const setStatus=(s)=>{const n=document.getElementById('vStatus'); if(n) n.textContent=s;};
-const setNote=(s)=>{const n=document.getElementById('vNote'); if(n) n.textContent=s;};
-function fmt(x){return Number(x).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});}
-function signed(x){const s=Number(x);const c=s>=0?'good':'bad';return `<span class="pillstat ${c}">${s>=0?'+':''}${fmt(s)}</span>`;}
-function parseNum(v){const n=Number(v);return isFinite(n)?n:0;}
-function computeDurationMin(entryD,entryT,exitD,exitT){if(!entryT||!exitT)return'';const sd=entryD||new Date().toISOString().slice(0,10);const ed=exitD||sd;const start=new Date(sd+'T'+entryT);const end=new Date(ed+'T'+exitT);const ms=end-start;if(!isFinite(ms))return'';return Math.max(0,Math.round(ms/60000));}
-
-// ===== Storage & global commission =====
-const storeKey='zt_trades_v1',gcRateKey='zt_gc_rate',gcAutoKey='zt_gc_auto';
-let trades=[]; try{trades=JSON.parse(localStorage.getItem(storeKey)||'[]');}catch{trades=[];}
-function saveTrades(v){try{localStorage.setItem(storeKey,JSON.stringify(v));}catch{}}
-function loadGcRate(){const v=localStorage.getItem(gcRateKey);return v?Number(v):null;}
-function saveGcRate(v){localStorage.setItem(gcRateKey,String(v));}
-function loadGcAuto(){return localStorage.getItem(gcAutoKey)!=='false';}
-function saveGcAuto(f){localStorage.setItem(gcAutoKey,f?'true':'false');}
-let gcRate=loadGcRate(),gcAuto=loadGcAuto(),lastAutoCommission=null;
-function computeCommissionFromGlobal(qty){if(!gcAuto)return null;if(gcRate==null||!isFinite(gcRate))return null;const q=Number(qty);if(!isFinite(q)||q<=0)return null;return gcRate*2*q;}
-function maybeAutoFillCommission(){const e=document.getElementById('commission'),q=document.getElementById('qty');if(!e||!q)return;const calc=computeCommissionFromGlobal(q.value);if(calc!=null){const cur=e.value;if(cur===''||(lastAutoCommission!=null&&Number(cur)===Number(lastAutoCommission))){e.value=calc.toFixed(2);lastAutoCommission=calc;}}}
-
-// ===== KPIs & charts =====
-function filterByRange(arr,range){
-  if(range==='all')return[...arr];
-  const now=new Date();const start=new Date(now);
-  if(range==='day'){start.setHours(0,0,0,0);return arr.filter(x=>new Date(x.date)>=start);}
-  if(range==='week'){const dt=new Date(now);const day=(dt.getDay()+6)%7;dt.setDate(dt.getDate()-day);dt.setHours(0,0,0,0);return arr.filter(x=>new Date(x.date)>=dt);}
-  if(range==='month'){start.setDate(1);start.setHours(0,0,0,0);return arr.filter(x=>new Date(x.date)>=start);}
-  if(range==='year'){start.setMonth(0,1);start.setHours(0,0,0,0);return arr.filter(x=>new Date(x.date)>=start);}
-  return arr;
-}
-function groupBy(arr,gran,metric='net'){
-  const map=new Map();
-  const keyFor=(t)=>{
-    const d=new Date(t.date);
-    if(gran==='day')return t.date;
-    if(gran==='week'){const s=new Date(d);const day=(s.getDay()+6)%7;s.setDate(s.getDate()-day);s.setHours(0,0,0,0);return s.toISOString().slice(0,10);}
-    if(gran==='month')return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
-    if(gran==='year')return String(d.getFullYear());
-    return t.date;
-  };
-  for(const t of arr){
-    const k=keyFor(t);
-    const v=metric==='commission'?t.commission:(metric==='gross'?t.gross:t.net);
-    map.set(k,(map.get(k)||0)+v);
-  }
-  const labels=[...map.keys()].sort();
-  return{labels,data:labels.map(k=>map.get(k))};
-}
-let plChart=null,commChart=null;
-function drawCharts(filtered){
-  const gran=document.getElementById('granSelect').value,metric=document.getElementById('metricSelect').value;
-  const pl=groupBy(filtered,gran,metric);
-  const cc=groupBy(filtered,gran,'commission');
-  if(plChart)plChart.destroy();
-  plChart=new Chart(document.getElementById('plChart'),{type:'line',data:{labels:pl.labels,datasets:[{label:metric.toUpperCase(),data:pl.data}]},options:{responsive:true,plugins:{legend:{display:true}},scales:{x:{ticks:{color:'#9ca3af'}},y:{ticks:{color:'#9ca3af'}}}}});
-  if(commChart)commChart.destroy();
-  commChart=new Chart(document.getElementById('commChart'),{type:'bar',data:{labels:cc.labels,datasets:[{label:'Commissions',data:cc.data}]},options:{responsive:true,plugins:{legend:{display:true}},scales:{x:{ticks:{color:'#9ca3af'}},y:{ticks:{color:'#9ca3af'}}}}});
-}
-function render(){
-  const range=document.getElementById('rangeSelect').value;
-  const filtered=filterByRange(trades,range);
-  const net=filtered.reduce((a,b)=>a+b.net,0);
-  const wins=filtered.filter(x=>x.net>0).length;
-  const avgWin=wins?(filtered.filter(x=>x.net>0).reduce((a,b)=>a+b.net,0)/wins):0;
-  const comm=filtered.reduce((a,b)=>a+b.commission,0);
-  document.getElementById('kNet').innerHTML=signed(net);
-  document.getElementById('kWin').textContent=(filtered.length?(wins/filtered.length*100).toFixed(1):'0.0')+'%';
-  document.getElementById('kAvgWin').textContent=fmt(avgWin);
-  document.getElementById('kComm').textContent=fmt(comm);
-  drawCharts(filtered);
-}
-function addTrade(obj){
-  let commissionVal=obj.commission;
-  const qtyNum=parseInt(obj.qty||1,10);
-  const commissionEl=document.getElementById('commission');
-  const looksManual=commissionEl&&commissionEl.value!==''&&(lastAutoCommission==null||Number(commissionEl.value)!==Number(lastAutoCommission));
-  if(!looksManual){const calc=computeCommissionFromGlobal(qtyNum);if(calc!=null)commissionVal=calc;}
-  const t={
-    id:crypto.randomUUID(),
-    date:obj.date||new Date().toISOString().slice(0,10),
-    symbol:(obj.symbol||'').trim().toUpperCase(),
-    direction:obj.direction||'Long',
-    qty:parseInt(obj.qty||1,10),
-    entry:parseNum(obj.entry),
-    exit:parseNum(obj.exit),
-    commission:parseNum(commissionVal),
-    entryTime:obj.entryTime||'',
-    exitTime:obj.exitTime||'',
-    duration:obj.duration||computeDurationMin(obj.date,obj.entryTime,obj.date,obj.exitTime)
-  };
-  const sign=t.direction==='Long'?1:-1;
-  const pts=(t.exit-t.entry)*sign;
-  const gross=pts*t.qty;
-  const net=gross-t.commission;
-  t.points=pts; t.gross=gross; t.net=net;
-  trades.push(t); saveTrades(trades); render();
-}
-
-/* Chips under form fields */
-function refreshChips(){
-  const bar=document.getElementById('chipBar');
-  const fmtChip=(k,v)=>`<span class="chip ${v?'ok':''}">${k}: ${v||'—'}</span>`;
-  bar.innerHTML=[
-    fmtChip('Date',document.getElementById('date').value),
-    fmtChip('Symbol',document.getElementById('symbol').value),
-    fmtChip('Dir',document.getElementById('direction').value),
-    fmtChip('Qty',document.getElementById('qty').value),
-    fmtChip('Entry',document.getElementById('entry').value),
-    fmtChip('Exit',document.getElementById('exit').value),
-    fmtChip('Comm',document.getElementById('commission').value),
-    fmtChip('E.Time',document.getElementById('entryTime').value),
-    fmtChip('X.Time',document.getElementById('exitTime').value),
-  ].join(' ');
-}
-['date','symbol','direction','qty','entry','exit','commission','entryTime','exitTime'].forEach(id=>{
-  document.addEventListener('input',(e)=>{ if(e.target && e.target.id===id) refreshChips();});
-});
-
-// ===== Voice with Chrome banner & robust toggling =====
-const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
-const voiceBtn=document.getElementById('voiceBtn'),voiceDot=document.getElementById('voiceDot'),keepAlive=document.getElementById('keepAlive'),primeBtn=document.getElementById('primeMicBtn');
-const envPill=document.getElementById('envPill');
-document.getElementById('vEngine').textContent=SR?(window.SpeechRecognition?'SpeechRecognition':'webkitSpeechRecognition'):'None';
-envPill.textContent=(window.isSecureContext?'HTTPS':'NOT-HTTPS')+' · SR:'+(SR?'yes':'no');
-
-/* Show warning banner if SR not supported */
-(function chromeBanner(){
-  const banner=document.getElementById('browserWarn');
-  const dismiss=document.getElementById('dismissWarn');
-  const key='ztp_dismiss_banner';
-  if(!SR && banner){
-    if(localStorage.getItem(key)!=='1'){
-      banner.style.display='block';
-      dismiss?.addEventListener('click',()=>{banner.style.display='none';localStorage.setItem(key,'1'); window.dispatchEvent(new Event('resize'));});
-    }
-  }
-})();
-
-if(!SR){
-  voiceBtn.disabled = true;
-  voiceBtn.title = 'Voice input requires Chrome or Microsoft Edge.';
-  document.getElementById('vNote').textContent = 'Voice not available here. Open in Chrome/Edge over HTTPS for dictation.';
-}
-
-// mic permission state into log
-navigator.permissions?.query?.({name:'microphone'}).then(p=>{ log('Mic permission state: '+p.state); });
-
-let rec=null,listening=false,wantListen=false,lastResultAt=0,watchdogId=null;
-let draft={date:'',symbol:'',direction:'',qty:'',entry:'',exit:'',commission:'',entryTime:'',exitTime:'',duration:''};
-
-async function primeMic(){
-  try{const s=await navigator.mediaDevices.getUserMedia({audio:true}); s.getTracks().forEach(t=>t.stop()); log('Mic primed.'); return true;}
-  catch(e){log('Mic permission error: '+e.name+' '+e.message); alert('Allow microphone (lock icon → Site settings → Microphone: Allow), then reload.'); return false;}
-}
-if(primeBtn) primeBtn.onclick=primeMic;
-
-function startRecognizer(){
-  if(!SR){return;}
-  if(rec){try{rec.onresult=rec.onend=rec.onerror=null;rec.stop();}catch{}rec=null;}
-  rec=new SR(); rec.lang=document.getElementById('lang').value||'en-US'; rec.interimResults=true; rec.continuous=true;
-  rec.onstart=()=>{listening=true;window.__zt_listening__=true;setStatus('listening');voiceDot.classList.add('live');log('onstart');lastResultAt=Date.now();};
-  rec.onend=()=>{listening=false;window.__zt_listening__=false;voiceDot.classList.remove('live');setStatus('idle');log('onend');if(wantListen&&keepAlive.checked){setTimeout(()=>{log('auto-restart (onend)');startRecognizer();},600);}};
-  rec.onerror=(e)=>{log('onerror '+(e.error||'')+': '+(e.message||''));if(wantListen&&keepAlive.checked&&['aborted','no-speech','audio-capture','network'].includes(e.error||'')){try{rec.stop();}catch{}setTimeout(()=>{log('auto-restart after error');startRecognizer();},800);}if((e.error||'')==='not-allowed'){wantListen=false;alert('Microphone blocked.');}};
-  rec.onresult=(ev)=>{
-    for(let i=ev.resultIndex;i<ev.results.length;i++){
-      const seg=ev.results[i][0].transcript;
-      const isFinal=ev.results[i].isFinal;
-      log((isFinal?'final: ':'interim: ')+seg);
-      handleUtteranceLive(seg, isFinal);
-      lastResultAt=Date.now();
-    }
-  };
-  try{rec.start();}catch(e){log('start error: '+e.message);}
-  if(watchdogId)clearInterval(watchdogId);
-  watchdogId=setInterval(()=>{if(wantListen&&keepAlive.checked&&listening){const idle=Date.now()-lastResultAt;if(idle>20000){log('watchdog idle → restarting');try{rec.stop();}catch{}startRecognizer();}}},5000);
-}
-function stopRecognizer(){wantListen=false;if(watchdogId){clearInterval(watchdogId);watchdogId=null;}if(rec){try{rec.stop();}catch{}}listening=false;window.__zt_listening__=false;setStatus('idle');voiceDot.classList.remove('live');log('stopped');}
-
-// NEW: robust voice button toggler (always primes mic first)
-if (voiceBtn) voiceBtn.onclick = async () => {
-  const SRok = !!(window.SpeechRecognition||window.webkitSpeechRecognition);
-  if (!SRok) { alert('Voice requires Chrome or Microsoft Edge.'); return; }
-  const ok = await primeMic(); if (!ok) return;
-  if (window.__zt_listening__) { stopRecognizer(); } else { wantListen=true; setStatus('starting'); startRecognizer(); }
-};
-
-function summarizeDraft(){
-  return `Draft: ${draft.symbol||'[symbol]'} ${draft.direction||'[dir]'} qty ${draft.qty||'[qty]'}, entry ${draft.entry||'[entry]'}, exit ${draft.exit||'[exit]'}${draft.entryTime?(', entry time '+draft.entryTime):''}${draft.exitTime?(', exit time '+draft.exitTime):''}${draft.date?(', date '+draft.date):''}.`;
-}
-function applyDraftToForm(){
-  const g=id=>document.getElementById(id);
-  if(draft.symbol){g('symbol').value=draft.symbol;}
-  if(draft.direction){g('direction').value=draft.direction;}
-  if(draft.qty){g('qty').value=draft.qty; maybeAutoFillCommission();}
-  if(draft.entry){g('entry').value=draft.entry;}
-  if(draft.exit){g('exit').value=draft.exit;}
-  if(draft.commission){g('commission').value=draft.commission;}
-  if(draft.entryTime){g('entryTime').value=draft.entryTime;}
-  if(draft.exitTime){g('exitTime').value=draft.exitTime;}
-  if(draft.date){g('date').value=draft.date;}
-  refreshChips();
-}
-function toTime24(s){if(!s)return null;s=s.replace(/\./g,':').replace(/\s+/g,'').toLowerCase();const m=s.match(/^(\d{1,2}):?(\d{2})?(am|pm)?$/);if(!m)return null;let h=parseInt(m[1],10),min=m[2]?parseInt(m[2],10):0;const ap=m[3];if(ap==='am'&&h===12)h=0;if(ap==='pm'&&h<12)h+=12;if(h>23||min>59)return null;return String(h).padStart(2,'0')+':'+String(min).padStart(2,'0');}
-const MONTHS=['january','february','march','april','may','june','july','august','september','october','november','december'];
-function parseDatePhrase(t){
-  t=t.toLowerCase().trim();
-  if(/\btoday\b/.test(t)) return new Date().toISOString().slice(0,10);
-  if(/\byesterday\b/.test(t)) return new Date(Date.now()-86400000).toISOString().slice(0,10);
-  let m=t.match(/\b(\d{4})-(\d{2})-(\d{2})\b/); if(m){return `${m[1]}-${m[2]}-${m[3]}`;}
-  m=t.match(/\b(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})\b/);
-  if(m){let y=m[3]; if(y.length===2){y=(+y<70?'20'+y:'19'+y);} const mm=String(+m[1]).padStart(2,'0'); const dd=String(+m[2]).padStart(2,'0'); return `${y}-${mm}-${dd}`;}
-  const monthRegex=new RegExp(`\\b(${MONTHS.join('|')})\\s+(\\d{1,2})(?:,\\s*(\\d{4}))?`);
-  m=t.match(monthRegex); if(m){const month=String(MONTHS.indexOf(m[1])+1).padStart(2,'0'); const day=String(+m[2]).padStart(2,'0'); const year=m[3]||String(new Date().getFullYear()); return `${year}-${month}-${day}`;}
-  const dayMonthRegex=new RegExp(`\\b(\\d{1,2})\\s+(${MONTHS.join('|')})(?:,\\s*(\\d{4}))?`);
-  m=t.match(dayMonthRegex); if(m){const month=String(MONTHS.indexOf(m[2])+1).padStart(2,'0'); const day=String(+m[1]).padStart(2,'0'); const year=m[3]||String(new Date().getFullYear()); return `${year}-${month}-${day}`;}
-  return null;
-}
-function handleUtteranceLive(raw,isFinal){
-  const t=raw.trim().toLowerCase();
-  if(/\b(cancel|reset|clear)\b/.test(t)){draft={date:'',symbol:'',direction:'',qty:'',entry:'',exit:'',commission:'',entryTime:'',exitTime:'',duration:''};setNote('Draft cleared.');applyDraftToForm();return;}
-  if(/\b(review|read back|recap)\b/.test(t)){const summary=summarizeDraft(); setNote(summary); try{ if(document.getElementById('ttsToggle').checked){ speechSynthesis.cancel(); speechSynthesis.speak(new SpeechSynthesisUtterance(summary)); }}catch{} return;}
-  if(/\b(confirm|submit(\s+trade)?|save(\s+trade)?)\b/.test(t)){
-    const obj={date:draft.date||document.getElementById('date').value,symbol:draft.symbol||document.getElementById('symbol').value,direction:draft.direction||document.getElementById('direction').value||'Long',qty:draft.qty||document.getElementById('qty').value||1,entry:draft.entry||document.getElementById('entry').value,exit:draft.exit||document.getElementById('exit').value,commission:draft.commission||document.getElementById('commission').value,entryTime:draft.entryTime||document.getElementById('entryTime').value,exitTime:draft.exitTime||document.getElementById('exitTime').value,duration:draft.duration||document.getElementById('duration').value};
-    addTrade(obj); setNote('Trade saved.'); try{ if(document.getElementById('ttsToggle').checked){ speechSynthesis.cancel(); speechSynthesis.speak(new SpeechSynthesisUtterance(`Saved ${obj.symbol||''} ${obj.direction||''} quantity ${obj.qty||''}.`)); }}catch{} 
-    draft={date:'',symbol:'',direction:'',qty:'',entry:'',exit:'',commission:'',entryTime:'',exitTime:'',duration:''}; applyDraftToForm(); return;
-  }
-  let changed=false;
-  const mSym=t.match(/(?:symbol|ticker)\s+([a-z0-9\.]+)/); if(mSym){ draft.symbol=mSym[1].toUpperCase(); changed=true; }
-  if(/\bshort\b/.test(t)){ draft.direction='Short'; changed=true; } else if(/\blong\b/.test(t)){ draft.direction='Long'; changed=true; }
-  let mQty=t.match(/(?:qty|quantity|size|contracts?)\s+(\d+)/); if(!mQty)mQty=t.match(/\b(\d+)\s+(?:contracts?|contract|lots?)\b/); if(mQty){ draft.qty=mQty[1]; changed=true; }
-  const mEntry=t.match(/\bentry\b(?:\s+price)?(?:\s+at)?\s+(\d+(?:\.\d+)?)/); if(mEntry){ draft.entry=mEntry[1]; changed=true; }
-  const mExit=t.match(/\bexit\b(?:\s+price)?(?:\s+at)?\s+(\d+(?:\.\d+)?)/); if(mExit){ draft.exit=mExit[1]; changed=true; }
-  const mComm=t.match(/\bcommission\b\s+(\d+(?:\.\d+)?)/); if(mComm){ draft.commission=mComm[1]; changed=true; }
-  const mET=t.match(/\bentry\s*time\s+(\d{1,2}[:\.]?\d{2}(?:\s?[ap]m)?)/); if(mET){ const v=toTime24(mET[1]); if(v){ draft.entryTime=v; changed=true; } }
-  const mXT=t.match(/\bexit\s*time\s+(\d{1,2}[:\.]?\d{2}(?:\s?[ap]m)?)/); if(mXT){ const v=toTime24(mXT[1]); if(v){ draft.exitTime=v; changed=true; } }
-  const mDate=t.match(/\bdate\b(.*)$/); if(mDate){ const parsed=parseDatePhrase(mDate[1]); if(parsed){ draft.date=parsed; changed=true; } }
-  if(changed && document.getElementById('liveFill').checked){ applyDraftToForm(); setNote('Fields updated from voice. Say “review” then “confirm”.'); }
-}
-
-// ===== UI wiring =====
-document.getElementById('rangeSelect').addEventListener('change',render);
-document.getElementById('importBtn').addEventListener('click',()=>document.getElementById('importFile').click());
-document.getElementById('exportBtn').addEventListener('click',()=>{
-  const rows=[['date','symbol','direction','qty','entry','exit','commission','entryTime','exitTime','duration','points','gross','net']];
-  for(const t of trades){rows.push([t.date,t.symbol,t.direction,t.qty,t.entry,t.exit,t.commission,t.entryTime,t.exitTime,t.duration,t.points,t.gross,t.net]);}
-  const csv=rows.map(r=>r.join(',')).join('\n');
-  const blob=new Blob([csv],{type:'text/csv'}); const url=URL.createObjectURL(blob);
-  const a=document.createElement('a'); a.href=url; a.download='trades.csv'; a.click(); URL.revokeObjectURL(url);
-});
-document.getElementById('importFile').addEventListener('change',(e)=>{
-  const f=e.target.files?.[0]; if(!f) return;
-  const reader=new FileReader();
-  reader.onload=()=>{ try{
-    const lines=String(reader.result).split(/\r?\n/).filter(Boolean);
-    const hdr=lines.shift().split(',');
-    const idx=(k)=>hdr.indexOf(k);
-    const out=[];
-    for(const line of lines){
-      const c=line.split(',');
-      const t={date:c[idx('date')],symbol:c[idx('symbol')],direction:c[idx('direction')],qty:+c[idx('qty')],entry:+c[idx('entry')],exit:+c[idx('exit')],commission:+c[idx('commission')],entryTime:c[idx('entryTime')],exitTime:c[idx('exitTime')],duration:+c[idx('duration')],points:+c[idx('points')],gross:+c[idx('gross')],net:+c[idx('net')]};
-      out.push(t);
-    }
-    trades=out; saveTrades(trades); render();
-  }catch(err){alert('Import failed: '+err.message);}};
-  reader.readAsText(f);
-});
-document.getElementById('addBtn').addEventListener('click',()=>{
-  const obj={date:document.getElementById('date').value,symbol:document.getElementById('symbol').value,direction:document.getElementById('direction').value,qty:document.getElementById('qty').value,entry:document.getElementById('entry').value,exit:document.getElementById('exit').value,commission:document.getElementById('commission').value,entryTime:document.getElementById('entryTime').value,exitTime:document.getElementById('exitTime').value,duration:document.getElementById('duration').value};
-  addTrade(obj);
-});
-document.getElementById('clearFormBtn').addEventListener('click',()=>{
-  ['date','symbol','direction','qty','entry','exit','commission','entryTime','exitTime','duration'].forEach(id=>{
-    const el=document.getElementById(id); if(!el) return;
-    if(el.tagName==='SELECT'){el.selectedIndex=0;} else {el.value='';}
-  });
-  refreshChips();
-});
-document.getElementById('wipeBtn').addEventListener('click',()=>{
-  if(confirm('Delete ALL trades?')){trades=[];saveTrades(trades);render();}
-});
-
-// ===== Init =====
-document.getElementById('envPill').textContent=(window.isSecureContext?'HTTPS':'NOT-HTTPS')+' · SR:'+((window.SpeechRecognition||window.webkitSpeechRecognition)?'yes':'no');
-if(gcRate!=null){ const el=document.getElementById('gcRateInput'); if(el) el.value=gcRate.toFixed(2); }
-document.getElementById('gcAutoToggle').checked = loadGcAuto();
-document.getElementById('gcRateInput').addEventListener('input',()=>{ const v=Number(gcRateInput.value); if(isFinite(v)){ gcRate=v; saveGcRate(gcRate); maybeAutoFillCommission(); }});
-document.getElementById('gcAutoToggle').addEventListener('change',()=>{ const on=gcAutoToggle.checked; saveGcAuto(on); gcAuto=on; maybeAutoFillCommission(); });
-
-refreshChips(); render();
-</script>
-</body>
-</html>
 	
 
 	
