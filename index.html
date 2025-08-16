@@ -1,116 +1,17 @@
-
-	<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>ZenTrader Pro</title>
-
-<!-- Brush-style headline font for the logo text -->
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Kaushan+Script&display=swap" rel="stylesheet">
-
+<!doctype html>
+<meta charset="utf-8">
+<title>ZenTrader Pro — smoke test</title>
 <style>
-/* ===== THEME / LAYOUT VARS ===== */
-:root {
-  --bg:#000000;           /* app background */
-  --card:#0f172a;         /* card background */
-  --text:#e5e7eb;         /* light text */
-  --muted:#94a3b8;        /* muted text */
-  --accent:#16a34a;       /* green accent */
-  --good:#22c55e;         /* positive chip */
-  --bad:#ef4444;          /* negative chip */
-  --headerH:132px;        /* fixed banner height */
-  --controlsH:60px;       /* sticky controls bar height */
-}
-
-html {
-  scroll-behavior: smooth;
-  /* keep anchor jumps clear of fixed+sticky bars */
-  scroll-padding-top: calc(var(--headerH) + var(--controlsH) + 16px);
-}
-
-* { box-sizing: border-box }
-html, body { height: 100% }
-body {
-  margin: 0;
-  font-family: system-ui, Segoe UI, Roboto, Arial, sans-serif;
-  background: var(--bg);
-  color: var(--text);
-}
-
-/* ===== FIXED TOP BANNER (logo) ===== */
-.banner {
-  position: fixed; top: 0; left: 0; right: 0; z-index: 60;
-  height: var(--headerH);
-  display: flex; align-items: center; justify-content: center;
-  background: #000; 
-  border-bottom: 1px solid #111827;
-  box-shadow: 0 10px 30px rgba(0,0,0,.35);
-}
-
-.brand-row {
-  display: flex; align-items: center; gap: 16px;
-  padding: 10px 16px;
-}
-
-.yinyang {
-  width: 64px; height: 64px; flex: 0 0 auto;
-  filter: drop-shadow(0 6px 18px rgba(255,255,255,.1));
-}
-
-.brand-title {
-  font-family: 'Kaushan Script', system-ui, sans-serif;
-  font-size: 46px;
-  line-height: 1;
-  color: #ffffff;
-  letter-spacing: .2px;
-  text-shadow: 0 2px 8px rgba(0,0,0,.65);
-  white-space: nowrap;
-}
-
-/* ===== STICKY CONTROLS BAR ===== */
-header.controls {
-  position: sticky;
-  top: var(--headerH);
-  z-index: 50;
-  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
-  gap: 12px;
-  padding: 10px 16px;
-  background: rgba(15,23,42,.95);     /* slate-ish */
-  border-bottom: 1px solid #1f2937;
-  /* subtle separation from content */
-  box-shadow: 0 6px 18px rgba(0,0,0,.35);
-  backdrop-filter: blur(6px);
-}
-
-.pill {
-  display: inline-flex; align-items: center; gap: 6px;
-  padding: 4px 10px; border-radius: 999px;
-  background: #0b1220; color: #cbd5e1;
-  border: 1px solid #334155; font-size: 12px;
-}
-
-button {
-  background: var(--accent); color: #fff; border: none;
-  border-radius: 10px; padding: 10px 14px; cursor: pointer;
-}
-button.ghost { background: #0b1220; color: #fff; border: 1px solid #374151 }
-button.danger { background: var(--bad) }
-
-/* ===== PAGE WRAP & CARDS ===== */
-.wrap {
-  max-width: 1100px;
-  margin: calc(var(--headerH) + var(--controlsH) + 24px) auto 18px auto; /* clears both bars */
-  padding: 0 16px;
-}
-.grid { display: grid; grid-template-columns: 1.2fr .8fr; gap: 16px; }
-.card {
-  background: var(--card); border: 1px solid #1f2937; border-radius: 14px; padding: 14px;
-  box-shadow: 0 10px 30px rgba(0,0,0,.25); margin
-	
-
+  body{margin:0;background:#000;color:#fff;font:20px/1.4 system-ui,Segoe UI,Arial}
+  .wrap{padding:24px}
+  .box{padding:16px;border:1px solid #333;border-radius:10px;background:#111}
+</style>
+<div class="wrap">
+  <h1>✅ If you see this, Netlify is publishing the right file.</h1>
+  <p>This is a simple test page. Next step: paste the full dashboard back.</p>
+  <div class="box">Time now: <span id="t"></span></div>
+</div>
+<script>document.getElementById('t').textContent=new Date().toLocaleString();</script>
 
 	
 
