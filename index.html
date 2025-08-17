@@ -1,10 +1,11 @@
 <!DOCTYPE html>
-<html lang="en" data-build="ztp-v11.1-hotfix">
+<html lang="en" data-build="ztp-onefile-ornate-v12">
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>ZenTrader Pro — Dashboard</title>
 
+<!-- No-cache to defeat stale deploys -->
 <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0"/>
 <meta http-equiv="Pragma" content="no-cache"/>
 <meta http-equiv="Expires" content="0"/>
@@ -24,7 +25,13 @@ body{
   margin:0; font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial;
   color:var(--text);
   background:radial-gradient(900px 540px at 50% -180px,#182235 10%,var(--bg) 60%);
-  padding-top:160px;
+  padding-top:168px; /* set by JS as well */
+  overflow-x:hidden;
+}
+
+/* Kill any legacy/modern logos a theme might inject */
+header img, header .logo, header .site-logo, header .brand-logo, header [class*="logo"]{
+  display:none!important; background-image:none!important;
 }
 
 /* Header (sticky) */
@@ -32,15 +39,16 @@ header.brand{
   position:fixed; left:0; right:0; top:0; z-index:1000;
   backdrop-filter:saturate(130%) blur(4px);
   background:linear-gradient(180deg,rgba(16,24,39,.95),rgba(11,15,23,.92));
-  border-bottom:1px solid var(--border); padding:12px 16px 10px;
+  border-bottom:1px solid var(--border); padding:12px 16px 12px;
 }
 .brand-inner{max-width:1200px;margin:0 auto;display:grid;place-items:center}
+
 .brand-title{
-  margin:6px 0 0; font-weight:800; letter-spacing:.3px; font-size:32px; line-height:1.1;
+  margin:8px 0 0; font-weight:800; letter-spacing:.3px; font-size:34px; line-height:1.1;
   font-family:"Garamond","Times New Roman","Palatino Linotype","Book Antiqua",Georgia,serif;
   background:linear-gradient(180deg,#ffe08a,#d4af37 55%,#7a5e12 100%);
   -webkit-background-clip:text; background-clip:text; color:transparent;
-  text-shadow:0 1px 0 #46360a,0 2px 10px rgba(0,0,0,.45);
+  text-shadow:0 1px 0 #46360a,0 3px 12px rgba(0,0,0,.45);
 }
 .brand-sub{margin:2px 0 0;color:var(--muted);font-size:12px}
 .voice{display:flex;gap:10px;align-items:center;justify-content:center;margin:10px 0 0;flex-wrap:wrap}
@@ -76,8 +84,9 @@ footer{color:var(--muted);font-size:12px;text-align:center;padding:24px 0}
 <!-- Sticky Header with INLINE ORNATE LOGO -->
 <header class="brand" role="banner">
   <div class="brand-inner">
-    <!-- Ornate pirate-style golden balance (lopsided, sunlight from upper-left) -->
-    <svg id="logo-header" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 540" width="640" height="288" role="img" aria-label="ZenTrader Pro ornate golden balance logo">
+
+    <!-- Ornate pirate-style golden balance (lopsided, sunlight upper-left) -->
+    <svg id="logo-header" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 540" width="660" height="297" role="img" aria-label="ZenTrader Pro ornate golden balance logo">
       <defs>
         <linearGradient id="g1" x1="0" x2="0" y1="0" y2="1">
           <stop offset="0%" stop-color="#ffd063"/><stop offset="45%" stop-color="#d4af37"/>
@@ -104,8 +113,10 @@ footer{color:var(--muted);font-size:12px;text-align:center;padding:24px 0}
       </g>
       <g filter="url(#drop)"><rect x="578" y="240" width="44" height="190" rx="10" fill="url(#g1)" stroke="#b88a1c" stroke-width="4"/><circle cx="600" cy="236" r="26" fill="url(#g1)" stroke="#b88a1c" stroke-width="4"/></g>
       <g filter="url(#drop)"><path d="M240 200 L 960 160" stroke="url(#g1)" stroke-width="18" stroke-linecap="round"/><path d="M240 200 L 960 160" stroke="#ffe08a" stroke-opacity=".35" stroke-width="6" stroke-linecap="round"/><path d="M240 200 L 960 160" stroke="#7a5e12" stroke-opacity=".35" stroke-width="3" stroke-linecap="round"/></g>
+      <!-- Chains (left lower, right higher) -->
       <g stroke="url(#g1)" stroke-width="6" filter="url(#drop)"><line x1="340" y1="183" x2="340" y2="305"/><line x1="420" y1="180" x2="420" y2="302"/><line x1="380" y1="188" x2="380" y2="308"/></g>
       <g stroke="url(#g1)" stroke-width="6" filter="url(#drop)"><line x1="820" y1="169" x2="820" y2="245"/><line x1="880" y1="166" x2="880" y2="242"/><line x1="850" y1="170" x2="850" y2="246"/></g>
+      <!-- Left pan w/ ornate Z (low) -->
       <g filter="url(#drop)">
         <ellipse cx="380" cy="330" rx="135" ry="26" fill="#000" fill-opacity=".28"/>
         <g transform="translate(280,306)">
@@ -118,6 +129,7 @@ footer{color:var(--muted);font-size:12px;text-align:center;padding:24px 0}
           <path d="M-20,-18 h40 l-44,36 h48" fill="none" stroke="#ffe08a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" opacity=".9"/>
         </g>
       </g>
+      <!-- Right pan w/ cash stack (high) -->
       <g filter="url(#drop)">
         <ellipse cx="850" cy="270" rx="120" ry="22" fill="#000" fill-opacity=".22"/>
         <g transform="translate(760,246)">
@@ -136,7 +148,7 @@ footer{color:var(--muted);font-size:12px;text-align:center;padding:24px 0}
     </svg>
 
     <div class="brand-title">ZenTrader Pro</div>
-    <div class="brand-sub">Voice Trading Console • v11.1</div>
+    <div class="brand-sub">Voice Trading Console • v12</div>
 
     <div class="voice" role="group" aria-label="Voice controls">
       <button id="startVoice" class="btn" type="button">🎙️ Start Voice</button>
@@ -194,35 +206,35 @@ footer{color:var(--muted);font-size:12px;text-align:center;padding:24px 0}
 </main>
 
 <footer role="contentinfo">
-  <!-- Smaller inline ornate logo -->
+  <!-- Smaller inline ornate logo for footer -->
   <div style="display:grid;place-items:center;margin-bottom:6px">
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 540" width="360" height="162" aria-hidden="true">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 540" width="340" height="153" aria-hidden="true">
       <use href="#logo-header"></use>
     </svg>
   </div>
-  <div style="color:var(--muted)">© ZenTrader Pro</div>
+  <div>© ZenTrader Pro</div>
 </footer>
 
 <script>
-/* Minimal helpers */
+/* === utilities === */
 function debounce(fn,ms){let t;return function(){clearTimeout(t);t=setTimeout(fn,ms)}}
-const fixHeaderPadding=debounce(()=>{try{const h=document.querySelector('header.brand')?.getBoundingClientRect().height||160;document.body.style.paddingTop=Math.ceil(h)+'px';}catch{}},40);
+const fixHeaderPadding=debounce(()=>{try{const h=document.querySelector('header.brand')?.getBoundingClientRect().height||168;document.body.style.paddingTop=Math.ceil(h)+'px';}catch{}},40);
 window.addEventListener('resize',fixHeaderPadding,{passive:true}); fixHeaderPadding();
 
-/* Demo data + tiny charts (no external libs) */
+/* === demo data + canvas charts (no external libs) === */
 const demo={labels:["Mon","Tue","Wed","Thu","Fri","Mon","Tue","Wed","Thu","Fri"],pnlCum:[0,300,-120,450,200,680,540,900,750,1200],trades:[{result:"Win",pnl:220},{result:"Loss",pnl:-80},{result:"Win",pnl:160},{result:"Win",pnl:340},{result:"BE",pnl:0},{result:"Win",pnl:180},{result:"Loss",pnl:-120},{result:"Win",pnl:260},{result:"Win",pnl:140},{result:"Win",pnl:310}]};
 function fmtMoney(v){const s=v<0?'-$':'$';return s+Math.abs(v).toLocaleString()}
-function calcKPIs(T){const n=T.length,w=T.filter(t=>t.result==="Win"),l=T.filter(t=>t.result==="Loss"),b=T.filter(t=>t.result==="BE");const wr=n?Math.round(w.length/n*100):0,tp=T.reduce((s,t)=>s+t.pnl,0);const gw=w.reduce((s,t)=>s+t.pnl,0),gl=Math.abs(l.reduce((s,t)=>s+t.pnl,0));const pf=gl?gw/gl:(gw?Infinity:0);return{n,winRate:wr,totalPnL:tp,profitFactor:pf,w:l.length,wins:w.length,losses:l.length,be:b.length};}
+function calcKPIs(T){const n=T.length,w=T.filter(t=>t.result==="Win"),l=T.filter(t=>t.result==="Loss"),b=T.filter(t=>t.result==="BE");const wr=n?Math.round(w.length/n*100):0,tp=T.reduce((s,t)=>s+t.pnl,0);const gw=w.reduce((s,t)=>s+t.pnl,0),gl=Math.abs(l.reduce((s,t)=>s+t.pnl,0));const pf=gl?gw/gl:(gw?Infinity:0);return{n,winRate:wr,totalPnL:tp,profitFactor:pf,wins:w.length,losses:l.length,be:b.length};}
 function updateKPIs(){const k=calcKPIs(demo.trades); document.getElementById("k1").textContent=fmtMoney(k.totalPnL); document.getElementById("k2").textContent=k.winRate+'%'; document.getElementById("k3").textContent=k.n; document.getElementById("k4").textContent=(Math.round(k.profitFactor*100)/100).toFixed(2);}
 function sizeCanvas(c){if(!c)return{ctx:null,W:0,H:0};const dpr=Math.max(1,window.devicePixelRatio||1);const r=c.getBoundingClientRect();const W=Math.floor(r.width*dpr),H=Math.floor(r.height*dpr);if(c.width!==W||c.height!==H){c.width=W;c.height=H;}return{ctx:c.getContext('2d'),W,H};}
 function grid(x,x1,y1,x2,y2,rows){x.save();x.strokeStyle='rgba(255,255,255,.06)';x.lineWidth=1;for(let i=0;i<=rows;i++){const y=y1+(y2-y1)*(i/rows);x.beginPath();x.moveTo(x1,y);x.lineTo(x2,y);x.stroke();}x.restore();}
-function drawLine(c,labels,data){const {ctx:x,W,H}=sizeCanvas(c); if(!x) return; x.fillStyle='#0e1524';x.fillRect(0,0,W,H); const p={l:50,r:12,t:18,b:34},w=W-p.l-p.r,h=H-p.t-p.b; const M=Math.max(...data,0),m=Math.min(...data,0),R=(M-m)||1,y=v=>p.t+h-((v-m)/R)*h; grid(x,p.l,p.t,W-p.r,p.t+h,4); x.strokeStyle='#ffe08a';x.lineWidth=2;x.beginPath(); data.forEach((v,i)=>{const X=p.l+w/(data.length-1)*i,Y=y(v);i?x.lineTo(X,Y):x.moveTo(X,Y)}); x.stroke(); x.fillStyle='#d4af37'; data.forEach((v,i)=>{const X=p.l+w/(data.length-1)*i,Y=y(v);x.beginPath();x.arc(X,Y,3,0,6.283);x.fill()});}
-function drawBars(c,cum){const {ctx:x,W,H}=sizeCanvas(c); if(!x) return; x.fillStyle='#0e1524';x.fillRect(0,0,W,H); const p={l:40,r:12,t:14,b:34},w=W-p.l-p.r,h=H-p.t-p.b,d=cum.map((v,i)=>i===0?v:cum[i]-cum[i-1]); const M=Math.max(...d,0),m=Math.min(...d,0),R=(M-m)||1,y=v=>p.t+h-((v-m)/R)*h,bw=w/d.length*.7; grid(x,p.l,p.t,W-p.r,p.t+h,4); d.forEach((v,i)=>{const X=p.l+w/d.length*i+(w/d.length-bw)/2,Y=y(v),Y0=y(0);x.fillStyle=v>=0?'rgba(63,179,127,.75)':'rgba(212,91,107,.75)';x.fillRect(X,Math.min(Y,Y0),bw,Math.abs(Y-Y0));x.strokeStyle=v>=0?'#3fb37f':'#d45b6b';x.strokeRect(X,Math.min(Y,Y0),bw,Math.abs(Y-Y0))});}
+function drawLine(c,labels,data){const {ctx:x,W,H}=sizeCanvas(c); if(!x) return; x.fillStyle='#0e1524';x.fillRect(0,0,W,H); const p={l:50,r:12,t:18,b:34},w=W-p.l-p.r,h=H-p.t-p.b; const M=Math.max(...data,0),m=Math.min(...data,0),R=(M-m)||1,y=v=>p.t+h-((v-m)/R)*h; grid(x,p.l,p.t,W-p.r,p.t+h,4); x.strokeStyle='#ffe08a';x.lineWidth=2;x.beginPath(); data.forEach((v,i)=>{const X=p.l+w/(data.length-1)*i,Y=y(v);i?x.lineTo(X,Y):x.moveTo(X,Y)}); x.stroke(); x.fillStyle='#d4af37'; data.forEach((v,i)=>{const X=p.l+w/(data.length-1)*i,Y=y(v);x.beginPath();x.arc(X,Y,3,0,6.283);x.fill()}); x.fillStyle='#9db0c8';x.font='11px system-ui,-apple-system,Segoe UI,Roboto,Arial';x.fillText('PnL',8,16);x.fillText('Time →',W/2-20,H-8);}
+function drawBars(c,cum){const {ctx:x,W,H}=sizeCanvas(c); if(!x) return; x.fillStyle='#0e1524';x.fillRect(0,0,W,H); const p={l:40,r:12,t:14,b:34},w=W-p.l-p.r,h=H-p.t-p.b,d=cum.map((v,i)=>i===0?v:cum[i]-cum[i-1]); const M=Math.max(...d,0),m=Math.min(...d,0),R=(M-m)||1,y=v=>p.t+h-((v-m)/R)*h,bw=w/d.length*.7; grid(x,p.l,p.t,W-p.r,p.t+h,4); d.forEach((v,i)=>{const X=p.l+w/d.length*i+(w/d.length-bw)/2,Y=y(v),Y0=y(0);x.fillStyle=v>=0?'rgba(63,179,127,.75)':'rgba(212,91,107,.75)';x.fillRect(X,Math.min(Y,Y0),bw,Math.abs(Y-Y0));x.strokeStyle=v>=0?'#3fb37f':'#d45b6b';x.strokeRect(X,Math.min(Y,Y0),bw,Math.abs(Y-Y0))}); x.fillStyle='#9db0c8';x.font='11px system-ui,-apple-system,Segoe UI,Roboto,Arial';x.fillText('Daily PnL',8,16);x.fillText('Time →',W/2-20,H-8);}
 function drawDonut(c,w,l,b){const {ctx:x,W,H}=sizeCanvas(c); if(!x) return; x.fillStyle='#0e1524';x.fillRect(0,0,W,H); const cx=W/2,cy=H/2,r=Math.min(W,H)/2-16,i=r*.6,t=w+l+b||1,P=[{v:w,color:'#3fb37f',label:'Wins'},{v:l,color:'#d45b6b',label:'Losses'},{v:b,color:'#9db0c8',label:'BE'}]; let a=-Math.PI/2;P.forEach(p=>{const a1=a+(p.v/t)*Math.PI*2;x.beginPath();x.moveTo(cx,cy);x.arc(cx,cy,r,a,a1);x.closePath();x.fillStyle=p.color;x.fill();a=a1}); x.globalCompositeOperation='destination-out';x.beginPath();x.arc(cx,cy,i,0,6.283);x.fill(); x.globalCompositeOperation='source-over';}
 function renderAll(){ updateKPIs(); drawLine(document.getElementById('pnlLine'),demo.labels,demo.pnlCum); drawBars(document.getElementById('pnlBars'),demo.pnlCum); const k=calcKPIs(demo.trades); drawDonut(document.getElementById('winLossDonut'),k.wins,k.losses,k.be); }
 window.addEventListener('resize',debounce(()=>requestAnimationFrame(renderAll),60),{passive:true});
 
-/* Voice (sultry British) + wake words — initialized on button click only */
+/* === Voice (sultry British) + wake words; starts only on user click === */
 (function(){
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
   const synth = window.speechSynthesis;
@@ -232,7 +244,7 @@ window.addEventListener('resize',debounce(()=>requestAnimationFrame(renderAll),6
   function currentVoice(){
     try{
       const list=synth?.getVoices?.()||[];
-      return list.find(v=>/en-GB/i.test(v.lang)&&/female|libby|sonia|hazel|amy|emma|charlotte/i.test(v.name))||list[0]||null;
+      return list.find(v=>/en-GB/i.test(v.lang)&&/female|libby|sonia|hazel|amy|emma|charlotte|ellie|mia|serena/i.test(v.name))||list[0]||null;
     }catch{return null}
   }
   function speak(text){
@@ -258,7 +270,7 @@ window.addEventListener('resize',debounce(()=>requestAnimationFrame(renderAll),6
       for(let i=e.resultIndex;i<e.results.length;i++){const r=e.results[i],txt=r[0].transcript?.trim?.()||""; if(r.isFinal && txt) finalText+=' '+txt;}
       if(!finalText) return;
       const low=finalText.toLowerCase();
-      if(!armed && (/\bhey[\s,.-]*then\b/.test(low)||/\bhey[\s,.-]*zen\b/.test(low))){
+      if(!armed && (/\bhey[\s,.-]*then\b/.test(low) || /\bhey[\s,.-]*zen\b/.test(low))){
         armed=true; speak("Yes… I’m listening.");
         if(statusEl) statusEl.textContent='Awake. Try “ticker AAPL quantity three entry 192 point 35”.';
         return;
@@ -274,6 +286,7 @@ window.addEventListener('resize',debounce(()=>requestAnimationFrame(renderAll),6
 
   document.getElementById('stopVoice').addEventListener('click',()=>{ if(rec){ try{rec.stop();}catch{} } armed=false; });
 
+  /* Speech → fields */
   const WORD_NUM=Object.freeze({"zero":0,"one":1,"two":2,"three":3,"four":4,"five":5,"six":6,"seven":7,"eight":8,"nine":9,"ten":10,"eleven":11,"twelve":12,"thirteen":13,"fourteen":14,"fifteen":15,"sixteen":16,"seventeen":17,"eighteen":18,"nineteen":19,"twenty":20});
   function wordsToNumberToken(s){return s.replace(/\b(zero|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|fourteen|fifteen|sixteen|seventeen|eighteen|nineteen|twenty)\b/gi,(m)=>String(WORD_NUM[m.toLowerCase()]));}
   function normalizeNumberText(s){return s.replace(/\bpoint\b/gi,'.').replace(/[^\d.]/g,'');}
@@ -311,6 +324,8 @@ window.addEventListener('resize',debounce(()=>requestAnimationFrame(renderAll),6
 </script>
 </body>
 </html>
+	
+
 	
 
 	
