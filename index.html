@@ -1,3 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ZenTrader Pro Dashboard</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #111;
+      color: #fff;
+      overflow-x: hidden;
+    }
+    .login-screen {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      text-align: center;
+      padding: 2rem;
+    }
+    .logo {
+      width: 150px;
+      margin-bottom: 1rem;
+      filter: drop-shadow(4px 4px 6px rgba(0,0,0,0.8));
+    }
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+    }
+    .btn {
+      padding: 0.75rem 1.5rem;
+      margin: 0.5rem;
+      border: none;
+      border-radius: 6px;
+      background: #f1c40f;
+      color: #111;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    .btn:hover {
+      background: #d4ac0d;
+    }
+
+    /* Dashboard styles */
+    .dashboard {
+      display: none;
+      padding: 2rem;
+    }
+    h2 {
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+      color: #f1c40f;
+    }
+    .kpi-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+    }
+    .card {
+      background: #1b1b1b;
+      border: 1px solid #f1c40f;
+      border-radius: 10px;
+      padding: 1rem;
+      text-align: center;
+    }
+    .charts {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1rem;
+      margin-top: 2rem;
+    }
+    canvas {
+      background: #222;
+      border-radius: 10px;
+      padding: 1rem;
+    }
+    footer {
+      margin-top: 2rem;
+      text-align: center;
+      color: #888;
+    }
+  </style>
+</head>
+<body>
+  <!-- Login Screen -->
+  <div class="login-screen" id="loginScreen">
+    <!-- Ornate pirate-style logo (inline SVG with gold + shading) -->
+    <svg class="logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+      <defs>
+        <radialGradient id="grad" cx="30%" cy="30%" r="80%">
+          <stop offset="0%" style="stop-color:#f9e79f; stop-opacity:1"/>
+          <stop offset="100%" style="stop-color:#b7950b; stop-opacity:1"/>
+        </radialGradient>
+      </defs>
+      <circle cx="100" cy="100" r="95" fill="url(#grad)" stroke="#7d6608" stroke-width="6"/>
+      <text x="50%" y="55%" text-anchor="middle" font-size="42" font-family="serif" fill="#111" font-weight="bold">
+        ZT
+      </text>
+    </svg>
+
+    <h1>ZenTrader Pro Dashboard</h1>
+    <button class="btn" onclick="initVoices()">Load Voices</button>
+    <button class="btn" onclick="testVoice()">Test Voice</button>
+    <button class="btn" onclick="enterDashboard()">Enter Dashboard</button>
+  </div>
+
+  <!-- Dashboard -->
+  <div class="dashboard" id="dashboard">
+    <h2>Key Performance Indicators</h2>
+    <div class="kpi-cards">
+      <div class="card"><h3>Total Trades</h3><p id="totalTrades">0</p></div>
+      <div class="card"><h3>Win Rate</h3><p id="winRate">0%</p></div>
+      <div class="card"><h3>Total PnL</h3><p id="totalPnL">$0</p></div>
+      <div class="card"><h3>Avg Trade Duration</h3><p id="avgDuration">0 min</p></div>
+    </div>
+
+    <div class="charts">
+      <canvas id="pnlChart"></canvas>
+      <canvas id="winLossChart"></canvas>
+    </div>
+
+    <footer>
+      <p>© 2025 ZenTrader Pro Dashboard</p>
+    </footer>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    let voices = [];
+
+    function initVoices() {
+      voices = speechSynthesis.getVoices();
+      alert("Voices loaded: " + voices.map(v => v.name).join(", "));
+    }
+
+    function testVoice() {
+      const msg = new SpeechSynthesisUtterance("Welcome to ZenTrader Pro Dashboard. Let's trade with style.");
+      msg.voice = voices.find(v => v.lang.includes("en-GB") && v.name.toLowerCase().includes("female")) || voices[0];
+      msg.rate = 0.9; // slower = sultrier
+      msg.pitch = 0.8; // lower pitch = more sultry
+      speechSynthesis.speak(msg);
+    }
+
+    function enterDashboard() {
+      document.getElementById("loginScreen").style.display = "none";
+      document.getElementById("dashboard").style.display = "block";
+      renderCharts();
+    }
+
+    function renderCharts() {
+      new Chart(document.getElementById("pnlChart"), {
+        type: "line",
+        data: {
+          labels: ["Mon","Tue","Wed","Thu","Fri"],
+          datasets: [{
+            label: "PnL",
+            data: [200,-100,300,150,-50],
+            borderColor: "#f1c40f",
+            backgroundColor: "rgba(241,196,15,0.3)"
+          }]
+        },
+        options: { responsive: true }
+      });
+
+      new Chart(document.getElementById("winLossChart"), {
+        type: "doughnut",
+        data: {
+          labels: ["Wins","Losses"],
+          datasets: [{
+            data: [70,30],
+            backgroundColor: ["#2ecc71","#e74c3c"]
+          }]
+        },
+        options: { responsive: true }
+      });
+    }
+  </script>
+</body>
+</html>
+	
 
 	
 
