@@ -12,7 +12,6 @@
     --border:#22314a; --text:#e8eef7; --muted:#9db0c8;
     --gold:#d4af37; --gold2:#b88a1c; --gold3:#7a5e12; --gold-lite:#ffe08a;
     --accent:#4cc9f0; --green:#3fb37f; --red:#d45b6b;
-    --header-h: 156px; /* target height; JS fine-tunes padding-top */
   }
   *,*::before,*::after{box-sizing:border-box}
   html,body{height:100%}
@@ -20,7 +19,7 @@
     margin:0; font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial;
     color:var(--text);
     background:radial-gradient(900px 540px at 50% -180px,#182235 10%,var(--bg) 60%);
-    padding-top:var(--header-h); /* prevent overlap with sticky header */
+    padding-top:160px; /* will be adjusted by JS */
   }
 
   /* Splash (login) */
@@ -86,7 +85,7 @@
   canvas{width:100%;height:260px;max-height:42vh}
   footer{color:var(--muted);font-size:12px;text-align:center;padding:24px 0}
 </style>
-<link id="favicon" rel="icon" type="image/png" href="">
+<link id="favicon" rel="icon" type="image/svg+xml" href="">
 </head>
 <body>
 
@@ -152,7 +151,7 @@
     <h2 id="recent-trades">Recent Trades</h2>
     <table aria-label="Recent trades">
       <thead><tr><th>Date</th><th>Symbol</th><th>Side</th><th>Qty</th><th>Entry</th><th>Exit</th><th>Result</th><th>Notes</th></tr></thead>
-    <tbody id="rows"><tr><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr></tbody>
+      <tbody id="rows"><tr><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr></tbody>
     </table>
   </section>
 
@@ -174,18 +173,14 @@
 
 <script>
 /* ===============================
-   ONE-TIME: paste your PNG here
+   Ornate Pirate-Style Logo (SVG)
+   — lopsided scales: Z low left, cash high right, sunlight from top-left
+   Used in splash, header, footer, favicon
    =============================== */
-const LOGO_BASE64 =
-  "";// ← set to: "data:image/png;base64,AAAA..."; (keep quotes)
-
-/* =======================================
-   Ornate Logo (fallback inline SVG)
-   =======================================*/
-function getFallbackLogoSVG(width){
+function getOrnateLogoSVG(width){
   const w = width || 800, h = Math.round(w*0.45);
   return `
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 540" width="${w}" height="${h}" role="img" aria-label="ZenTrader Pro ornate golden balance">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 540" width="${w}" height="${h}" role="img" aria-label="ZenTrader Pro ornate golden balance: Z left low, cash right high">
   <defs>
     <linearGradient id="goldGrad" x1="0" x2="0" y1="0" y2="1">
       <stop offset="0%" stop-color="#ffd063"/>
@@ -202,31 +197,43 @@ function getFallbackLogoSVG(width){
       <feDropShadow dx="0" dy="8" stdDeviation="8" flood-color="#000000" flood-opacity="0.55"/>
     </filter>
   </defs>
+
+  <!-- Ornate base -->
   <g filter="url(#drop)">
     <path d="M240 480 C 380 430, 820 430, 960 480 L 980 510 C 820 520, 380 520, 220 510 Z"
           fill="url(#goldGrad)" stroke="#b88a1c" stroke-width="4"/>
     <path d="M260 470 C 410 420, 790 420, 940 470" fill="none" stroke="#ffe08a" stroke-opacity=".45" stroke-width="4"/>
     <path d="M240 480 C 380 430, 820 430, 960 480" fill="none" stroke="#7a5e12" stroke-opacity=".6" stroke-width="6"/>
   </g>
+
+  <!-- Center column -->
   <g filter="url(#drop)">
     <rect x="578" y="240" width="44" height="190" rx="10" fill="url(#goldGrad)" stroke="#b88a1c" stroke-width="4"/>
     <circle cx="600" cy="236" r="26" fill="url(#goldGrad)" stroke="#b88a1c" stroke-width="4"/>
   </g>
+
+  <!-- Cross arm (lopsided: left down, right up) -->
   <g filter="url(#drop)">
     <path d="M240 200 L 960 160" stroke="url(#goldGrad)" stroke-width="18" stroke-linecap="round"/>
     <path d="M240 200 L 960 160" stroke="#ffe08a" stroke-opacity=".35" stroke-width="6" stroke-linecap="round"/>
     <path d="M240 200 L 960 160" stroke="#7a5e12" stroke-opacity=".35" stroke-width="3" stroke-linecap="round"/>
   </g>
+
+  <!-- Left chains (low) -->
   <g stroke="url(#goldGrad)" stroke-width="6" filter="url(#drop)">
     <line x1="340" y1="183" x2="340" y2="305"/>
     <line x1="420" y1="180" x2="420" y2="302"/>
     <line x1="380" y1="188" x2="380" y2="308"/>
   </g>
+
+  <!-- Right chains (high) -->
   <g stroke="url(#goldGrad)" stroke-width="6" filter="url(#drop)">
     <line x1="820" y1="169" x2="820" y2="245"/>
     <line x1="880" y1="166" x2="880" y2="242"/>
     <line x1="850" y1="170" x2="850" y2="246"/>
   </g>
+
+  <!-- Left pan (very low) with ornate Z -->
   <g filter="url(#drop)">
     <ellipse cx="380" cy="330" rx="135" ry="26" fill="#000" fill-opacity=".28"/>
     <g transform="translate(280,306)">
@@ -240,6 +247,8 @@ function getFallbackLogoSVG(width){
       <path d="M-20,-18 h40 l-44,36 h48" fill="none" stroke="#ffe08a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" opacity=".85"/>
     </g>
   </g>
+
+  <!-- Right pan (high) with crisp cash stack -->
   <g filter="url(#drop)">
     <ellipse cx="850" cy="270" rx="120" ry="22" fill="#000" fill-opacity=".22"/>
     <g transform="translate(760,246)">
@@ -255,48 +264,26 @@ function getFallbackLogoSVG(width){
       <rect x="-16" y="-48" width="32" height="94" fill="#ffffff" opacity=".85"/>
     </g>
   </g>
-  <circle cx="0" cy="0" r="500" fill="url(#shine)"/>
+
+  <!-- Warm sunlight from top-left -->
+  <circle cx="0" cy="0" r="500" fill="url(#shine)" />
 </svg>`;
 }
 
-/* =========================
-   Mount logo (PNG if set; else SVG fallback)
-   ========================= */
-function mountLogoImg(containerSelector, widthPx){
-  const el = document.querySelector(containerSelector);
+/* Mount logo everywhere + favicon (SVG data URL) */
+function mountLogo(where, width){
+  const el = document.querySelector(where);
   if(!el) return;
-  el.innerHTML = "";
-  const hasPng = LOGO_BASE64 && /^data:image\/png;base64,/i.test(LOGO_BASE64);
-  if (hasPng){
-    const img = new Image();
-    img.alt = "ZenTrader Pro Logo";
-    img.style.maxWidth = "100%";
-    img.style.width = (widthPx||560) + "px";
-    img.src = LOGO_BASE64;
-    el.appendChild(img);
-  } else {
-    el.innerHTML = getFallbackLogoSVG(widthPx||560);
-  }
+  el.innerHTML = getOrnateLogoSVG(width);
 }
-
-/* =========================
-   Favicon
-   ========================= */
 function setFavicon(){
+  const svg = getOrnateLogoSVG(256);
+  const dataUrl = 'data:image/svg+xml;utf8,' + encodeURIComponent(svg);
   const link = document.getElementById('favicon');
-  if (!link) return;
-  if (LOGO_BASE64 && /^data:image\/png;base64,/i.test(LOGO_BASE64)){
-    link.href = LOGO_BASE64;
-  } else {
-    // fallback: tiny SVG data URL
-    const svg = getFallbackLogoSVG(256);
-    link.href = 'data:image/svg+xml;utf8,' + encodeURIComponent(svg);
-  }
+  if (link) link.href = dataUrl;
 }
 
-/* =========================
-   KPIs + Charts (Canvas)
-   ========================= */
+/* Demo KPIs/Charts */
 const demo = {
   labels:["Mon","Tue","Wed","Thu","Fri","Mon","Tue","Wed","Thu","Fri"],
   pnlCum:[0,300,-120,450,200,680,540,900,750,1200],
@@ -313,25 +300,22 @@ function calcKPIs(T){
   const wr=n?Math.round(w.length/n*100):0, tp=T.reduce((s,t)=>s+t.pnl,0);
   const gw=w.reduce((s,t)=>s+t.pnl,0), gl=Math.abs(l.reduce((s,t)=>s+t.pnl,0));
   const pf=gl?gw/gl:(gw?Infinity:0);
-  return {n: n, winRate: wr, totalPnL: tp, profitFactor: pf, wins:w.length, losses:l.length, be:b.length};
+  return {n, winRate: wr, totalPnL: tp, profitFactor: pf, wins:w.length, losses:l.length, be:b.length};
 }
-function updateKPIs(k){
-  const $=id=>document.getElementById(id);
-  $("k1").textContent = fmtMoney(k.totalPnL);
-  $("k2").textContent = k.winRate+"%";
-  $("k3").textContent = k.n;
-  $("k4").textContent = (Math.round(k.profitFactor*100)/100).toFixed(2);
+function updateKPIs(){
+  const k=calcKPIs(demo.trades);
+  const set=(id,val)=>{const el=document.getElementById(id); if(el) el.textContent=val;};
+  set('k1',fmtMoney(k.totalPnL)); set('k2',k.winRate+'%'); set('k3',k.n); set('k4',(Math.round(k.profitFactor*100)/100).toFixed(2));
 }
-/* Charts */
+
+/* Canvas charts (no libs) */
 function grid(x,x1,y1,x2,y2,s){x.strokeStyle='rgba(255,255,255,0.06)';x.lineWidth=1;for(let i=0;i<=s;i++){const y=y1+(y2-y1)*(i/s);x.beginPath();x.moveTo(x1,y);x.lineTo(x2,y);x.stroke();}}
 function drawLine(c,labels,data){const x=c.getContext('2d'),W=c.width,H=c.height;x.fillStyle='#0e1524';x.fillRect(0,0,W,H);const p={l:50,r:12,t:18,b:34},w=W-p.l-p.r,h=H-p.t-p.b;const M=Math.max(...data,0),m=Math.min(...data,0),R=(M-m)||1,y=v=>p.t+h-((v-m)/R)*h;grid(x,p.l,p.t,W-p.r,p.t+h,4);x.strokeStyle='#ffe08a';x.lineWidth=2;x.beginPath();data.forEach((v,i)=>{const X=p.l+w/(data.length-1)*i,Y=y(v);i?x.lineTo(X,Y):x.moveTo(X,Y)});x.stroke();x.fillStyle='#d4af37';data.forEach((v,i)=>{const X=p.l+w/(data.length-1)*i,Y=y(v);x.beginPath();x.arc(X,Y,3,0,6.283);x.fill()});x.fillStyle='#9db0c8';x.font='11px system-ui,-apple-system,Segoe UI,Roboto,Arial';x.fillText('PnL',8,16);x.fillText('Time →',W/2-20,H-8)}
 function drawBars(c,labels,cum){const x=c.getContext('2d'),W=c.width,H=c.height;x.fillStyle='#0e1524';x.fillRect(0,0,W,H);const p={l:40,r:12,t:14,b:34},w=W-p.l-p.r,h=H-p.t-p.b;const d=cum.map((v,i)=>i===0?v:cum[i]-cum[i-1]);const M=Math.max(...d,0),m=Math.min(...d,0),R=(M-m)||1,y=v=>p.t+h-((v-m)/R)*h,bw=w/d.length*.7;grid(x,p.l,p.t,W-p.r,p.t+h,4);d.forEach((v,i)=>{const X=p.l+w/d.length*i+(w/d.length-bw)/2,Y=y(v),Y0=y(0);x.fillStyle=v>=0?'rgba(63,179,127,.75)':'rgba(212,91,107,.75)';x.fillRect(X,Math.min(Y,Y0),bw,Math.abs(Y-Y0));x.strokeStyle=v>=0?'#3fb37f':'#d45b6b';x.strokeRect(X,Math.min(Y,Y0),bw,Math.abs(Y-Y0))});x.fillStyle='#9db0c8';x.font='11px system-ui,-apple-system,Segoe UI,Roboto,Arial';x.fillText('Daily PnL',8,16);x.fillText('Time →',W/2-20,H-8)}
 function drawDonut(c,w,l,b){const x=c.getContext('2d'),W=c.width,H=c.height;x.fillStyle='#0e1524';x.fillRect(0,0,W,H);const cx=W/2,cy=H/2,r=Math.min(W,H)/2-16,i=r*.6,t=w+l+b||1,P=[{v:w,color:'#3fb37f',label:'Wins'},{v:l,color:'#d45b6b',label:'Losses'},{v:b,color:'#9db0c8',label:'BE'}];let a=-Math.PI/2;P.forEach(p=>{const a1=a+(p.v/t)*Math.PI*2;x.beginPath();x.moveTo(cx,cy);x.arc(cx,cy,r,a,a1);x.closePath();x.fillStyle=p.color;x.fill();a=a1});x.globalCompositeOperation='destination-out';x.beginPath();x.arc(cx,cy,i,0,6.283);x.fill();x.globalCompositeOperation='source-over';x.font='12px system-ui,-apple-system,Segoe UI,Roboto,Arial';x.fillStyle='#e8eef7';let ly=H-10,lx=10;P.forEach(p=>{x.fillStyle=p.color;x.fillRect(lx,ly-10,10,10);x.fillStyle='#e8eef7';x.fillText(p.label+': '+p.v,lx+16,ly);ly-=16})}
-function renderAll(){const k=calcKPIs(demo.trades);updateKPIs(k);drawLine(document.getElementById('pnlLine'),demo.labels,demo.pnlCum);drawBars(document.getElementById('pnlBars'),demo.labels,demo.pnlCum);drawDonut(document.getElementById('winLossDonut'),k.wins,k.losses,k.be)}
+function renderAll(){updateKPIs();drawLine(document.getElementById('pnlLine'),demo.labels,demo.pnlCum);drawBars(document.getElementById('pnlBars'),demo.labels,demo.pnlCum);const k=calcKPIs(demo.trades);drawDonut(document.getElementById('winLossDonut'),k.wins,k.losses,k.be)}
 
-/* =========================
-   Voice (robust loader + fallbacks)
-   ========================= */
+/* Voice (robust loader + fallbacks) */
 const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
 const synth = window.speechSynthesis;
 const voiceSelect = document.getElementById('voiceSelect');
@@ -361,13 +345,10 @@ function currentVoice(){const name=voiceSelect?.value;const list=synth?.getVoice
 function speak(text){
   try{const u=new SpeechSynthesisUtterance(text);const v=currentVoice();if(v)u.voice=v;u.rate=1.0;u.pitch=1.0;u.volume=1.0;synth.speak(u);}catch(e){console.warn('TTS error',e);}
 }
-
 testVoiceBtn.addEventListener('click',()=>{if(!voicesLoaded)populateVoices();speak("Hello. This is the ZenTrader Pro assistant, speaking with a British accent if available.");});
 enterBtn.addEventListener('click',()=>{document.getElementById('splash').classList.add('hidden');speak("Welcome to ZenTrader Pro.");});
 
-/* =========================
-   Speech recognition (manual start)
-   ========================= */
+/* Speech recognition (manual start) */
 let rec=null,listening=false,armed=false;
 if(SR){rec=new SR();rec.lang='en-US';rec.continuous=true;rec.interimResults=true;
   rec.onresult=(e)=>{let finalText='';for(let i=e.resultIndex;i<e.results.length;i++){const r=e.results[i],txt=r[0].transcript.trim();if(r.isFinal)finalText+=' '+txt;}
@@ -381,7 +362,7 @@ if(SR){rec=new SR();rec.lang='en-US';rec.continuous=true;rec.interimResults=true
 btnStart.addEventListener('click',()=>{if(!rec){statusEl.textContent='Speech recognition not supported in this browser.';return;}try{if(!listening)rec.start();}catch(_){}}); 
 btnStop.addEventListener('click',()=>{if(!rec)return;armed=false;try{rec.stop();}catch(_){}});
 
-/* Fill form fields from voice commands + readback */
+/* Parse commands -> form + readback */
 function handleCommand(t){
   const s=t.toLowerCase();
   const tm=s.match(/\b(ticker|symbol)\s+([a-z]{1,5})\b/); if(tm) document.getElementById('ticker').value=tm[2].toUpperCase();
@@ -398,9 +379,7 @@ function handleCommand(t){
   }
 }
 
-/* =========================
-   Layout fixes (no header overlap)
-   ========================= */
+/* Header spacing fix so content never hides under it */
 function fixHeaderPadding(){
   const header = document.querySelector('header.brand');
   if(!header) return;
@@ -410,14 +389,14 @@ function fixHeaderPadding(){
 window.addEventListener('resize', fixHeaderPadding);
 window.addEventListener('load', fixHeaderPadding);
 
-/* =========================
-   Mount logos + favicon and render charts/KPIs
-   ========================= */
+/* Mount logos + favicon and render charts/KPIs */
 function initBranding(){
-  mountLogoImg('#splashLogo', 560);
-  mountLogoImg('#brandLogo', 520);
-  const f = document.getElementById('footerLogo'); if(f) mountLogoImg('#footerLogo', 260);
-  setFavicon();
+  const mount = (sel,w)=>{ const el=document.querySelector(sel); if(el) el.innerHTML = getOrnateLogoSVG(w); };
+  mount('#splashLogo', 560);
+  mount('#brandLogo', 560);
+  mount('#footerLogo', 280);
+  const svg = getOrnateLogoSVG(256);
+  document.getElementById('favicon').href = 'data:image/svg+xml;utf8,' + encodeURIComponent(svg);
 }
 function init(){
   initBranding();
@@ -430,9 +409,6 @@ if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded'
 </html>
 	
 
-	
-
-	
 
 	
 
