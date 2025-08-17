@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-build="ztp-v10-ornate-singlefile">
+<html lang="en" data-build="ztp-v11-ornate-forcer">
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
@@ -13,167 +13,90 @@
 <meta name="color-scheme" content="dark"/>
 <meta name="theme-color" content="#0b0f17"/>
 
-<!-- Favicon will be replaced at runtime with data-URL of the inline ornate SVG -->
+<!-- Favicon replaced at runtime from inline ornate SVG -->
 <link id="favicon" rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='16' cy='16' r='16' fill='%23d4af37'/%3E%3C/svg%3E"/>
 
 <style>
-  :root{
-    --bg:#0b0f17; --panel:#111827; --panel-2:#0e1524;
-    --border:#22314a; --text:#e8eef7; --muted:#9db0c8;
-    --gold:#d4af37; --gold-lite:#ffe08a; --accent:#4cc9f0;
-    --green:#3fb37f; --red:#d45b6b;
-  }
-  *,*::before,*::after{box-sizing:border-box}
-  html,body{height:100%}
-  body{
-    margin:0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
-    color:var(--text);
-    background: radial-gradient(900px 540px at 50% -180px,#182235 10%,var(--bg) 60%);
-    padding-top:160px; /* sync to header height via JS */
-  }
+:root{
+  --bg:#0b0f17; --panel:#111827; --panel-2:#0e1524;
+  --border:#22314a; --text:#e8eef7; --muted:#9db0c8;
+  --gold:#d4af37; --gold-lite:#ffe08a; --green:#3fb37f; --red:#d45b6b;
+}
+*,*::before,*::after{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0; font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial;
+  color:var(--text);
+  background:radial-gradient(900px 540px at 50% -180px,#182235 10%,var(--bg) 60%);
+  padding-top:160px; /* synced to header height via JS */
+}
 
-  /* Buttons / inputs */
-  .btn{background:#0e1524;border:1px solid var(--border);color:var(--text);padding:10px 14px;border-radius:12px;cursor:pointer;font-weight:600}
-  .btn:hover{border-color:#3c5f94}
-  select{background:#0e1524;color:var(--text);border:1px solid var(--border);border-radius:10px;padding:8px 10px}
+/* Header (sticky) */
+header.brand{
+  position:fixed; inset:0 0 auto 0; z-index:1000;
+  backdrop-filter:saturate(130%) blur(4px);
+  background:linear-gradient(180deg,rgba(16,24,39,.95),rgba(11,15,23,.92));
+  border-bottom:1px solid var(--border); padding:12px 16px 10px;
+}
+.brand-inner{max-width:1200px;margin:0 auto;display:grid;place-items:center}
+.brand-title{
+  margin:6px 0 0; font-weight:800; letter-spacing:.3px; font-size:32px; line-height:1.1;
+  font-family:"Garamond","Times New Roman","Palatino Linotype","Book Antiqua",Georgia,serif;
+  background:linear-gradient(180deg,#ffe08a,#d4af37 55%,#7a5e12 100%);
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+  text-shadow:0 1px 0 #46360a,0 2px 10px rgba(0,0,0,.45);
+}
+.brand-sub{margin:2px 0 0;color:var(--muted);font-size:12px}
+.voice{display:flex;gap:10px;align-items:center;justify-content:center;margin:10px 0 0;flex-wrap:wrap}
+.btn{background:#0e1524;border:1px solid var(--border);color:var(--text);padding:10px 14px;border-radius:12px;cursor:pointer;font-weight:600}
+.btn:hover{border-color:#3c5f94}
+.status{color:var(--muted);font-size:12px}
 
-  /* Splash / login */
-  .splash{position:fixed;inset:0;display:grid;place-items:center;z-index:2000;
-    background:radial-gradient(1000px 700px at 40% -300px,#1a2740 0%,#0b0f17 60%);
-    transition:opacity .35s ease}
-  .splash.hidden{opacity:0;pointer-events:none}
-  .splash-card{width:min(900px,94vw);background:linear-gradient(180deg,#121a2b,#0e1524);
-    border:1px solid var(--border);border-radius:18px;padding:24px;
-    box-shadow:0 20px 80px rgba(0,0,0,.45), inset 0 0 60px rgba(212,175,55,.06);text-align:center}
+/* Layout */
+main{max-width:1200px;margin:18px auto;padding:0 16px 60px;display:grid;gap:16px;grid-template-columns:2fr 1fr}
+@media (max-width:980px){main{grid-template-columns:1fr}}
+.card{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:16px;box-shadow:0 2px 18px rgba(0,0,0,.25)}
+.card h2{margin:0 0 12px;font-size:16px;color:var(--gold-lite);font-family:"Garamond","Times New Roman",serif}
+.gold-outline{border:1px solid rgba(212,175,55,.35);box-shadow:inset 0 0 12px rgba(212,175,55,.15)}
+.form-grid{display:grid;grid-template-columns:140px 1fr;gap:12px;align-items:center}
+label{color:var(--muted);font-size:13px}
+input,select,textarea{width:100%;background:var(--panel-2);color:var(--text);border:1px solid #283853;border-radius:10px;padding:10px;font-size:14px;outline:none;transition:border-color .2s,box-shadow .2s}
+input:focus,select:focus,textarea:focus{border-color:#3c5f94;box-shadow:0 0 0 3px rgba(76,201,240,.12)}
+textarea{min-height:80px;resize:vertical}
+table{width:100%;border-collapse:collapse}
+th,td{border:1px solid var(--border);padding:8px 10px;text-align:left;vertical-align:top}
+th{background:var(--panel-2);color:var(--gold-lite);font-weight:700}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.stat{background:var(--panel-2);border:1px solid var(--border);border-radius:12px;padding:12px;text-align:center}
+.stat .v{font-size:20px;font-weight:800}
+.stat .l{color:var(--muted);font-size:12px}
+.chart{background:var(--panel-2);border:1px solid var(--border);border-radius:12px;padding:14px;display:grid;place-items:center}
+canvas{width:100%;height:260px;max-height:42vh}
+footer{color:var(--muted);font-size:12px;text-align:center;padding:24px 0}
 
-  /* Header (sticky) */
-  header.brand{position:fixed;left:0;right:0;top:0;z-index:1000;backdrop-filter:saturate(130%) blur(4px);
-    background:linear-gradient(180deg,rgba(16,24,39,.95),rgba(11,15,23,.92));
-    border-bottom:1px solid var(--border);padding:12px 16px 10px}
-  .brand-inner{max-width:1200px;margin:0 auto;display:grid;place-items:center}
+/* Nuke any old “modern” logos if they sneak in */
+img[src*="logo"], img[src*="brand"], img[class*="logo"], [class*="logo"] img,
+.logo, .site-logo, .brand-logo, .header-logo { display:none !important; }
+[style*="background-image"][class*="logo"]{ background-image:none !important; }
 
-  /* Ornate title style using serif stack */
-  .brand-title{
-    margin:6px 0 0; font-weight:800; letter-spacing:.3px; font-size:32px; line-height:1.1;
-    font-family: "Garamond", "Times New Roman", "Palatino Linotype", "Book Antiqua", Georgia, serif;
-    background: linear-gradient(180deg, #ffe08a, #d4af37 55%, #7a5e12 100%);
-    -webkit-background-clip: text; background-clip: text; color: transparent;
-    text-shadow: 0 1px 0 #46360a, 0 2px 8px rgba(0,0,0,.45);
-  }
-  .brand-sub{margin:2px 0 0;color:var(--muted);font-size:12px}
-  .voice{display:flex;gap:10px;align-items:center;justify-content:center;margin:10px 0 0;flex-wrap:wrap}
-  .status{color:var(--muted);font-size:12px}
-
-  /* Layout */
-  main{max-width:1200px;margin:18px auto;padding:0 16px 60px;display:grid;gap:16px;grid-template-columns:2fr 1fr}
-  @media (max-width:980px){main{grid-template-columns:1fr}}
-  .card{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:16px;box-shadow:0 2px 18px rgba(0,0,0,.25)}
-  .card h2{margin:0 0 12px;font-size:16px;color:var(--gold-lite);font-family: "Garamond","Times New Roman",serif}
-  .gold-outline{border:1px solid rgba(212,175,55,.35);box-shadow:inset 0 0 12px rgba(212,175,55,.15)}
-  .form-grid{display:grid;grid-template-columns:140px 1fr;gap:12px;align-items:center}
-  label{color:var(--muted);font-size:13px}
-  input,select,textarea{width:100%;background:var(--panel-2);color:var(--text);border:1px solid #283853;border-radius:10px;padding:10px;font-size:14px;outline:none;transition:border-color .2s,box-shadow .2s}
-  input:focus,select:focus,textarea:focus{border-color:#3c5f94;box-shadow:0 0 0 3px rgba(76,201,240,.12)}
-  textarea{min-height:80px;resize:vertical}
-  table{width:100%;border-collapse:collapse}
-  th,td{border:1px solid var(--border);padding:8px 10px;text-align:left;vertical-align:top}
-  th{background:var(--panel-2);color:var(--gold-lite);font-weight:700}
-  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
-  .stat{background:var(--panel-2);border:1px solid var(--border);border-radius:12px;padding:12px;text-align:center}
-  .stat .v{font-size:20px;font-weight:800}
-  .stat .l{color:var(--muted);font-size:12px}
-  .chart{background:var(--panel-2);border:1px solid var(--border);border-radius:12px;padding:14px;display:grid;place-items:center}
-  canvas{width:100%;height:260px;max-height:42vh}
-  footer{color:var(--muted);font-size:12px;text-align:center;padding:24px 0}
-
-  /* Hide any old “modern” assets if they sneak in */
-  img[src*="logo"], img[src*="brand"], img[class*="logo"], [class*="logo"] img,
-  .logo, .site-logo, .brand-logo, .header-logo { display:none !important; }
-  [style*="background-image"][class*="logo"]{ background-image:none !important; }
-
-  @media (prefers-reduced-motion: reduce){
-    *{scroll-behavior:auto!important;animation:none!important;transition:none!important}
-  }
+@media (prefers-reduced-motion:reduce){
+  *{scroll-behavior:auto!important;animation:none!important;transition:none!important}
+}
 </style>
 </head>
 <body>
 
-<!-- Splash / Login -->
-<div id="splash" class="splash" role="dialog" aria-modal="true" aria-labelledby="splashTitle">
-  <div class="splash-card">
-    <div style="display:grid;place-items:center;margin-bottom:10px" aria-hidden="true">
-      <!-- ORNATE PIRATE-STYLE GOLDEN BALANCE (lopsided, sunlight from upper-left) -->
-      <svg id="logo-splash" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 540" width="720" height="324" role="img" aria-label="ZenTrader Pro ornate golden balance logo">
-        <defs>
-          <linearGradient id="goldGrad" x1="0" x2="0" y1="0" y2="1">
-            <stop offset="0%" stop-color="#ffd063"/><stop offset="45%" stop-color="#d4af37"/><stop offset="70%" stop-color="#b88a1c"/><stop offset="100%" stop-color="#7a5e12"/>
-          </linearGradient>
-          <radialGradient id="shine" cx="0.06" cy="0.04" r="0.95">
-            <stop offset="0%" stop-color="#ffffff" stop-opacity="0.70"/>
-            <stop offset="40%" stop-color="#ffe08a" stop-opacity="0.30"/>
-            <stop offset="100%" stop-color="#000000" stop-opacity="0"/>
-          </radialGradient>
-          <linearGradient id="cashGrad" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stop-color="#6fdb8b"/><stop offset="50%" stop-color="#3fb37f"/><stop offset="100%" stop-color="#2e7c47"/></linearGradient>
-          <filter id="drop" x="-50%" y="-50%" width="200%" height="200%"><feDropShadow dx="0" dy="8" stdDeviation="8" flood-color="#000000" flood-opacity="0.55"/></filter>
-        </defs>
-        <g filter="url(#drop)"><path d="M240 480 C 380 430, 820 430, 960 480 L 980 510 C 820 520, 380 520, 220 510 Z" fill="url(#goldGrad)" stroke="#b88a1c" stroke-width="4"/>
-          <path d="M260 470 C 410 420, 790 420, 940 470" fill="none" stroke="#ffe08a" stroke-opacity=".45" stroke-width="4"/>
-          <path d="M240 480 C 380 430, 820 430, 960 480" fill="none" stroke="#7a5e12" stroke-opacity=".65" stroke-width="6"/></g>
-        <g filter="url(#drop)"><rect x="578" y="240" width="44" height="190" rx="10" fill="url(#goldGrad)" stroke="#b88a1c" stroke-width="4"/><circle cx="600" cy="236" r="26" fill="url(#goldGrad)" stroke="#b88a1c" stroke-width="4"/></g>
-        <g filter="url(#drop)"><path d="M240 200 L 960 160" stroke="url(#goldGrad)" stroke-width="18" stroke-linecap="round"/><path d="M240 200 L 960 160" stroke="#ffe08a" stroke-opacity=".35" stroke-width="6" stroke-linecap="round"/><path d="M240 200 L 960 160" stroke="#7a5e12" stroke-opacity=".35" stroke-width="3" stroke-linecap="round"/></g>
-        <g stroke="url(#goldGrad)" stroke-width="6" filter="url(#drop)"><line x1="340" y1="183" x2="340" y2="305"/><line x1="420" y1="180" x2="420" y2="302"/><line x1="380" y1="188" x2="380" y2="308"/></g>
-        <g stroke="url(#goldGrad)" stroke-width="6" filter="url(#drop)"><line x1="820" y1="169" x2="820" y2="245"/><line x1="880" y1="166" x2="880" y2="242"/><line x1="850" y1="170" x2="850" y2="246"/></g>
-        <g filter="url(#drop)"><ellipse cx="380" cy="330" rx="135" ry="26" fill="#000" fill-opacity=".28"/>
-          <g transform="translate(280,306)"><path d="M0 0 h200 a18 18 0 0 1 18 18 v8 a14 14 0 0 1 -14 14 h-208 a14 14 0 0 1 -14 -14 v-8 a18 18 0 0 1 18 -18z" fill="url(#goldGrad)" stroke="#b88a1c" stroke-width="4"/><path d="M-10 10 h220" stroke="#ffe08a" stroke-opacity=".45" stroke-width="4"/></g>
-          <g transform="translate(380,300)"><circle r="42" fill="url(#goldGrad)" stroke="#b88a1c" stroke-width="4"/><path d="M-20,-18 h40 l-44,36 h48" fill="none" stroke="#1a2233" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/><path d="M-20,-18 h40 l-44,36 h48" fill="none" stroke="#ffe08a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" opacity=".9"/></g></g>
-        <g filter="url(#drop)"><ellipse cx="850" cy="270" rx="120" ry="22" fill="#000" fill-opacity=".22"/>
-          <g transform="translate(760,246)"><path d="M0 0 h180 a16 16 0 0 1 16 16 v6 a12 12 0 0 1 -12 12 h-188 a12 12 0 0 1 -12 -12 v-6 a16 16 0 0 1 16 -16z" fill="url(#goldGrad)" stroke="#b88a1c" stroke-width="4"/><path d="M-6 8 h192" stroke="#ffe08a" stroke-opacity=".45" stroke-width="3"/></g>
-          <g transform="translate(820,220)"><rect x="-58" y="-42" width="116" height="28" rx="4" fill="url(#cashGrad)" stroke="#153a25" stroke-width="3"/><rect x="-60" y="-16" width="120" height="28" rx="4" fill="url(#cashGrad)" stroke="#153a25" stroke-width="3"/><rect x="-62" y="10"  width="124" height="28" rx="4" fill="url(#cashGrad)" stroke="#153a25" stroke-width="3"/><rect x="-18" y="-50" width="36" height="98" fill="#f6f6f6" stroke="#c9c9c9" stroke-width="2"/><rect x="-16" y="-48" width="32" height="94" fill="#ffffff" opacity=".9"/></g></g>
-        <circle cx="0" cy="0" r="520" fill="url(#shine)"/>
-      </svg>
-    </div>
-
-    <h1 id="splashTitle" style="font-family:'Garamond','Times New Roman',serif;color:var(--gold-lite);letter-spacing:.3px;margin:.2rem 0;font-size:34px;text-shadow:0 1px 0 #46360a,0 3px 12px rgba(0,0,0,.45)">ZenTrader Pro</h1>
-    <div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:12px">
-      <select id="voiceSelect" title="Voice"><option>Loading voices…</option></select>
-      <button id="testVoice" class="btn" type="button">🔊 Test Voice</button>
-      <button id="enterApp" class="btn" type="button">Enter Dashboard</button>
-    </div>
-    <div id="voiceHint" style="margin-top:10px;font-size:12px;color:var(--muted)">Tip: say “hey then” or “hey zen” to wake, then: “ticker AAPL quantity three entry 192 point 35”.</div>
-  </div>
-</div>
-
 <!-- Sticky Header -->
 <header class="brand" role="banner">
   <div class="brand-inner">
-    <div aria-hidden="true" style="display:grid;place-items:center">
-      <!-- same ornate logo, header size -->
-      <svg id="logo-header" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 540" width="560" height="252" role="img" aria-label="ZenTrader Pro ornate golden balance logo">
-        <!-- Use the same defs/paths as splash (duplicated inside this SVG for isolation) -->
-        <defs>
-          <linearGradient id="goldGrad" x1="0" x2="0" y1="0" y2="1">
-            <stop offset="0%" stop-color="#ffd063"/><stop offset="45%" stop-color="#d4af37"/><stop offset="70%" stop-color="#b88a1c"/><stop offset="100%" stop-color="#7a5e12"/>
-          </linearGradient>
-          <radialGradient id="shine" cx="0.06" cy="0.04" r="0.95"><stop offset="0%" stop-color="#ffffff" stop-opacity="0.70"/><stop offset="40%" stop-color="#ffe08a" stop-opacity="0.30"/><stop offset="100%" stop-color="#000000" stop-opacity="0"/></radialGradient>
-          <linearGradient id="cashGrad" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stop-color="#6fdb8b"/><stop offset="50%" stop-color="#3fb37f"/><stop offset="100%" stop-color="#2e7c47"/></linearGradient>
-          <filter id="drop" x="-50%" y="-50%" width="200%" height="200%"><feDropShadow dx="0" dy="8" stdDeviation="8" flood-color="#000" flood-opacity="0.55"/></filter>
-        </defs>
-        <g filter="url(#drop)"><path d="M240 480 C 380 430, 820 430, 960 480 L 980 510 C 820 520, 380 520, 220 510 Z" fill="url(#goldGrad)" stroke="#b88a1c" stroke-width="4"/><path d="M260 470 C 410 420, 790 420, 940 470" fill="none" stroke="#ffe08a" stroke-opacity=".45" stroke-width="4"/><path d="M240 480 C 380 430, 820 430, 960 480" fill="none" stroke="#7a5e12" stroke-opacity=".65" stroke-width="6"/></g>
-        <g filter="url(#drop)"><rect x="578" y="240" width="44" height="190" rx="10" fill="url(#goldGrad)" stroke="#b88a1c" stroke-width="4"/><circle cx="600" cy="236" r="26" fill="url(#goldGrad)" stroke="#b88a1c" stroke-width="4"/></g>
-        <g filter="url(#drop)"><path d="M240 200 L 960 160" stroke="url(#goldGrad)" stroke-width="18" stroke-linecap="round"/><path d="M240 200 L 960 160" stroke="#ffe08a" stroke-opacity=".35" stroke-width="6" stroke-linecap="round"/><path d="M240 200 L 960 160" stroke="#7a5e12" stroke-opacity=".35" stroke-width="3" stroke-linecap="round"/></g>
-        <g stroke="url(#goldGrad)" stroke-width="6" filter="url(#drop)"><line x1="340" y1="183" x2="340" y2="305"/><line x1="420" y1="180" x2="420" y2="302"/><line x1="380" y1="188" x2="380" y2="308"/></g>
-        <g stroke="url(#goldGrad)" stroke-width="6" filter="url(#drop)"><line x1="820" y1="169" x2="820" y2="245"/><line x1="880" y1="166" x2="880" y2="242"/><line x1="850" y1="170" x2="850" y2="246"/></g>
-        <g filter="url(#drop)"><ellipse cx="380" cy="330" rx="135" ry="26" fill="#000" fill-opacity=".28"/><g transform="translate(280,306)"><path d="M0 0 h200 a18 18 0 0 1 18 18 v8 a14 14 0 0 1 -14 14 h-208 a14 14 0 0 1 -14 -14 v-8 a18 18 0 0 1 18 -18z" fill="url(#goldGrad)" stroke="#b88a1c" stroke-width="4"/><path d="M-10 10 h220" stroke="#ffe08a" stroke-opacity=".45" stroke-width="4"/></g><g transform="translate(380,300)"><circle r="42" fill="url(#goldGrad)" stroke="#b88a1c" stroke-width="4"/><path d="M-20,-18 h40 l-44,36 h48" fill="none" stroke="#1a2233" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/><path d="M-20,-18 h40 l-44,36 h48" fill="none" stroke="#ffe08a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" opacity=".9"/></g></g>
-        <g filter="url(#drop)"><ellipse cx="850" cy="270" rx="120" ry="22" fill="#000" fill-opacity=".22"/><g transform="translate(760,246)"><path d="M0 0 h180 a16 16 0 0 1 16 16 v6 a12 12 0 0 1 -12 12 h-188 a12 12 0 0 1 -12 -12 v-6 a16 16 0 0 1 16 -16z" fill="url(#goldGrad)" stroke="#b88a1c" stroke-width="4"/><path d="M-6 8 h192" stroke="#ffe08a" stroke-opacity=".45" stroke-width="3"/></g><g transform="translate(820,220)"><rect x="-58" y="-42" width="116" height="28" rx="4" fill="url(#cashGrad)" stroke="#153a25" stroke-width="3"/><rect x="-60" y="-16" width="120" height="28" rx="4" fill="url(#cashGrad)" stroke="#153a25" stroke-width="3"/><rect x="-62" y="10"  width="124" height="28" rx="4" fill="url(#cashGrad)" stroke="#153a25" stroke-width="3"/><rect x="-18" y="-50" width="36" height="98" fill="#f6f6f6" stroke="#c9c9c9" stroke-width="2"/><rect x="-16" y="-48" width="32" height="94" fill="#ffffff" opacity=".9"/></g></g>
-        <circle cx="0" cy="0" r="520" fill="url(#shine)"/>
-      </svg>
-    </div>
+    <div id="brandLogo" aria-hidden="true" style="display:grid;place-items:center"></div>
     <div class="brand-title">ZenTrader Pro</div>
-    <div class="brand-sub">Voice Trading Console • v10.0</div>
+    <div class="brand-sub">Voice Trading Console • v11.0</div>
     <div class="voice" role="group" aria-label="Voice controls">
       <button id="startVoice" class="btn" type="button">🎙️ Start Voice</button>
       <button id="stopVoice" class="btn" type="button">⏹️ Stop</button>
-      <span id="voiceStatus" class="status" aria-live="polite">Idle — click Start Voice</span>
+      <button id="testVoice" class="btn" type="button">🔊 Test Voice</button>
+      <span id="voiceStatus" class="status" aria-live="polite">Idle — click Start Voice (wake words: “hey then” / “hey zen”)</span>
     </div>
   </div>
 </header>
@@ -225,52 +148,118 @@
 </main>
 
 <footer role="contentinfo">
-  <div style="display:grid;place-items:center;margin-bottom:6px" aria-hidden="true">
-    <!-- same ornate logo, footer size -->
-    <svg id="logo-footer" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 540" width="320" height="144" role="img" aria-label="ZenTrader Pro ornate golden balance logo">
-      <!-- reuse same defs/paths (duplicated for isolation) -->
-      <defs>
-        <linearGradient id="goldGrad" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stop-color="#ffd063"/><stop offset="45%" stop-color="#d4af37"/><stop offset="70%" stop-color="#b88a1c"/><stop offset="100%" stop-color="#7a5e12"/></linearGradient>
-        <radialGradient id="shine" cx="0.06" cy="0.04" r="0.95"><stop offset="0%" stop-color="#ffffff" stop-opacity="0.70"/><stop offset="40%" stop-color="#ffe08a" stop-opacity="0.30"/><stop offset="100%" stop-color="#000000" stop-opacity="0"/></radialGradient>
-        <linearGradient id="cashGrad" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stop-color="#6fdb8b"/><stop offset="50%" stop-color="#3fb37f"/><stop offset="100%" stop-color="#2e7c47"/></linearGradient>
-        <filter id="drop" x="-50%" y="-50%" width="200%" height="200%"><feDropShadow dx="0" dy="8" stdDeviation="8" flood-color="#000" flood-opacity="0.55"/></filter>
-      </defs>
-      <g filter="url(#drop)"><path d="M240 480 C 380 430, 820 430, 960 480 L 980 510 C 820 520, 380 520, 220 510 Z" fill="url(#goldGrad)" stroke="#b88a1c" stroke-width="4"/></g>
-      <g filter="url(#drop)"><rect x="578" y="240" width="44" height="190" rx="10" fill="url(#goldGrad)" stroke="#b88a1c" stroke-width="4"/><circle cx="600" cy="236" r="26" fill="url(#goldGrad)" stroke="#b88a1c" stroke-width="4"/></g>
-      <g filter="url(#drop)"><path d="M240 200 L 960 160" stroke="url(#goldGrad)" stroke-width="18" stroke-linecap="round"/></g>
-      <g stroke="url(#goldGrad)" stroke-width="6" filter="url(#drop)"><line x1="340" y1="183" x2="340" y2="305"/><line x1="420" y1="180" x2="420" y2="302"/><line x1="380" y1="188" x2="380" y2="308"/></g>
-      <g stroke="url(#goldGrad)" stroke-width="6" filter="url(#drop)"><line x1="820" y1="169" x2="820" y2="245"/><line x1="880" y1="166" x2="880" y2="242"/><line x1="850" y1="170" x2="850" y2="246"/></g>
-      <g filter="url(#drop)"><ellipse cx="380" cy="330" rx="135" ry="26" fill="#000" fill-opacity=".28"/></g>
-      <g filter="url(#drop)"><ellipse cx="850" cy="270" rx="120" ry="22" fill="#000" fill-opacity=".22"/></g>
-      <circle cx="0" cy="0" r="520" fill="url(#shine)"/>
-    </svg>
-  </div>
+  <div id="footerLogo" aria-hidden="true" style="display:grid;place-items:center;margin-bottom:6px"></div>
   <div>© ZenTrader Pro</div>
 </footer>
 
 <script>
-/* ====== SERVICE WORKER PURGE + FAVICON FROM INLINE SVG ====== */
+/* ===== SERVICE WORKER PURGE + FAVICON FROM INLINE SVG ===== */
 (function(){
   if('serviceWorker' in navigator){
     navigator.serviceWorker.getRegistrations().then(rs=>rs.forEach(r=>r.unregister().catch(()=>{}))).catch(()=>{});
   }
-  const svg = document.querySelector('#logo-splash')?.outerHTML || '';
-  const fav = document.getElementById('favicon');
-  if(fav && svg){ fav.href = 'data:image/svg+xml;utf8,'+encodeURIComponent(svg)+'#v='+Date.now(); }
 })();
 
-/* ====== HEADER PADDING (avoid underlap) ====== */
-function debounce(fn,ms){let t;return function(){clearTimeout(t);t=setTimeout(fn,ms)}}
-const fixHeaderPadding = debounce(()=>{ try{ const h=document.querySelector('header.brand')?.getBoundingClientRect().height||160; document.body.style.paddingTop=Math.ceil(h)+'px'; }catch{} }, 40);
-window.addEventListener('resize',fixHeaderPadding,{passive:true});
-new MutationObserver(()=>fixHeaderPadding()).observe(document.documentElement,{subtree:true,childList:true,attributes:true,attributeFilter:['style','class']});
+/* ===== ORNATE PIRATE-STYLE LOGO (inline SVG, lopsided, sunlight UL) ===== */
+function ornateSVG(w){
+  const W=w||560,H=Math.round(W*0.45);
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 540" width="${W}" height="${H}" role="img" aria-label="ZenTrader Pro ornate golden balance logo">
+    <defs>
+      <linearGradient id="goldGrad" x1="0" x2="0" y1="0" y2="1">
+        <stop offset="0%" stop-color="#ffd063"/><stop offset="45%" stop-color="#d4af37"/>
+        <stop offset="70%" stop-color="#b88a1c"/><stop offset="100%" stop-color="#7a5e12"/>
+      </linearGradient>
+      <radialGradient id="shine" cx="0.06" cy="0.04" r="0.95">
+        <stop offset="0%" stop-color="#ffffff" stop-opacity="0.70"/>
+        <stop offset="40%" stop-color="#ffe08a" stop-opacity="0.30"/>
+        <stop offset="100%" stop-color="#000000" stop-opacity="0"/>
+      </radialGradient>
+      <linearGradient id="cashGrad" x1="0" x2="0" y1="0" y2="1">
+        <stop offset="0%" stop-color="#6fdb8b"/><stop offset="50%" stop-color="#3fb37f"/><stop offset="100%" stop-color="#2e7c47"/>
+      </linearGradient>
+      <filter id="drop" x="-50%" y="-50%" width="200%" height="200%">
+        <feDropShadow dx="0" dy="8" stdDeviation="8" flood-color="#000" flood-opacity="0.55"/>
+      </filter>
+    </defs>
+    <g filter="url(#drop)">
+      <path d="M240 480 C 380 430, 820 430, 960 480 L 980 510 C 820 520, 380 520, 220 510 Z" fill="url(#goldGrad)" stroke="#b88a1c" stroke-width="4"/>
+      <path d="M260 470 C 410 420, 790 420, 940 470" fill="none" stroke="#ffe08a" stroke-opacity=".45" stroke-width="4"/>
+      <path d="M240 480 C 380 430, 820 430, 960 480" fill="none" stroke="#7a5e12" stroke-opacity=".65" stroke-width="6"/>
+    </g>
+    <g filter="url(#drop)"><rect x="578" y="240" width="44" height="190" rx="10" fill="url(#goldGrad)" stroke="#b88a1c" stroke-width="4"/><circle cx="600" cy="236" r="26" fill="url(#goldGrad)" stroke="#b88a1c" stroke-width="4"/></g>
+    <g filter="url(#drop)">
+      <path d="M240 200 L 960 160" stroke="url(#goldGrad)" stroke-width="18" stroke-linecap="round"/>
+      <path d="M240 200 L 960 160" stroke="#ffe08a" stroke-opacity=".35" stroke-width="6" stroke-linecap="round"/>
+      <path d="M240 200 L 960 160" stroke="#7a5e12" stroke-opacity=".35" stroke-width="3" stroke-linecap="round"/>
+    </g>
+    <g stroke="url(#goldGrad)" stroke-width="6" filter="url(#drop)"><line x1="340" y1="183" x2="340" y2="305"/><line x1="420" y1="180" x2="420" y2="302"/><line x1="380" y1="188" x2="380" y2="308"/></g>
+    <g stroke="url(#goldGrad)" stroke-width="6" filter="url(#drop)"><line x1="820" y1="169" x2="820" y2="245"/><line x1="880" y1="166" x2="880" y2="242"/><line x1="850" y1="170" x2="850" y2="246"/></g>
+    <g filter="url(#drop)">
+      <ellipse cx="380" cy="330" rx="135" ry="26" fill="#000" fill-opacity=".28"/>
+      <g transform="translate(280,306)">
+        <path d="M0 0 h200 a18 18 0 0 1 18 18 v8 a14 14 0 0 1 -14 14 h-208 a14 14 0 0 1 -14 -14 v-8 a18 18 0 0 1 18 -18z" fill="url(#goldGrad)" stroke="#b88a1c" stroke-width="4"/>
+        <path d="M-10 10 h220" stroke="#ffe08a" stroke-opacity=".45" stroke-width="4"/>
+      </g>
+      <g transform="translate(380,300)">
+        <circle r="42" fill="url(#goldGrad)" stroke="#b88a1c" stroke-width="4"/>
+        <path d="M-20,-18 h40 l-44,36 h48" fill="none" stroke="#1a2233" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M-20,-18 h40 l-44,36 h48" fill="none" stroke="#ffe08a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" opacity=".9"/>
+      </g>
+    </g>
+    <g filter="url(#drop)">
+      <ellipse cx="850" cy="270" rx="120" ry="22" fill="#000" fill-opacity=".22"/>
+      <g transform="translate(760,246)">
+        <path d="M0 0 h180 a16 16 0 0 1 16 16 v6 a12 12 0 0 1 -12 12 h-188 a12 12 0 0 1 -12 -12 v-6 a16 16 0 0 1 16 -16z" fill="url(#goldGrad)" stroke="#b88a1c" stroke-width="4"/>
+        <path d="M-6 8 h192" stroke="#ffe08a" stroke-opacity=".45" stroke-width="3"/>
+      </g>
+      <g transform="translate(820,220)">
+        <rect x="-58" y="-42" width="116" height="28" rx="4" fill="url(#cashGrad)" stroke="#153a25" stroke-width="3"/>
+        <rect x="-60" y="-16" width="120" height="28" rx="4" fill="url(#cashGrad)" stroke="#153a25" stroke-width="3"/>
+        <rect x="-62" y="10"  width="124" height="28" rx="4" fill="url(#cashGrad)" stroke="#153a25" stroke-width="3"/>
+        <rect x="-18" y="-50" width="36" height="98" fill="#f6f6f6" stroke="#c9c9c9" stroke-width="2"/>
+        <rect x="-16" y="-48" width="32" height="94" fill="#ffffff" opacity=".9"/>
+      </g>
+    </g>
+    <circle cx="0" cy="0" r="520" fill="url(#shine)"/>
+  </svg>`;
+}
 
-/* ====== DEMO DATA + CHARTS (no external libs) ====== */
+/* Place/force logos + favicon + kill legacy logos */
+(function(){
+  function place(){
+    const headerHost=document.getElementById('brandLogo');
+    const footerHost=document.getElementById('footerLogo');
+    if(headerHost && !headerHost.querySelector('svg')) headerHost.innerHTML=ornateSVG(560);
+    if(footerHost && !footerHost.querySelector('svg')) footerHost.innerHTML=ornateSVG(320);
+    const fav=document.getElementById('favicon'); if(fav) fav.href='data:image/svg+xml;utf8,'+encodeURIComponent(ornateSVG(256))+'#v='+Date.now();
+  }
+  function enforce(){
+    document.querySelectorAll('img,svg use,[style*="background"]').forEach(n=>{
+      const src=(n.currentSrc||n.src||n.getAttribute?.('href')||n.getAttribute?.('xlink:href')||n.style?.backgroundImage||'').toLowerCase();
+      const cls=(n.className?.toString()||'').toLowerCase();
+      if(/logo|brand/.test(src)||/logo|brand/.test(cls)){
+        if(n.tagName==='IMG'){ const wrap=document.createElement('div'); wrap.innerHTML=ornateSVG(560); n.replaceWith(wrap.firstElementChild); }
+        else if(n.tagName==='USE'){ const s=n.closest('svg'); if(s) s.outerHTML=ornateSVG(560); }
+        else if(n.style && n.style.backgroundImage){ n.style.backgroundImage='url("data:image/svg+xml;utf8,'+encodeURIComponent(ornateSVG(560))+'")'; n.style.backgroundSize='contain'; n.style.backgroundRepeat='no-repeat'; n.style.backgroundPosition='center'; }
+      }
+    });
+  }
+  place(); enforce();
+  const mo=new MutationObserver(()=>{place(); enforce();});
+  mo.observe(document.documentElement,{subtree:true,childList:true,attributes:true,attributeFilter:['src','href','class','style']});
+})();
+
+/* Header padding so content slides under fixed top bar correctly */
+function debounce(fn,ms){let t;return function(){clearTimeout(t);t=setTimeout(fn,ms)}}
+const fixHeaderPadding=debounce(()=>{try{const h=document.querySelector('header.brand')?.getBoundingClientRect().height||160;document.body.style.paddingTop=Math.ceil(h)+'px';}catch{}},40);
+window.addEventListener('resize',fixHeaderPadding,{passive:true}); new MutationObserver(()=>fixHeaderPadding()).observe(document.documentElement,{subtree:true,childList:true,attributes:true}); fixHeaderPadding();
+
+/* ===== Demo data + custom charts (no external libs) ===== */
 const demo={labels:["Mon","Tue","Wed","Thu","Fri","Mon","Tue","Wed","Thu","Fri"],pnlCum:[0,300,-120,450,200,680,540,900,750,1200],trades:[{result:"Win",pnl:220},{result:"Loss",pnl:-80},{result:"Win",pnl:160},{result:"Win",pnl:340},{result:"BE",pnl:0},{result:"Win",pnl:180},{result:"Loss",pnl:-120},{result:"Win",pnl:260},{result:"Win",pnl:140},{result:"Win",pnl:310}]};
 function fmtMoney(v){const s=v<0?'-$':'$';return s+Math.abs(v).toLocaleString()}
 function calcKPIs(T){const n=T.length,w=T.filter(t=>t.result==="Win"),l=T.filter(t=>t.result==="Loss"),b=T.filter(t=>t.result==="BE");const wr=n?Math.round(w.length/n*100):0,tp=T.reduce((s,t)=>s+t.pnl,0);const gw=w.reduce((s,t)=>s+t.pnl,0),gl=Math.abs(l.reduce((s,t)=>s+t.pnl,0));const pf=gl?gw/gl:(gw?Infinity:0);return{n,winRate:wr,totalPnL:tp,profitFactor:pf,wins:w.length,losses:l.length,be:b.length};}
-function updateKPIs(){const k=calcKPIs(demo.trades); document.getElementById("k1")?.(0); document.getElementById("k1").textContent=fmtMoney(k.totalPnL); document.getElementById("k2").textContent=k.winRate+'%'; document.getElementById("k3").textContent=k.n; document.getElementById("k4").textContent=(Math.round(k.profitFactor*100)/100).toFixed(2);}
-function sizeCanvasForDPR(canvas){if(!canvas) return {ctx:null,W:0,H:0};const dpr=Math.max(1, window.devicePixelRatio||1);const rect=canvas.getBoundingClientRect();const needW=Math.floor(rect.width*dpr),needH=Math.floor(rect.height*dpr); if(canvas.width!==needW||canvas.height!==needH){canvas.width=needW;canvas.height=needH;} return {ctx:canvas.getContext('2d'),W:canvas.width,H:canvas.height};}
+function updateKPIs(){const k=calcKPIs(demo.trades); document.getElementById("k1").textContent=fmtMoney(k.totalPnL); document.getElementById("k2").textContent=k.winRate+'%'; document.getElementById("k3").textContent=k.n; document.getElementById("k4").textContent=(Math.round(k.profitFactor*100)/100).toFixed(2);}
+function sizeCanvasForDPR(canvas){if(!canvas) return {ctx:null,W:0,H:0};const dpr=Math.max(1,window.devicePixelRatio||1);const r=canvas.getBoundingClientRect();const w=Math.floor(r.width*dpr),h=Math.floor(r.height*dpr); if(canvas.width!==w||canvas.height!==h){canvas.width=w;canvas.height=h;} return {ctx:canvas.getContext('2d'),W:w,H:h};}
 function grid(x,x1,y1,x2,y2,s){x.save();x.strokeStyle='rgba(255,255,255,0.06)';x.lineWidth=1;for(let i=0;i<=s;i++){const y=y1+(y2-y1)*(i/s);x.beginPath();x.moveTo(x1,y);x.lineTo(x2,y);x.stroke();}x.restore();}
 function drawLine(c,labels,data){const {ctx:x,W,H}=sizeCanvasForDPR(c); if(!x) return; x.fillStyle='#0e1524';x.fillRect(0,0,W,H); const p={l:50,r:12,t:18,b:34},w=W-p.l-p.r,h=H-p.t-p.b; const M=Math.max(...data,0),m=Math.min(...data,0),R=(M-m)||1,y=v=>p.t+h-((v-m)/R)*h; grid(x,p.l,p.t,W-p.r,p.t+h,4); x.strokeStyle='#ffe08a';x.lineWidth=2;x.beginPath(); data.forEach((v,i)=>{const X=p.l+w/(data.length-1)*i,Y=y(v);i?x.lineTo(X,Y):x.moveTo(X,Y)}); x.stroke(); x.fillStyle='#d4af37'; data.forEach((v,i)=>{const X=p.l+w/(data.length-1)*i,Y=y(v);x.beginPath();x.arc(X,Y,3,0,6.283);x.fill()}); x.fillStyle='#9db0c8';x.font='11px system-ui,-apple-system,Segoe UI,Roboto,Arial';x.fillText('PnL',8,16);x.fillText('Time →',W/2-20,H-8);}
 function drawBars(c,labels,cum){const {ctx:x,W,H}=sizeCanvasForDPR(c); if(!x) return; x.fillStyle='#0e1524';x.fillRect(0,0,W,H); const p={l:40,r:12,t:14,b:34},w=W-p.l-p.r,h=H-p.t-p.b,d=cum.map((v,i)=>i===0?v:cum[i]-cum[i-1]); const M=Math.max(...d,0),m=Math.min(...d,0),R=(M-m)||1,y=v=>p.t+h-((v-m)/R)*h,bw=w/d.length*.7; grid(x,p.l,p.t,W-p.r,p.t+h,4); d.forEach((v,i)=>{const X=p.l+w/d.length*i+(w/d.length-bw)/2,Y=y(v),Y0=y(0);x.fillStyle=v>=0?'rgba(63,179,127,.75)':'rgba(212,91,107,.75)';x.fillRect(X,Math.min(Y,Y0),bw,Math.abs(Y-Y0));x.strokeStyle=v>=0?'#3fb37f':'#d45b6b';x.strokeRect(X,Math.min(Y,Y0),bw,Math.abs(Y-Y0))}); x.fillStyle='#9db0c8';x.font='11px system-ui,-apple-system,Segoe UI,Roboto,Arial';x.fillText('Daily PnL',8,16);x.fillText('Time →',W/2-20,H-8);}
@@ -278,82 +267,62 @@ function drawDonut(c,w,l,b){const {ctx:x,W,H}=sizeCanvasForDPR(c); if(!x) return
 function renderAll(){ updateKPIs(); drawLine(document.getElementById('pnlLine'),demo.labels,demo.pnlCum); drawBars(document.getElementById('pnlBars'),demo.labels,demo.pnlCum); const k=calcKPIs(demo.trades); drawDonut(document.getElementById('winLossDonut'),k.wins,k.losses,k.be); }
 const renderAllDebounced = debounce(()=>{ requestAnimationFrame(renderAll); }, 60);
 
-/* ====== VOICE (sultry British) + WAKE WORDS ====== */
+/* ===== Voice (sultry British preferred) + wake words ===== */
 const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
 const synth = window.speechSynthesis;
-function rankVoice(v){let s=0;if(/en-GB/i.test(v.lang))s+=1000;if(/female|woman|girl/i.test(v.name))s+=200;if(/Google|Microsoft|Apple/i.test(v.name))s+=50;if(/(Libby|Sonia|Hazel|Amy|Emma|Charlotte|Ellie|Mia|Aria|Jane|Lucy|Serena)/i.test(v.name))s+=120;return s;}
+function rankVoice(v){let s=0;if(/en-GB/i.test(v.lang))s+=1000;if(/female|woman|girl/i.test(v.name))s+=200;if(/(Libby|Sonia|Hazel|Amy|Emma|Charlotte|Ellie|Mia|Aria|Jane|Lucy|Serena)/i.test(v.name))s+=120;return s;}
 function getVoicesSorted(){try{const list=synth?.getVoices?.()||[];return list.slice().sort((a,b)=>rankVoice(b)-rankVoice(a));}catch{return[]}}
-let voicesReady=false, voicesTries=0;
+let voicesReady=false, tries=0;
 function populateVoices(){
   const list=getVoicesSorted();
-  if(!list.length && voicesTries<24){ voicesTries++; setTimeout(populateVoices,220); return; }
+  if(!list.length && tries<24){ tries++; setTimeout(populateVoices,220); return; }
   voicesReady=true;
-  const sel=document.getElementById('voiceSelect'), hint=document.getElementById('voiceHint');
-  if(!list.length){ if(hint) hint.textContent='No system voices available.'; return; }
-  if(sel){ sel.innerHTML=""; list.forEach(v=>{const o=document.createElement('option');o.value=v.name;o.textContent=`${v.name} (${v.lang})`;sel.appendChild(o);});
-    const saved=localStorage.getItem('ztpVoice'); sel.value = (saved && list.some(v=>v.name===saved)) ? saved : list[0].name; }
-  if(hint) hint.textContent='British female preferred. Your choice is saved.';
+  const sel=document.getElementById('voiceSelect'); if(sel){ sel.remove(); } // selector omitted for simplicity
 }
-if(synth && typeof synth.onvoiceschanged!=='undefined'){ synth.onvoiceschanged=populateVoices; }
-document.addEventListener('click', function once(){ if(!voicesReady) populateVoices(); document.removeEventListener('click', once, {passive:true}); }, {passive:true});
-document.getElementById('voiceSelect')?.addEventListener('change',()=>localStorage.setItem('ztpVoice', document.getElementById('voiceSelect').value));
 const SULTRY = Object.freeze({ rate:0.82, pitch:0.80, volume:1.0 });
-function currentVoice(){try{const name=document.getElementById('voiceSelect')?.value;const list=synth?.getVoices?.()||[];return list.find(v=>v.name===name)||list[0]||null;}catch{return null}}
+function currentVoice(){try{const list=synth?.getVoices?.()||[];return list.find(v=>/en-GB/i.test(v.lang)&&/female|libby|sonia|hazel|amy|emma|charlotte/i.test(v.name))||list[0]||null;}catch{return null}}
 function speak(text, style=SULTRY){
   try{
     if(!synth || !('SpeechSynthesisUtterance' in window)) return;
     synth.cancel();
     const cleaned=String(text||'').replace(/\s+/g,' ').trim(); if(!cleaned) return;
     const u=new SpeechSynthesisUtterance(cleaned);
-    const v=currentVoice(); if(v) u.voice=v;
-    u.rate=style.rate; u.pitch=style.pitch; u.volume=style.volume;
+    const v=currentVoice(); if(v) u.voice=v; u.rate=style.rate; u.pitch=style.pitch; u.volume=style.volume;
     synth.speak(u);
   }catch(e){ console.warn('TTS error',e); }
 }
-document.getElementById('testVoice')?.addEventListener('click',()=>{ if(!(synth && (getVoicesSorted().length||0))) populateVoices(); if(!synth){ alert('This browser does not support text-to-speech.'); return; } speak("Hello… this is ZenTrader Pro. I’ll guide you, in a calm, confident British tone."); },{passive:true});
-document.getElementById('enterApp')?.addEventListener('click',()=>{ const s=document.getElementById('splash'); if(s){ s.classList.add('hidden'); s.setAttribute('aria-hidden','true'); } speak("Welcome to ZenTrader Pro. Let’s begin."); },{passive:true});
+document.getElementById('testVoice').addEventListener('click',()=>{ if(!voicesReady) populateVoices(); speak("Hello… this is ZenTrader Pro. I’ll guide you, in a calm, confident British tone."); });
 
-/* ====== Speech recognition (no repeated permission spam) ====== */
 let rec=null,listening=false,armed=false,starting=false;
 if(SR){
   rec=new SR(); rec.lang='en-US'; rec.continuous=true; rec.interimResults=true;
   rec.onresult=(e)=>{
-    let finalText='';
-    for(let i=e.resultIndex;i<e.results.length;i++){
-      const r=e.results[i],txt=r[0].transcript?.trim?.()||"";
-      if(r.isFinal && txt) finalText+=' '+txt;
-    }
+    let finalText=''; for(let i=e.resultIndex;i<e.results.length;i++){const r=e.results[i],txt=r[0].transcript?.trim?.()||""; if(r.isFinal && txt) finalText+=' '+txt;}
     if(!finalText) return;
     const low=finalText.toLowerCase();
     if(!armed && (/\bhey[\s,.-]*then\b/.test(low)||/\bhey[\s,.-]*zen\b/.test(low))){
-      armed=true; speak("Yes… I’m listening.");
-      const vs=document.getElementById('voiceStatus'); if(vs) vs.textContent='Awake. Try “ticker AAPL quantity three entry 192 point 35”.';
-      return;
+      armed=true; speak("Yes… I’m listening."); const vs=document.getElementById('voiceStatus'); if(vs) vs.textContent='Awake. Try “ticker AAPL quantity three entry 192 point 35”.'; return;
     }
     if(armed){ handleCommand(finalText); }
   };
   rec.onstart=()=>{listening=true;starting=false;const vs=document.getElementById('voiceStatus'); if(vs) vs.textContent='Listening… Say “hey then” or “hey zen”…';};
-  rec.onend = ()=>{listening=false;starting=false;const vs=document.getElementById('voiceStatus'); if(vs) vs.textContent='Stopped. Click Start Voice to resume.';};
-  rec.onerror=(ev)=>{ starting=false; const vs=document.getElementById('voiceStatus');
-    if(ev.error==='not-allowed'){ if(vs) vs.textContent='Mic blocked. Allow access in site settings.'; }
-    else if(ev.error==='aborted'){ if(vs) vs.textContent='Listening aborted.'; }
-    else { if(vs) vs.textContent='Voice error: '+ev.error; }
-  };
+  rec.onend=()=>{listening=false;starting=false;const vs=document.getElementById('voiceStatus'); if(vs) vs.textContent='Stopped. Click Start Voice to resume.';};
+  rec.onerror=(ev)=>{starting=false;const vs=document.getElementById('voiceStatus'); if(ev.error==='not-allowed'){ if(vs) vs.textContent='Mic blocked. Allow access in site settings.'; } else if(ev.error==='aborted'){ if(vs) vs.textContent='Listening aborted.'; } else { if(vs) vs.textContent='Voice error: '+ev.error; } };
 }
-document.getElementById('startVoice')?.addEventListener('click',async ()=>{
+document.getElementById('startVoice').addEventListener('click',async ()=>{
   if(!rec){ const vs=document.getElementById('voiceStatus'); if(vs) vs.textContent='Speech recognition not supported in this browser.'; return; }
   if(listening||starting) return;
   try{
     if(navigator.permissions && navigator.permissions.query){
-      try{ const p = await navigator.permissions.query({name:'microphone'}); if(p.state==='denied'){ const vs=document.getElementById('voiceStatus'); if(vs) vs.textContent='Microphone is blocked in site settings.'; } }catch(_){}
+      try{ const p=await navigator.permissions.query({name:'microphone'}); if(p.state==='denied'){ const vs=document.getElementById('voiceStatus'); if(vs) vs.textContent='Microphone is blocked in site settings.'; } }catch(_){}
     }
     starting=true; rec.start();
   }catch(_){ starting=false; }
-},{passive:true});
-document.getElementById('stopVoice')?.addEventListener('click',()=>{ if(!rec) return; armed=false; try{ rec.stop(); }catch(_){} },{passive:true});
+});
+document.getElementById('stopVoice').addEventListener('click',()=>{ if(!rec) return; armed=false; try{rec.stop();}catch(_){}});
 
-/* ====== Command → fields ====== */
-const WORD_NUM = Object.freeze({"zero":0,"one":1,"two":2,"three":3,"four":4,"five":5,"six":6,"seven":7,"eight":8,"nine":9,"ten":10,"eleven":11,"twelve":12,"thirteen":13,"fourteen":14,"fifteen":15,"sixteen":16,"seventeen":17,"eighteen":18,"nineteen":19,"twenty":20});
+/* ===== Command parsing → fill fields + read back ===== */
+const WORD_NUM=Object.freeze({"zero":0,"one":1,"two":2,"three":3,"four":4,"five":5,"six":6,"seven":7,"eight":8,"nine":9,"ten":10,"eleven":11,"twelve":12,"thirteen":13,"fourteen":14,"fifteen":15,"sixteen":16,"seventeen":17,"eighteen":18,"nineteen":19,"twenty":20});
 function wordsToNumberToken(s){return s.replace(/\b(zero|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|fourteen|fifteen|sixteen|seventeen|eighteen|nineteen|twenty)\b/gi,(m)=>String(WORD_NUM[m.toLowerCase()]));}
 function normalizeNumberText(s){return s.replace(/\bpoint\b/gi,'.').replace(/[^\d.]/g,'');}
 function handleCommand(t){
@@ -371,17 +340,28 @@ function handleCommand(t){
   }
 }
 
-/* ====== INIT ====== */
-function init(){
-  fixHeaderPadding();
-  updateKPIs();
-  renderAll();
-  window.addEventListener('resize', renderAllDebounced, {passive:true});
-}
+/* ===== Populate demo table ===== */
+(function(){
+  const tbody=document.getElementById('rows'); if(!tbody) return; tbody.innerHTML='';
+  const now=new Date(); const toD=v=>v.toFixed(2);
+  demo.trades.forEach((t,i)=>{
+    const tr=document.createElement('tr');
+    const dt=new Date(now.getTime()- (demo.trades.length-i)*86400000);
+    tr.innerHTML=`<td>${dt.toISOString().slice(0,10)}</td><td>${['AAPL','ES','SPY','NVDA','TSLA'][i%5]}</td>
+      <td>${t.result==='Loss'?'Short':'Long'}</td><td>${Math.max(1,(i%5)+1)}</td><td>${toD(100+Math.random()*50)}</td>
+      <td>${toD(100+Math.random()*50)}</td><td>${t.result}</td><td>—</td>`;
+    tbody.appendChild(tr);
+  });
+})();
+
+/* ===== Init ===== */
+function init(){ fixHeaderPadding(); updateKPIs(); renderAll(); window.addEventListener('resize',()=>{renderAllDebounced();},{passive:true}); }
 if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',init,{once:true});}else{init();}
 </script>
 </body>
 </html>
+	
+
 	
 
 	
