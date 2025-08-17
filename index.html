@@ -1,329 +1,611 @@
 <!DOCTYPE html>
-<html lang="en" data-build="ztp-onefile-ornate-v12">
+<html lang="en">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>ZenTrader Pro — Dashboard</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ZenTrader Pro — Trading Dashboard</title>
 
-<!-- No-cache to defeat stale deploys -->
-<meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0"/>
-<meta http-equiv="Pragma" content="no-cache"/>
-<meta http-equiv="Expires" content="0"/>
+  <!-- Favicon: use cropped Z coin (square) -->
+  <link rel="icon" type="image/png" href="favicon.png" />
 
-<meta name="color-scheme" content="dark"/>
-<meta name="theme-color" content="#0b0f17"/>
-
-<style>
-:root{
-  --bg:#0b0f17; --panel:#111827; --panel-2:#0e1524;
-  --border:#22314a; --text:#e8eef7; --muted:#9db0c8;
-  --gold:#d4af37; --gold-lite:#ffe08a; --green:#3fb37f; --red:#d45b6b;
-}
-*,*::before,*::after{box-sizing:border-box}
-html,body{height:100%}
-body{
-  margin:0; font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial;
-  color:var(--text);
-  background:radial-gradient(900px 540px at 50% -180px,#182235 10%,var(--bg) 60%);
-  padding-top:168px; /* set by JS as well */
-  overflow-x:hidden;
-}
-
-/* Kill any legacy/modern logos a theme might inject */
-header img, header .logo, header .site-logo, header .brand-logo, header [class*="logo"]{
-  display:none!important; background-image:none!important;
-}
-
-/* Header (sticky) */
-header.brand{
-  position:fixed; left:0; right:0; top:0; z-index:1000;
-  backdrop-filter:saturate(130%) blur(4px);
-  background:linear-gradient(180deg,rgba(16,24,39,.95),rgba(11,15,23,.92));
-  border-bottom:1px solid var(--border); padding:12px 16px 12px;
-}
-.brand-inner{max-width:1200px;margin:0 auto;display:grid;place-items:center}
-
-.brand-title{
-  margin:8px 0 0; font-weight:800; letter-spacing:.3px; font-size:34px; line-height:1.1;
-  font-family:"Garamond","Times New Roman","Palatino Linotype","Book Antiqua",Georgia,serif;
-  background:linear-gradient(180deg,#ffe08a,#d4af37 55%,#7a5e12 100%);
-  -webkit-background-clip:text; background-clip:text; color:transparent;
-  text-shadow:0 1px 0 #46360a,0 3px 12px rgba(0,0,0,.45);
-}
-.brand-sub{margin:2px 0 0;color:var(--muted);font-size:12px}
-.voice{display:flex;gap:10px;align-items:center;justify-content:center;margin:10px 0 0;flex-wrap:wrap}
-.btn{background:#0e1524;border:1px solid var(--border);color:var(--text);padding:10px 14px;border-radius:12px;cursor:pointer;font-weight:600}
-.btn:hover{border-color:#3c5f94}
-.status{color:var(--muted);font-size:12px}
-
-/* Layout */
-main{max-width:1200px;margin:18px auto;padding:0 16px 60px;display:grid;gap:16px;grid-template-columns:2fr 1fr}
-@media (max-width:980px){main{grid-template-columns:1fr}}
-.card{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:16px;box-shadow:0 2px 18px rgba(0,0,0,.25)}
-.card h2{margin:0 0 12px;font-size:16px;color:var(--gold-lite);font-family:"Garamond","Times New Roman",serif}
-.gold-outline{border:1px solid rgba(212,175,55,.35);box-shadow:inset 0 0 12px rgba(212,175,55,.15)}
-.form-grid{display:grid;grid-template-columns:140px 1fr;gap:12px;align-items:center}
-label{color:var(--muted);font-size:13px}
-input,select,textarea{width:100%;background:var(--panel-2);color:var(--text);border:1px solid #283853;border-radius:10px;padding:10px;font-size:14px;outline:none;transition:border-color .2s,box-shadow .2s}
-input:focus,select:focus,textarea:focus{border-color:#3c5f94;box-shadow:0 0 0 3px rgba(76,201,240,.12)}
-textarea{min-height:80px;resize:vertical}
-table{width:100%;border-collapse:collapse}
-th,td{border:1px solid var(--border);padding:8px 10px;text-align:left;vertical-align:top}
-th{background:var(--panel-2);color:var(--gold-lite);font-weight:700}
-.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
-.stat{background:var(--panel-2);border:1px solid var(--border);border-radius:12px;padding:12px;text-align:center}
-.stat .v{font-size:20px;font-weight:800}
-.stat .l{color:var(--muted);font-size:12px}
-.chart{background:var(--panel-2);border:1px solid var(--border);border-radius:12px;padding:14px;display:grid;place-items:center}
-canvas{width:100%;height:260px;max-height:42vh}
-footer{color:var(--muted);font-size:12px;text-align:center;padding:24px 0}
-</style>
+  <style>
+    :root{
+      --bg:#0e0e0f; --panel:#151517; --panel2:#1b1b1e; --gold:#d4af37; --muted:#a7a7ad; --good:#1fbf6b; --bad:#ff5454;
+      --text:#f4f4f6; --accent:#e6c766; --shadow:rgba(0,0,0,.35);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; background:var(--bg); color:var(--text); font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif;
+    }
+    header,footer{
+      background:#000; padding:18px 14px; display:flex; align-items:center; justify-content:center; gap:16px;
+      box-shadow:0 2px 10px var(--shadow);
+    }
+    header img, footer img{ max-height:80px; height:auto; width:auto; display:block; }
+    main{ padding:20px; max-width:1300px; margin:0 auto; }
+    .grid{
+      display:grid; gap:16px;
+      grid-template-columns: repeat(12, 1fr);
+    }
+    .card{
+      background:linear-gradient(180deg,var(--panel),var(--panel2)); border:1px solid #232327; border-radius:18px;
+      box-shadow:0 8px 24px var(--shadow); padding:16px;
+    }
+    .span-12{grid-column: span 12;}
+    .span-8{grid-column: span 8;}
+    .span-4{grid-column: span 4;}
+    .span-6{grid-column: span 6;}
+    h2,h3{margin:0 0 12px 0; font-weight:700; letter-spacing:.2px}
+    h2{font-size:1.2rem; color:var(--accent)}
+    h3{font-size:1rem; color:var(--muted)}
+    .kpis{ display:grid; grid-template-columns:repeat(4,1fr); gap:12px; }
+    .kpi{ background:#121214; border:1px solid #222; border-radius:14px; padding:12px }
+    .kpi .label{color:var(--muted); font-size:.8rem}
+    .kpi .value{font-size:1.35rem; margin-top:6px}
+    .row{display:flex; gap:10px; flex-wrap:wrap}
+    .row > *{flex:1}
+    input,select,textarea,button{
+      width:100%; background:#0f0f11; color:var(--text); border:1px solid #2a2a2f; border-radius:10px; padding:10px 12px;
+      outline:none;
+    }
+    input::placeholder, textarea::placeholder{color:#6c6c72}
+    button{
+      background:linear-gradient(180deg,#2a2a2d,#202024); border:1px solid #3a3a40; cursor:pointer; font-weight:600;
+      transition:transform .05s ease, box-shadow .2s ease;
+    }
+    button:hover{ box-shadow:0 6px 18px var(--shadow) }
+    button:active{ transform:translateY(1px) }
+    .btn-gold{background:linear-gradient(180deg,#f6d98b,#d9b449); color:#1a1302; border-color:#f0c96a}
+    .btn-outline{ background:transparent; border-style:dashed }
+    .toolbar{ display:flex; gap:10px; flex-wrap:wrap }
+    canvas{ width:100%; height:280px; background:#101012; border:1px solid #222; border-radius:12px }
+    table{ width:100%; border-collapse:collapse; font-size:.92rem }
+    th,td{ padding:8px 10px; border-bottom:1px solid #232327; text-align:left }
+    tr:hover td{ background:#121216 }
+    .tag{ display:inline-block; padding:2px 8px; border:1px solid #333; border-radius:20px; font-size:.75rem; color:#cfcfd5 }
+    .good{color:var(--good)} .bad{color:var(--bad)}
+    .note{color:#b7b7bd; font-size:.9rem}
+    .mic{display:inline-flex; align-items:center; gap:8px}
+    .dot{width:10px; height:10px; border-radius:50%; background:#555}
+    .dot.live{ background:#32d296; box-shadow:0 0 10px #32d296 }
+    @media (max-width: 980px){
+      .span-8,.span-4,.span-6{grid-column: span 12;}
+      .kpis{grid-template-columns:repeat(2,1fr)}
+      header img, footer img{max-height:64px}
+    }
+  </style>
 </head>
 <body>
 
-<!-- Sticky Header with INLINE ORNATE LOGO -->
-<header class="brand" role="banner">
-  <div class="brand-inner">
+  <!-- Header with EXACT logo -->
+  <header>
+    <img src="zentrader-logo.png" alt="ZenTrader Pro Logo" />
+  </header>
 
-    <!-- Ornate pirate-style golden balance (lopsided, sunlight upper-left) -->
-    <svg id="logo-header" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 540" width="660" height="297" role="img" aria-label="ZenTrader Pro ornate golden balance logo">
-      <defs>
-        <linearGradient id="g1" x1="0" x2="0" y1="0" y2="1">
-          <stop offset="0%" stop-color="#ffd063"/><stop offset="45%" stop-color="#d4af37"/>
-          <stop offset="70%" stop-color="#b88a1c"/><stop offset="100%" stop-color="#7a5e12"/>
-        </linearGradient>
-        <radialGradient id="shine" cx="0.06" cy="0.04" r="0.95">
-          <stop offset="0%" stop-color="#ffffff" stop-opacity="0.70"/>
-          <stop offset="40%" stop-color="#ffe08a" stop-opacity="0.30"/>
-          <stop offset="100%" stop-color="#000000" stop-opacity="0"/>
-        </radialGradient>
-        <linearGradient id="cash" x1="0" x2="0" y1="0" y2="1">
-          <stop offset="0%" stop-color="#6fdb8b"/>
-          <stop offset="50%" stop-color="#3fb37f"/>
-          <stop offset="100%" stop-color="#2e7c47"/>
-        </linearGradient>
-        <filter id="drop" x="-50%" y="-50%" width="200%" height="200%">
-          <feDropShadow dx="0" dy="8" stdDeviation="8" flood-color="#000" flood-opacity="0.55"/>
-        </filter>
-      </defs>
-      <g filter="url(#drop)">
-        <path d="M240 480 C 380 430, 820 430, 960 480 L 980 510 C 820 520, 380 520, 220 510 Z" fill="url(#g1)" stroke="#b88a1c" stroke-width="4"/>
-        <path d="M260 470 C 410 420, 790 420, 940 470" fill="none" stroke="#ffe08a" stroke-opacity=".45" stroke-width="4"/>
-        <path d="M240 480 C 380 430, 820 430, 960 480" fill="none" stroke="#7a5e12" stroke-opacity=".65" stroke-width="6"/>
-      </g>
-      <g filter="url(#drop)"><rect x="578" y="240" width="44" height="190" rx="10" fill="url(#g1)" stroke="#b88a1c" stroke-width="4"/><circle cx="600" cy="236" r="26" fill="url(#g1)" stroke="#b88a1c" stroke-width="4"/></g>
-      <g filter="url(#drop)"><path d="M240 200 L 960 160" stroke="url(#g1)" stroke-width="18" stroke-linecap="round"/><path d="M240 200 L 960 160" stroke="#ffe08a" stroke-opacity=".35" stroke-width="6" stroke-linecap="round"/><path d="M240 200 L 960 160" stroke="#7a5e12" stroke-opacity=".35" stroke-width="3" stroke-linecap="round"/></g>
-      <!-- Chains (left lower, right higher) -->
-      <g stroke="url(#g1)" stroke-width="6" filter="url(#drop)"><line x1="340" y1="183" x2="340" y2="305"/><line x1="420" y1="180" x2="420" y2="302"/><line x1="380" y1="188" x2="380" y2="308"/></g>
-      <g stroke="url(#g1)" stroke-width="6" filter="url(#drop)"><line x1="820" y1="169" x2="820" y2="245"/><line x1="880" y1="166" x2="880" y2="242"/><line x1="850" y1="170" x2="850" y2="246"/></g>
-      <!-- Left pan w/ ornate Z (low) -->
-      <g filter="url(#drop)">
-        <ellipse cx="380" cy="330" rx="135" ry="26" fill="#000" fill-opacity=".28"/>
-        <g transform="translate(280,306)">
-          <path d="M0 0 h200 a18 18 0 0 1 18 18 v8 a14 14 0 0 1 -14 14 h-208 a14 14 0 0 1 -14 -14 v-8 a18 18 0 0 1 18 -18z" fill="url(#g1)" stroke="#b88a1c" stroke-width="4"/>
-          <path d="M-10 10 h220" stroke="#ffe08a" stroke-opacity=".45" stroke-width="4"/>
-        </g>
-        <g transform="translate(380,300)">
-          <circle r="42" fill="url(#g1)" stroke="#b88a1c" stroke-width="4"/>
-          <path d="M-20,-18 h40 l-44,36 h48" fill="none" stroke="#1a2233" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
-          <path d="M-20,-18 h40 l-44,36 h48" fill="none" stroke="#ffe08a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" opacity=".9"/>
-        </g>
-      </g>
-      <!-- Right pan w/ cash stack (high) -->
-      <g filter="url(#drop)">
-        <ellipse cx="850" cy="270" rx="120" ry="22" fill="#000" fill-opacity=".22"/>
-        <g transform="translate(760,246)">
-          <path d="M0 0 h180 a16 16 0 0 1 16 16 v6 a12 12 0 0 1 -12 12 h-188 a12 12 0 0 1 -12 -12 v-6 a16 16 0 0 1 16 -16z" fill="url(#g1)" stroke="#b88a1c" stroke-width="4"/>
-          <path d="M-6 8 h192" stroke="#ffe08a" stroke-opacity=".45" stroke-width="3"/>
-        </g>
-        <g transform="translate(820,220)">
-          <rect x="-58" y="-42" width="116" height="28" rx="4" fill="url(#cash)" stroke="#153a25" stroke-width="3"/>
-          <rect x="-60" y="-16" width="120" height="28" rx="4" fill="url(#cash)" stroke="#153a25" stroke-width="3"/>
-          <rect x="-62" y="10"  width="124" height="28" rx="4" fill="url(#cash)" stroke="#153a25" stroke-width="3"/>
-          <rect x="-18" y="-50" width="36" height="98" fill="#f6f6f6" stroke="#c9c9c9" stroke-width="2"/>
-          <rect x="-16" y="-48" width="32" height="94" fill="#ffffff" opacity=".9"/>
-        </g>
-      </g>
-      <circle cx="0" cy="0" r="520" fill="url(#shine)"/>
-    </svg>
+  <main>
+    <div class="grid">
+      <!-- KPIs -->
+      <section class="card span-12">
+        <h2>Key Performance Indicators</h2>
+        <div class="kpis" id="kpiGrid">
+          <div class="kpi"><div class="label">Net P&amp;L ($)</div><div class="value" id="k_net">0</div></div>
+          <div class="kpi"><div class="label">Win Rate</div><div class="value" id="k_win">0%</div></div>
+          <div class="kpi"><div class="label">Profit Factor</div><div class="value" id="k_pf">0.00</div></div>
+          <div class="kpi"><div class="label">Expectancy ($/trade)</div><div class="value" id="k_exp">0.00</div></div>
 
-    <div class="brand-title">ZenTrader Pro</div>
-    <div class="brand-sub">Voice Trading Console • v12</div>
+          <div class="kpi"><div class="label">Avg Win ($)</div><div class="value" id="k_avgw">0.00</div></div>
+          <div class="kpi"><div class="label">Avg Loss ($)</div><div class="value" id="k_avgl">0.00</div></div>
+          <div class="kpi"><div class="label">Max Drawdown ($)</div><div class="value" id="k_mdd">0.00</div></div>
+          <div class="kpi"><div class="label">Best/Worst Trade ($)</div><div class="value" id="k_bw">0 / 0</div></div>
 
-    <div class="voice" role="group" aria-label="Voice controls">
-      <button id="startVoice" class="btn" type="button">🎙️ Start Voice</button>
-      <button id="stopVoice" class="btn" type="button">⏹️ Stop</button>
-      <button id="testVoice" class="btn" type="button">🔊 Test Voice</button>
-      <span id="voiceStatus" class="status" aria-live="polite">Idle — click Start Voice (wake: “hey then” / “hey zen”)</span>
+          <div class="kpi"><div class="label">Total Trades</div><div class="value" id="k_trades">0</div></div>
+          <div class="kpi"><div class="label">Win/Loss Streak</div><div class="value" id="k_streak">0 / 0</div></div>
+          <div class="kpi"><div class="label">Avg R (approx.)</div><div class="value" id="k_r">0.00</div></div>
+          <div class="kpi"><div class="label">Last Update</div><div class="value" id="k_updated">—</div></div>
+        </div>
+      </section>
+
+      <!-- Trade Entry -->
+      <section class="card span-8">
+        <h2>Log a Trade</h2>
+        <div class="row">
+          <input id="t_date" type="datetime-local" />
+          <input id="t_symbol" placeholder="Symbol (e.g., SPY)" />
+          <select id="t_side">
+            <option value="LONG">LONG</option>
+            <option value="SHORT">SHORT</option>
+          </select>
+          <input id="t_qty" type="number" step="1" placeholder="Qty" />
+        </div>
+        <div class="row">
+          <input id="t_entry" type="number" step="0.01" placeholder="Entry Price" />
+          <input id="t_exit" type="number" step="0.01" placeholder="Exit Price" />
+          <input id="t_fees" type="number" step="0.01" placeholder="Fees/Comm" />
+          <input id="t_points" type="text" placeholder="Auto: Points" disabled />
+        </div>
+        <div class="row">
+          <input id="t_setup" placeholder="Setup (e.g., RSI bounce)" />
+          <input id="t_stop" type="number" step="0.01" placeholder="Implied Risk per unit (optional)" />
+          <input id="t_target" type="number" step="0.01" placeholder="Target per unit (optional)" />
+        </div>
+        <textarea id="t_notes" rows="3" placeholder="Notes"></textarea>
+        <div class="toolbar" style="margin-top:10px">
+          <button class="btn-gold" onclick="addTrade()">Add Trade</button>
+          <button onclick="clearForm()">Clear</button>
+          <span class="mic">
+            <button id="btnMic" onclick="toggleMic()">🎙️ Voice</button>
+            <span id="micDot" class="dot" title="Mic status"></span>
+          </span>
+          <button onclick="speakStats()">🔊 Read Stats</button>
+          <button class="btn-outline" onclick="exportCSV()">Export CSV</button>
+          <label class="btn-outline" style="padding:0; overflow:hidden; position:relative">
+            <span style="display:block; padding:10px 12px; cursor:pointer">Import CSV</span>
+            <input type="file" accept=".csv" style="opacity:0; position:absolute; inset:0" onchange="importCSV(event)"/>
+          </label>
+        </div>
+        <p class="note">Tip: try voice commands like “log trade”, “read stats”, “start listening”, “stop listening”.</p>
+      </section>
+
+      <!-- Charts -->
+      <section class="card span-4">
+        <h2>Status &amp; Voice</h2>
+        <div id="voiceStatus" class="note">Voice: idle</div>
+        <div style="margin-top:10px">
+          <span class="tag">Voice: British female (auto)</span>
+          <span class="tag">Local save</span>
+          <span class="tag">Hands-free</span>
+        </div>
+        <h3 style="margin-top:16px">Quick Actions</h3>
+        <div class="row">
+          <button onclick="quickWin()">+ Quick Win</button>
+          <button onclick="quickLoss()">− Quick Loss</button>
+        </div>
+        <p class="note" style="margin-top:8px">Quick Win/Loss logs a $+50/$−50 placeholder on SPY for testing.</p>
+      </section>
+
+      <section class="card span-6">
+        <h2>Equity Curve</h2>
+        <canvas id="chartEquity" width="800" height="300"></canvas>
+      </section>
+      <section class="card span-6">
+        <h2>Daily P&amp;L</h2>
+        <canvas id="chartDaily" width="800" height="300"></canvas>
+      </section>
+      <section class="card span-6">
+        <h2>Win / Loss Distribution</h2>
+        <canvas id="chartHist" width="800" height="300"></canvas>
+      </section>
+
+      <!-- Trades Table -->
+      <section class="card span-12">
+        <h2>Trades</h2>
+        <div style="overflow:auto">
+          <table id="tbl">
+            <thead>
+              <tr>
+                <th>#</th><th>Date</th><th>Symbol</th><th>Side</th><th>Qty</th><th>Entry</th><th>Exit</th>
+                <th>Points</th><th>P&amp;L ($)</th><th>Fees</th><th>Setup</th><th>Notes</th><th></th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </section>
     </div>
-  </div>
-</header>
+  </main>
 
-<main role="main">
-  <!-- Trade Entry -->
-  <section class="card gold-outline" aria-labelledby="trade-entry">
-    <h2 id="trade-entry">Trade Entry</h2>
-    <div class="form-grid">
-      <label for="ticker">Ticker</label><input id="ticker" inputmode="text" autocomplete="off" placeholder="e.g., SPY, ES, AAPL">
-      <label for="side">Direction</label><select id="side"><option value="">— Select —</option><option>Long</option><option>Short</option></select>
-      <label for="qty">Quantity</label><input id="qty" type="number" min="0" step="1" placeholder="e.g., 3">
-      <label for="entry">Entry Price</label><input id="entry" type="number" min="0" step="0.01" placeholder="e.g., 492.35">
-      <label for="exit">Exit Price</label><input id="exit" type="number" min="0" step="0.01" placeholder="e.g., 495.10">
-      <label for="result">Win / Loss</label><select id="result"><option value="">— Select —</option><option>Win</option><option>Loss</option><option>BE</option></select>
-      <label for="notes">Notes</label><textarea id="notes" placeholder="Reason for entry, setup, management…"></textarea>
-    </div>
-  </section>
+  <!-- Footer with EXACT logo -->
+  <footer>
+    <img src="zentrader-logo.png" alt="ZenTrader Pro Logo" />
+    <div style="margin-left:10px; color:#b9b9bf">© 2025 ZenTrader Pro • Balance first, profit follows.</div>
+  </footer>
 
-  <!-- KPIs -->
-  <section class="card gold-outline" aria-labelledby="kpis">
-    <h2 id="kpis">KPIs</h2>
-    <div class="stats">
-      <div class="stat"><div class="v" id="k1">$0</div><div class="l">PnL (Today)</div></div>
-      <div class="stat"><div class="v" id="k2">0%</div><div class="l">Win Rate</div></div>
-      <div class="stat"><div class="v" id="k3">0</div><div class="l"># Trades</div></div>
-      <div class="stat"><div class="v" id="k4">0.00</div><div class="l">Profit Factor</div></div>
-    </div>
-  </section>
+  <script>
+  /* =======================
+     Utility & State
+  ======================== */
+  const $ = s => document.querySelector(s);
+  const tradesKey = 'ztp_trades_v1';
+  let trades = load() || [];
 
-  <!-- Recent Trades -->
-  <section class="card gold-outline" aria-labelledby="recent-trades" style="grid-column:1/-1">
-    <h2 id="recent-trades">Recent Trades</h2>
-    <table aria-label="Recent trades">
-      <thead><tr><th>Date</th><th>Symbol</th><th>Side</th><th>Qty</th><th>Entry</th><th>Exit</th><th>Result</th><th>Notes</th></tr></thead>
-      <tbody id="rows"><tr><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr></tbody>
-    </table>
-  </section>
+  function nowISO(){ const d=new Date(); d.setMinutes(d.getMinutes()-d.getTimezoneOffset()); return d.toISOString().slice(0,16); }
+  $('#t_date').value = nowISO();
 
-  <!-- Charts -->
-  <section class="card gold-outline" aria-labelledby="charts" style="grid-column:1/-1">
-    <h2 id="charts">Performance Charts</h2>
-    <div class="chart" style="margin-bottom:14px"><canvas id="pnlLine" width="1000" height="260" aria-label="Equity curve"></canvas></div>
-    <div class="chart" style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
-      <canvas id="winLossDonut" height="240" aria-label="Win/Loss"></canvas>
-      <canvas id="pnlBars" height="240" aria-label="Daily PnL"></canvas>
-    </div>
-  </section>
-</main>
+  function save(){ localStorage.setItem(tradesKey, JSON.stringify(trades)); }
+  function load(){ try{ return JSON.parse(localStorage.getItem(tradesKey)||'[]'); }catch{ return []; } }
 
-<footer role="contentinfo">
-  <!-- Smaller inline ornate logo for footer -->
-  <div style="display:grid;place-items:center;margin-bottom:6px">
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 540" width="340" height="153" aria-hidden="true">
-      <use href="#logo-header"></use>
-    </svg>
-  </div>
-  <div>© ZenTrader Pro</div>
-</footer>
+  function fmt(n, d=2){ if(!isFinite(n)) return '0.00'; return Number(n).toLocaleString(undefined,{minimumFractionDigits:d, maximumFractionDigits:d}); }
+  function sum(a){ return a.reduce((x,y)=>x+y,0); }
 
-<script>
-/* === utilities === */
-function debounce(fn,ms){let t;return function(){clearTimeout(t);t=setTimeout(fn,ms)}}
-const fixHeaderPadding=debounce(()=>{try{const h=document.querySelector('header.brand')?.getBoundingClientRect().height||168;document.body.style.paddingTop=Math.ceil(h)+'px';}catch{}},40);
-window.addEventListener('resize',fixHeaderPadding,{passive:true}); fixHeaderPadding();
-
-/* === demo data + canvas charts (no external libs) === */
-const demo={labels:["Mon","Tue","Wed","Thu","Fri","Mon","Tue","Wed","Thu","Fri"],pnlCum:[0,300,-120,450,200,680,540,900,750,1200],trades:[{result:"Win",pnl:220},{result:"Loss",pnl:-80},{result:"Win",pnl:160},{result:"Win",pnl:340},{result:"BE",pnl:0},{result:"Win",pnl:180},{result:"Loss",pnl:-120},{result:"Win",pnl:260},{result:"Win",pnl:140},{result:"Win",pnl:310}]};
-function fmtMoney(v){const s=v<0?'-$':'$';return s+Math.abs(v).toLocaleString()}
-function calcKPIs(T){const n=T.length,w=T.filter(t=>t.result==="Win"),l=T.filter(t=>t.result==="Loss"),b=T.filter(t=>t.result==="BE");const wr=n?Math.round(w.length/n*100):0,tp=T.reduce((s,t)=>s+t.pnl,0);const gw=w.reduce((s,t)=>s+t.pnl,0),gl=Math.abs(l.reduce((s,t)=>s+t.pnl,0));const pf=gl?gw/gl:(gw?Infinity:0);return{n,winRate:wr,totalPnL:tp,profitFactor:pf,wins:w.length,losses:l.length,be:b.length};}
-function updateKPIs(){const k=calcKPIs(demo.trades); document.getElementById("k1").textContent=fmtMoney(k.totalPnL); document.getElementById("k2").textContent=k.winRate+'%'; document.getElementById("k3").textContent=k.n; document.getElementById("k4").textContent=(Math.round(k.profitFactor*100)/100).toFixed(2);}
-function sizeCanvas(c){if(!c)return{ctx:null,W:0,H:0};const dpr=Math.max(1,window.devicePixelRatio||1);const r=c.getBoundingClientRect();const W=Math.floor(r.width*dpr),H=Math.floor(r.height*dpr);if(c.width!==W||c.height!==H){c.width=W;c.height=H;}return{ctx:c.getContext('2d'),W,H};}
-function grid(x,x1,y1,x2,y2,rows){x.save();x.strokeStyle='rgba(255,255,255,.06)';x.lineWidth=1;for(let i=0;i<=rows;i++){const y=y1+(y2-y1)*(i/rows);x.beginPath();x.moveTo(x1,y);x.lineTo(x2,y);x.stroke();}x.restore();}
-function drawLine(c,labels,data){const {ctx:x,W,H}=sizeCanvas(c); if(!x) return; x.fillStyle='#0e1524';x.fillRect(0,0,W,H); const p={l:50,r:12,t:18,b:34},w=W-p.l-p.r,h=H-p.t-p.b; const M=Math.max(...data,0),m=Math.min(...data,0),R=(M-m)||1,y=v=>p.t+h-((v-m)/R)*h; grid(x,p.l,p.t,W-p.r,p.t+h,4); x.strokeStyle='#ffe08a';x.lineWidth=2;x.beginPath(); data.forEach((v,i)=>{const X=p.l+w/(data.length-1)*i,Y=y(v);i?x.lineTo(X,Y):x.moveTo(X,Y)}); x.stroke(); x.fillStyle='#d4af37'; data.forEach((v,i)=>{const X=p.l+w/(data.length-1)*i,Y=y(v);x.beginPath();x.arc(X,Y,3,0,6.283);x.fill()}); x.fillStyle='#9db0c8';x.font='11px system-ui,-apple-system,Segoe UI,Roboto,Arial';x.fillText('PnL',8,16);x.fillText('Time →',W/2-20,H-8);}
-function drawBars(c,cum){const {ctx:x,W,H}=sizeCanvas(c); if(!x) return; x.fillStyle='#0e1524';x.fillRect(0,0,W,H); const p={l:40,r:12,t:14,b:34},w=W-p.l-p.r,h=H-p.t-p.b,d=cum.map((v,i)=>i===0?v:cum[i]-cum[i-1]); const M=Math.max(...d,0),m=Math.min(...d,0),R=(M-m)||1,y=v=>p.t+h-((v-m)/R)*h,bw=w/d.length*.7; grid(x,p.l,p.t,W-p.r,p.t+h,4); d.forEach((v,i)=>{const X=p.l+w/d.length*i+(w/d.length-bw)/2,Y=y(v),Y0=y(0);x.fillStyle=v>=0?'rgba(63,179,127,.75)':'rgba(212,91,107,.75)';x.fillRect(X,Math.min(Y,Y0),bw,Math.abs(Y-Y0));x.strokeStyle=v>=0?'#3fb37f':'#d45b6b';x.strokeRect(X,Math.min(Y,Y0),bw,Math.abs(Y-Y0))}); x.fillStyle='#9db0c8';x.font='11px system-ui,-apple-system,Segoe UI,Roboto,Arial';x.fillText('Daily PnL',8,16);x.fillText('Time →',W/2-20,H-8);}
-function drawDonut(c,w,l,b){const {ctx:x,W,H}=sizeCanvas(c); if(!x) return; x.fillStyle='#0e1524';x.fillRect(0,0,W,H); const cx=W/2,cy=H/2,r=Math.min(W,H)/2-16,i=r*.6,t=w+l+b||1,P=[{v:w,color:'#3fb37f',label:'Wins'},{v:l,color:'#d45b6b',label:'Losses'},{v:b,color:'#9db0c8',label:'BE'}]; let a=-Math.PI/2;P.forEach(p=>{const a1=a+(p.v/t)*Math.PI*2;x.beginPath();x.moveTo(cx,cy);x.arc(cx,cy,r,a,a1);x.closePath();x.fillStyle=p.color;x.fill();a=a1}); x.globalCompositeOperation='destination-out';x.beginPath();x.arc(cx,cy,i,0,6.283);x.fill(); x.globalCompositeOperation='source-over';}
-function renderAll(){ updateKPIs(); drawLine(document.getElementById('pnlLine'),demo.labels,demo.pnlCum); drawBars(document.getElementById('pnlBars'),demo.pnlCum); const k=calcKPIs(demo.trades); drawDonut(document.getElementById('winLossDonut'),k.wins,k.losses,k.be); }
-window.addEventListener('resize',debounce(()=>requestAnimationFrame(renderAll),60),{passive:true});
-
-/* === Voice (sultry British) + wake words; starts only on user click === */
-(function(){
-  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  const synth = window.speechSynthesis;
-  const statusEl = document.getElementById('voiceStatus');
-  let rec=null, listening=false, armed=false;
-
-  function currentVoice(){
-    try{
-      const list=synth?.getVoices?.()||[];
-      return list.find(v=>/en-GB/i.test(v.lang)&&/female|libby|sonia|hazel|amy|emma|charlotte|ellie|mia|serena/i.test(v.name))||list[0]||null;
-    }catch{return null}
-  }
-  function speak(text){
-    try{
-      if(!synth || !('SpeechSynthesisUtterance' in window)) return;
-      synth.cancel();
-      const u=new SpeechSynthesisUtterance(String(text||'').replace(/\s+/g,' ').trim());
-      const v=currentVoice(); if(v) u.voice=v;
-      u.rate=.82; u.pitch=.80; u.volume=1.0;
-      synth.speak(u);
-    }catch{}
-  }
-
-  document.getElementById('testVoice').addEventListener('click',()=>speak("Hello… this is ZenTrader Pro. I’ll guide you in a calm, confident British tone."));
-
-  document.getElementById('startVoice').addEventListener('click',()=>{
-    if(!SR){ if(statusEl) statusEl.textContent='Speech recognition not supported in this browser.'; return; }
-    if(rec){ try{rec.start();}catch{} return; }
-    rec=new SR(); rec.lang='en-US'; rec.continuous=true; rec.interimResults=true;
-
-    rec.onresult=(e)=>{
-      let finalText='';
-      for(let i=e.resultIndex;i<e.results.length;i++){const r=e.results[i],txt=r[0].transcript?.trim?.()||""; if(r.isFinal && txt) finalText+=' '+txt;}
-      if(!finalText) return;
-      const low=finalText.toLowerCase();
-      if(!armed && (/\bhey[\s,.-]*then\b/.test(low) || /\bhey[\s,.-]*zen\b/.test(low))){
-        armed=true; speak("Yes… I’m listening.");
-        if(statusEl) statusEl.textContent='Awake. Try “ticker AAPL quantity three entry 192 point 35”.';
-        return;
-      }
-      if(armed){ handleCommand(finalText); }
+  /* =======================
+     Add / Remove Trades
+  ======================== */
+  function addTrade(){
+    const t = {
+      date: $('#t_date').value || new Date().toISOString(),
+      symbol: $('#t_symbol').value.trim() || 'SPY',
+      side: $('#t_side').value,
+      qty: +$('#t_qty').value || 1,
+      entry: +$('#t_entry').value || 0,
+      exit: +$('#t_exit').value || 0,
+      fees: +$('#t_fees').value || 0,
+      setup: $('#t_setup').value.trim(),
+      stop: +$('#t_stop').value || null,
+      target: +$('#t_target').value || null,
+      notes: $('#t_notes').value.trim()
     };
-    rec.onstart=()=>{listening=true; if(statusEl) statusEl.textContent='Listening… Say “hey then” or “hey zen”…';};
-    rec.onend=()=>{listening=false; if(statusEl) statusEl.textContent='Stopped. Click Start Voice to resume.';};
-    rec.onerror=(ev)=>{ if(statusEl) statusEl.textContent='Voice error: '+ev.error; };
+    const dir = t.side==='LONG' ? 1 : -1;
+    t.points = (t.exit - t.entry) * dir;
+    t.pnl = t.points * t.qty - t.fees;
 
-    try{ rec.start(); }catch{}
-  });
+    trades.push(t);
+    save();
+    speak(`Trade added: ${t.symbol} ${t.side}, profit ${t.pnl>=0? 'plus' : 'minus'} ${Math.abs(t.pnl).toFixed(2)} dollars.`);
+    clearForm(false);
+    render();
+  }
 
-  document.getElementById('stopVoice').addEventListener('click',()=>{ if(rec){ try{rec.stop();}catch{} } armed=false; });
+  function removeTrade(idx){
+    const t = trades[idx];
+    trades.splice(idx,1); save(); render();
+    speak(`Removed trade number ${idx+1} for ${t.symbol}.`);
+  }
 
-  /* Speech → fields */
-  const WORD_NUM=Object.freeze({"zero":0,"one":1,"two":2,"three":3,"four":4,"five":5,"six":6,"seven":7,"eight":8,"nine":9,"ten":10,"eleven":11,"twelve":12,"thirteen":13,"fourteen":14,"fifteen":15,"sixteen":16,"seventeen":17,"eighteen":18,"nineteen":19,"twenty":20});
-  function wordsToNumberToken(s){return s.replace(/\b(zero|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|fourteen|fifteen|sixteen|seventeen|eighteen|nineteen|twenty)\b/gi,(m)=>String(WORD_NUM[m.toLowerCase()]));}
-  function normalizeNumberText(s){return s.replace(/\bpoint\b/gi,'.').replace(/[^\d.]/g,'');}
-  window.handleCommand=function(t){
-    const raw=t.toLowerCase(); const s = wordsToNumberToken(raw);
-    const tm=s.match(/\b(ticker|symbol)\s+([a-z]{1,6})\b/i); if(tm) document.getElementById("ticker").value=tm[2].toUpperCase();
-    if(/\b(long|buy)\b/i.test(s))  document.getElementById("side").value='Long';
-    if(/\b(short|sell)\b/i.test(s)) document.getElementById("side").value='Short';
-    const qm=s.match(/\b(quantity|qty)\s+([a-z\d]{1,12})\b/i); if(qm){ const q=parseInt(wordsToNumberToken(qm[2]).replace(/[^\d]/g,''),10); if(Number.isFinite(q)) document.getElementById("qty").value=q; }
-    const em=s.match(/\b(entry|enter|at)\s+([\d\s]*(?:point\s*\d+)?)\b/i); if(em){ const v=parseFloat(normalizeNumberText(em[2])); if(Number.isFinite(v)) document.getElementById("entry").value=v; }
-    const xm=s.match(/\b(exit|target|take\s*profit)\s+([\d\s]*(?:point\s*\d+)?)\b/i); if(xm){ const v=parseFloat(normalizeNumberText(xm[2])); if(Number.isFinite(v)) document.getElementById("exit").value=v; }
-    const nm=s.match(/\bnotes?\s+(.*)$/i); if(nm) document.getElementById("notes").value=nm[1];
-    if(/\b(read\s*back|confirm|repeat)\b/i.test(s)){
-      const out={ticker:document.getElementById("ticker").value||'—',side:document.getElementById("side").value||'—',qty:document.getElementById("qty").value||'—',entry:document.getElementById("entry").value||'—',exit:document.getElementById("exit").value||'—'};
-      speak(`Ticker ${out.ticker}. Direction ${out.side}. Quantity ${out.qty}. Entry ${out.entry}. Exit ${out.exit}.`);
+  function clearForm(resetDate=true){
+    if(resetDate) $('#t_date').value = nowISO();
+    $('#t_symbol').value=''; $('#t_qty').value=''; $('#t_entry').value=''; $('#t_exit').value='';
+    $('#t_fees').value=''; $('#t_setup').value=''; $('#t_notes').value=''; $('#t_stop').value=''; $('#t_target').value='';
+    $('#t_points').value='';
+  }
+
+  /* =======================
+     KPIs & Stats
+  ======================== */
+  function calcStats(){
+    const N = trades.length;
+    const pnl = trades.map(t=>t.pnl);
+    const wins = pnl.filter(x=>x>0), losses = pnl.filter(x=>x<0);
+    const net = sum(pnl);
+    const winRate = N? (wins.length/N*100):0;
+    const avgW = wins.length? sum(wins)/wins.length:0;
+    const avgL = losses.length? sum(losses)/losses.length:0;
+    const pf = sum(wins) / Math.abs(sum(losses)||1);
+    const exp = N? (sum(wins)/N + sum(losses)/N):0;
+
+    // Equity & Max Drawdown
+    let eq=0, peak=0, mdd=0;
+    pnl.forEach(x=>{ eq+=x; peak=Math.max(peak,eq); mdd=Math.min(mdd, eq-peak); });
+    const best = N? Math.max(...pnl):0, worst=N? Math.min(...pnl):0;
+
+    // Streaks
+    let winStreak=0, lossStreak=0, curW=0, curL=0;
+    pnl.forEach(x=>{
+      if(x>0){ curW++; curL=0; } else if(x<0){ curL++; curW=0; } else { curW=0; curL=0; }
+      winStreak=Math.max(winStreak,curW); lossStreak=Math.max(lossStreak,curL);
+    });
+
+    // Approx Avg R using provided stop if any (use median of provided stop per-unit)
+    const risks = trades.map(t=>t.stop).filter(v=>v && v>0);
+    let avgR = 0;
+    if(risks.length){
+      const medRisk = risks.sort((a,b)=>a-b)[Math.floor(risks.length/2)];
+      const Rs = trades.map(t => medRisk? (t.pnl / (medRisk * (t.qty||1))) : 0 );
+      const RsValid = Rs.filter(v=>isFinite(v));
+      avgR = RsValid.length? sum(RsValid)/RsValid.length : 0;
     }
-  };
-})();
 
-/* Populate demo table & render */
-(function(){
-  const tbody=document.getElementById('rows'); if(!tbody) return; tbody.innerHTML='';
-  const now=new Date(); const toD=v=>v.toFixed(2);
-  demo.trades.forEach((t,i)=>{
-    const tr=document.createElement('tr');
-    const dt=new Date(now.getTime()- (demo.trades.length-i)*86400000);
-    tr.innerHTML=`<td>${dt.toISOString().slice(0,10)}</td><td>${['AAPL','ES','SPY','NVDA','TSLA'][i%5]}</td>
-      <td>${t.result==='Loss'?'Short':'Long'}</td><td>${Math.max(1,(i%5)+1)}</td><td>${toD(100+Math.random()*50)}</td>
-      <td>${toD(100+Math.random()*50)}</td><td>${t.result}</td><td>—</td>`;
-    tbody.appendChild(tr);
+    return {N, net, winRate, avgW, avgL, pf, exp, mdd:Math.abs(mdd), best, worst, winStreak, lossStreak, avgR};
+  }
+
+  function renderKPIs(s){
+    $('#k_net').textContent = fmt(s.net,2);
+    $('#k_win').textContent = fmt(s.winRate,1)+'%';
+    $('#k_pf').textContent = (isFinite(s.pf)? s.pf:0).toFixed(2);
+    $('#k_exp').textContent = fmt(s.exp,2);
+    $('#k_avgw').textContent = fmt(s.avgW,2);
+    $('#k_avgl').textContent = fmt(Math.abs(s.avgL),2);
+    $('#k_mdd').textContent = fmt(s.mdd,2);
+    $('#k_bw').textContent = `${fmt(s.best,2)} / ${fmt(s.worst,2)}`;
+    $('#k_trades').textContent = s.N;
+    $('#k_streak').textContent = `${s.winStreak} / ${s.lossStreak}`;
+    $('#k_r').textContent = fmt(s.avgR,2);
+    $('#k_updated').textContent = new Date().toLocaleString();
+  }
+
+  /* =======================
+     Table
+  ======================== */
+  function renderTable(){
+    const tb = $('#tbl tbody'); tb.innerHTML='';
+    trades.forEach((t,i)=>{
+      const tr = document.createElement('tr');
+      const cells = [
+        i+1,
+        new Date(t.date).toLocaleString(),
+        t.symbol, t.side, t.qty, fmt(t.entry), fmt(t.exit),
+        fmt(t.points,3),
+        `<span class="${t.pnl>=0?'good':'bad'}">${fmt(t.pnl)}</span>`,
+        fmt(t.fees), t.setup||'—', t.notes||'—',
+        `<button onclick="removeTrade(${i})">Delete</button>`
+      ];
+      cells.forEach(c=>{
+        const td=document.createElement('td'); td.innerHTML=c; tr.appendChild(td);
+      });
+      tb.appendChild(tr);
+    });
+  }
+
+  /* =======================
+     Simple Canvas Charts (no external libs)
+  ======================== */
+  function drawLineChart(canvas, values, opts={}){
+    const ctx = canvas.getContext('2d');
+    const w = canvas.width, h = canvas.height;
+    ctx.clearRect(0,0,w,h);
+    // padding
+    const p = 30;
+    const xs = values.map((_,i)=>p + i*( (w-2*p)/Math.max(1,values.length-1) ));
+    const min = Math.min(...values,0), max = Math.max(...values,0);
+    const range = (max-min)||1;
+    const ys = values.map(v => h-p - ( (v-min)/range )*(h-2*p) );
+    // grid
+    ctx.strokeStyle='#2a2a2f'; ctx.lineWidth=1;
+    for(let i=0;i<=4;i++){
+      const y = p + i*( (h-2*p)/4 );
+      ctx.beginPath(); ctx.moveTo(p,y); ctx.lineTo(w-p,y); ctx.stroke();
+    }
+    // axis
+    ctx.strokeStyle='#555'; ctx.lineWidth=1.2;
+    ctx.beginPath(); ctx.moveTo(p, p); ctx.lineTo(p, h-p); ctx.lineTo(w-p, h-p); ctx.stroke();
+    // zero line
+    if(min<0 && max>0){
+      const zy = h-p - ((0-min)/range)*(h-2*p);
+      ctx.strokeStyle='#444'; ctx.setLineDash([4,4]);
+      ctx.beginPath(); ctx.moveTo(p,zy); ctx.lineTo(w-p,zy); ctx.stroke();
+      ctx.setLineDash([]);
+    }
+    // line
+    ctx.strokeStyle='#e6c766'; ctx.lineWidth=2.2;
+    ctx.beginPath(); ctx.moveTo(xs[0]||p, ys[0]||h-p);
+    for(let i=1;i<ys.length;i++){ ctx.lineTo(xs[i], ys[i]); }
+    ctx.stroke();
+  }
+
+  function drawBarChart(canvas, values){
+    const ctx = canvas.getContext('2d');
+    const w = canvas.width, h = canvas.height;
+    ctx.clearRect(0,0,w,h);
+    const p = 30, innerW = w-2*p, innerH = h-2*p;
+    const min = Math.min(0, ...values), max = Math.max(0, ...values);
+    const range = (max-min)||1;
+    const zeroY = h-p - ((0-min)/range)*innerH;
+
+    // grid
+    ctx.strokeStyle='#2a2a2f';
+    for(let i=0;i<=4;i++){
+      const y = p + i*(innerH/4);
+      ctx.beginPath(); ctx.moveTo(p,y); ctx.lineTo(w-p,y); ctx.stroke();
+    }
+
+    // axis
+    ctx.strokeStyle='#555';
+    ctx.beginPath(); ctx.moveTo(p,p); ctx.lineTo(p,h-p); ctx.lineTo(w-p,h-p); ctx.stroke();
+
+    // bars
+    const bw = innerW / Math.max(values.length,1) * .7;
+    values.forEach((v,i)=>{
+      const x = p + i*(innerW/Math.max(values.length,1)) + (innerW/Math.max(values.length,1)-bw)/2;
+      const y = h-p - ((v-min)/range)*innerH;
+      ctx.fillStyle = v>=0? '#1fbf6b' : '#ff5454';
+      ctx.fillRect(x, Math.min(y, zeroY), bw, Math.abs(y-zeroY));
+    });
+  }
+
+  function drawHist(canvas, values, bins=12){
+    const ctx = canvas.getContext('2d');
+    const w=canvas.width, h=canvas.height, p=30, innerW=w-2*p, innerH=h-2*p;
+    ctx.clearRect(0,0,w,h);
+    if(values.length===0){ return; }
+    const min=Math.min(...values), max=Math.max(...values);
+    const step=(max-min)||1; const binW = step/bins || 1;
+    const hist = Array(bins).fill(0);
+    values.forEach(v=>{
+      let idx = Math.floor((v-min)/ ( (max-min)||1 ) * bins);
+      if(idx===bins) idx=bins-1; hist[idx]++; 
+    });
+    const peak = Math.max(...hist) || 1;
+    // axes
+    ctx.strokeStyle='#555';
+    ctx.beginPath(); ctx.moveTo(p,p); ctx.lineTo(p,h-p); ctx.lineTo(w-p,h-p); ctx.stroke();
+
+    // bars
+    const bw = innerW/bins * .9;
+    hist.forEach((c,i)=>{
+      const x = p + i*(innerW/bins) + (innerW/bins-bw)/2;
+      const barH = (c/peak)*innerH;
+      ctx.fillStyle='#7e8cff';
+      ctx.fillRect(x, h-p-barH, bw, barH);
+    });
+  }
+
+  /* =======================
+     Render All
+  ======================== */
+  function render(){
+    // Table
+    renderTable();
+
+    // KPIs
+    const s = calcStats();
+    renderKPIs(s);
+
+    // Charts
+    const eq = []; let acc=0; trades.forEach(t=>{ acc+=t.pnl; eq.push(acc); });
+    drawLineChart($('#chartEquity'), eq);
+
+    // group by day
+    const map = {};
+    trades.forEach(t=>{
+      const d = new Date(t.date); const key = d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();
+      map[key] = (map[key]||0) + t.pnl;
+    });
+    const daily = Object.entries(map).sort((a,b)=> new Date(a[0]) - new Date(b[0]) ).map(e=>e[1]);
+    drawBarChart($('#chartDaily'), daily);
+
+    drawHist($('#chartHist'), trades.map(t=>t.pnl), 14);
+  }
+
+  /* =======================
+     CSV Import/Export
+  ======================== */
+  function exportCSV(){
+    const header = ['date','symbol','side','qty','entry','exit','fees','points','pnl','setup','notes'].join(',');
+    const lines = trades.map(t=>[
+      t.date, t.symbol, t.side, t.qty, t.entry, t.exit, t.fees, t.points, t.pnl, JSON.stringify(t.setup||''), JSON.stringify(t.notes||'')
+    ].join(','));
+    const csv = [header, ...lines].join('\n');
+    const blob = new Blob([csv],{type:'text/csv'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'zentrader_trades.csv';
+    a.click();
+  }
+
+  function importCSV(evt){
+    const file = evt.target.files[0]; if(!file) return;
+    const reader = new FileReader();
+    reader.onload = e=>{
+      const text = e.target.result;
+      const [header, ...rows] = text.split(/\r?\n/).filter(Boolean);
+      const cols = header.split(',');
+      const idx = (k)=> cols.indexOf(k);
+      rows.forEach(r=>{
+        const c = r.split(',');
+        const t = {
+          date: c[idx('date')] || new Date().toISOString(),
+          symbol: c[idx('symbol')] || 'SPY',
+          side: c[idx('side')] || 'LONG',
+          qty: +c[idx('qty')] || 1,
+          entry: +c[idx('entry')]||0,
+          exit: +c[idx('exit')]||0,
+          fees: +c[idx('fees')]||0,
+          points: +c[idx('points')]||0,
+          pnl: +c[idx('pnl')]||0,
+          setup: JSON.parse(c[idx('setup')]||'""'),
+          notes: JSON.parse(c[idx('notes')]||'""')
+        };
+        trades.push(t);
+      });
+      save(); render(); speak('Your CSV was imported successfully.');
+    };
+    reader.readAsText(file);
+  }
+
+  /* =======================
+     Voice: Recognition & TTS
+  ======================== */
+  let recog=null, listening=false, enGBVoice=null;
+
+  function pickBritishVoice(){
+    const voices = window.speechSynthesis.getVoices();
+    // Try common British female voices
+    const prefNames = [
+      'Google UK English Female','Microsoft Sonia Online (Natural) - English (United Kingdom)',
+      'Serena','Kate','English (United Kingdom)'
+    ];
+    for(const name of prefNames){
+      const v = voices.find(v=> v.name.includes(name) || (v.lang==='en-GB' && /female/i.test(v.name)) );
+      if(v) return v;
+    }
+    return voices.find(v=>v.lang==='en-GB') || voices[0] || null;
+  }
+  window.speechSynthesis.onvoiceschanged = ()=> { enGBVoice = pickBritishVoice(); };
+
+  function speak(text){
+    const u = new SpeechSynthesisUtterance(text);
+    enGBVoice = enGBVoice || pickBritishVoice();
+    if(enGBVoice) u.voice = enGBVoice;
+    u.lang = 'en-GB';
+    u.rate = 0.98; u.pitch = 0.8; u.volume = 1; // smooth, lower tone
+    window.speechSynthesis.speak(u);
+  }
+
+  function setupRecog(){
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if(!SR){ $('#voiceStatus').textContent='Voice: not supported in this browser.'; return null; }
+    const r = new SR();
+    r.lang='en-US'; r.interimResults=false; r.continuous=true;
+    r.onresult = e=>{
+      const txt = e.results[e.results.length-1][0].transcript.trim().toLowerCase();
+      $('#voiceStatus').textContent = 'Heard: ' + txt;
+      handleCommand(txt);
+    };
+    r.onstart = ()=> { listening=true; $('#micDot').classList.add('live'); $('#voiceStatus').textContent='Listening…'; };
+    r.onend = ()=> { listening=false; $('#micDot').classList.remove('live'); $('#voiceStatus').textContent='Voice: idle'; };
+    r.onerror = (e)=> { $('#voiceStatus').textContent='Voice error: '+e.error; };
+    return r;
+  }
+
+  function toggleMic(){
+    if(!recog) recog = setupRecog();
+    if(!recog) return;
+    if(listening){ recog.stop(); } else { recog.start(); }
+  }
+
+  function handleCommand(txt){
+    if(/stop (listening|voice)/.test(txt)){ if(recog && listening) recog.stop(); speak('Stopping now.'); return; }
+    if(/start (listening|voice)/.test(txt)){ if(recog && !listening) recog.start(); speak('I am listening.'); return; }
+    if(/read (stats|statistics|k p i|k p i s)/.test(txt)){ speakStats(); return; }
+    if(/log trade/.test(txt)){
+      addTrade(); return;
+    }
+    // quick numeric capture e.g. "profit fifty" / "loss twenty"
+    const m = txt.match(/(profit|loss)\s+(-?\d+(?:\.\d+)?)/);
+    if(m){
+      const val = parseFloat(m[2]) * (m[1]==='loss' ? -1 : 1);
+      const t = {date:new Date().toISOString(), symbol:'SPY', side: val>=0?'LONG':'SHORT', qty:1, entry:0, exit:0, fees:0, points:0, pnl:val, setup:'Voice quick', notes:''};
+      trades.push(t); save(); render(); speak(`Logged ${val>=0?'profit':'loss'} of ${Math.abs(val)} dollars.`);
+    }
+  }
+
+  function speakStats(){
+    const s = calcStats();
+    const msg = `Here are your numbers. Net P and L ${s.net.toFixed(0)} dollars. Win rate ${s.winRate.toFixed(0)} percent. 
+    Profit factor ${isFinite(s.pf)? s.pf.toFixed(2) : 'zero'}. 
+    Expectancy ${s.exp.toFixed(2)} dollars per trade. 
+    Max drawdown ${s.mdd.toFixed(0)} dollars. Best trade ${s.best.toFixed(0)}, worst ${s.worst.toFixed(0)}.`;
+    speak(msg);
+  }
+
+  /* =======================
+     Quick demo buttons
+  ======================== */
+  function quickWin(){
+    trades.push({date:new Date().toISOString(), symbol:'SPY', side:'LONG', qty:1, entry:0, exit:0, fees:0, points:0, pnl:50, setup:'Quick', notes:''});
+    save(); render();
+  }
+  function quickLoss(){
+    trades.push({date:new Date().toISOString(), symbol:'SPY', side:'SHORT', qty:1, entry:0, exit:0, fees:0, points:0, pnl:-50, setup:'Quick', notes:''});
+    save(); render();
+  }
+
+  // Update points live when entry/exit change
+  ['t_entry','t_exit','t_side'].forEach(id=>{
+    document.getElementById(id).addEventListener('input', ()=>{
+      const side=$('#t_side').value, entry=+$('#t_entry').value||0, exit=+$('#t_exit').value||0;
+      const dir = side==='LONG'?1:-1; const pts = (exit-entry)*dir;
+      $('#t_points').value = isFinite(pts)? pts.toFixed(3) : '';
+    });
   });
-  updateKPIs();
-  requestAnimationFrame(()=>{renderAll();});
-})();
-</script>
+
+  // Initial render
+  render();
+  </script>
 </body>
 </html>
+	
+
 	
 
 	
