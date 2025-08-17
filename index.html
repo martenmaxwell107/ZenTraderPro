@@ -11,7 +11,7 @@
       --bg:#0b0f17; --panel:#111827; --panel-2:#0e1524;
       --border:#22314a; --text:#e8eef7; --muted:#9db0c8;
       --gold:#d4af37; --gold2:#b88a1c; --gold3:#7a5e12; --gold-lite:#ffe08a;
-      --accent:#4cc9f0; --green:#4aa564; --green2:#2e7c47; --green3:#1e5631;
+      --accent:#4cc9f0; --green:#3fb37f; --red:#d45b6b;
     }
     *,*::before,*::after{box-sizing:border-box}
     html,body{height:100%}
@@ -21,12 +21,13 @@
       background:radial-gradient(900px 540px at 50% -180px,#182235 10%,var(--bg) 60%);
     }
 
+    /* Splash / welcome */
     .splash{position:fixed; inset:0; display:grid; place-items:center; z-index:2000;
       background:radial-gradient(1000px 700px at 40% -300px,#1a2740 0%, #0b0f17 60%);
       transition:opacity .4s ease}
     .splash.hidden{opacity:0; pointer-events:none}
     .splash-card{
-      width:min(680px,92vw);
+      width:min(720px,92vw);
       background:linear-gradient(180deg,#121a2b 0%, #0e1524 100%);
       border:1px solid var(--border); border-radius:18px; padding:24px;
       box-shadow:0 20px 80px rgba(0,0,0,.45), inset 0 0 60px rgba(212,175,55,.06);
@@ -42,6 +43,7 @@
       border-radius:10px; padding:8px 10px;
     }
 
+    /* Sticky header */
     header.brand{
       position:sticky; top:0; z-index:1000;
       backdrop-filter:saturate(130%) blur(4px);
@@ -50,11 +52,12 @@
       padding:12px 16px 10px;
     }
     .brand-inner{max-width:1200px;margin:0 auto;display:grid;place-items:center}
-    .brand-title{margin:8px 0 0; font-weight:800; letter-spacing:.3px; font-size:20px; color:var(--gold-lite)}
+    .brand-title{margin:8px 0 0; font-weight:900; letter-spacing:.35px; font-size:22px; color:var(--gold-lite); text-shadow:0 1px 0 #7a5e12}
     .brand-sub{margin:2px 0 0; color:var(--muted); font-size:12px}
     .voice{display:flex; gap:10px; align-items:center; justify-content:center; margin:10px 0 0; flex-wrap:wrap}
     .status{color:var(--muted); font-size:12px}
 
+    /* Layout */
     main{max-width:1200px;margin:18px auto;padding:0 16px 60px;display:grid;gap:16px;grid-template-columns:2fr 1fr}
     @media (max-width:980px){ main{grid-template-columns:1fr} }
     .card{background:var(--panel); border:1px solid var(--border); border-radius:14px; padding:16px; box-shadow:0 2px 18px rgba(0,0,0,.25)}
@@ -84,20 +87,20 @@
     canvas{width:100%; height:260px; max-height:42vh}
 
     footer{color:var(--muted); font-size:12px; text-align:center; padding:24px 0}
-    .logo-wrap{display:grid; place-items:center; width:min(320px,90vw)}
-    .footer-logo{width:min(140px,40vw)}
+    .logo-wrap{display:grid; place-items:center; width:min(460px,90vw)}
+    .footer-logo{display:inline-block}
   </style>
-  <link id="favicon" rel="icon" type="image/png" href="">
+  <link id="favicon" rel="icon" type="image/svg+xml" href="">
 </head>
 <body>
 
-  <!-- Splash -->
-  <div id="splash" class="splash">
+  <!-- Splash / Welcome (auto-closes after a moment, or click Enter) -->
+  <div id="splash" class="splash" role="dialog" aria-modal="true" aria-label="Welcome">
     <div class="splash-card">
       <div id="splashLogo" class="logo-wrap"></div>
-      <h1 style="color:var(--gold-lite);letter-spacing:.3px;margin:.2rem 0">ZenTrader Pro</h1>
-      <p style="color:var(--muted);margin:.2rem 0">Ornate, golden balance — Z low, cash high.</p>
-      <div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:12px">
+      <h1 style="color:var(--gold-lite);letter-spacing:.3px;margin:.35rem 0">ZenTrader Pro</h1>
+      <p style="color:var(--muted);margin:.2rem 0">Premium voice-enabled trading dashboard.</p>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:14px">
         <select id="voiceSelect" title="Voice"><option>Loading voices…</option></select>
         <button id="testVoice" class="btn">🔊 Test Voice</button>
         <button id="enterApp" class="btn">Enter Dashboard</button>
@@ -105,182 +108,431 @@
     </div>
   </div>
 
-  <!-- Header -->
+  <!-- Sticky Header -->
   <header class="brand" role="banner">
     <div class="brand-inner">
       <div id="brandLogo" class="logo-wrap"></div>
       <div class="brand-title">ZenTrader Pro</div>
       <div class="brand-sub">Voice Trading Console • v6.0</div>
-      <div class="voice">
-        <button id="startVoice" class="btn">🎙️ Start Voice</button>
+      <div class="voice" role="group" aria-label="Voice controls">
+        <button id="startVoice" class="btn" aria-pressed="false">🎙️ Start Voice</button>
         <button id="stopVoice" class="btn">⏹️ Stop</button>
         <span id="voiceStatus" class="status">Say “hey then” or “hey zen”…</span>
       </div>
     </div>
   </header>
-	<div class="kpi">
-                <h3>Total Trades</h3>
-                <p id="total-trades">0</p>
-            </div>
-            <div class="kpi">
-                <h3>Win Rate</h3>
-                <p id="win-rate">0%</p>
-            </div>
-            <div class="kpi">
-                <h3>Net Profit</h3>
-                <p id="net-profit">$0</p>
-            </div>
-        </div>
 
-        <!-- Charts Section -->
-        <div class="charts">
-            <div class="chart-container">
-                <canvas id="equityChart"></canvas>
-            </div>
-            <div class="chart-container">
-                <canvas id="winLossChart"></canvas>
-            </div>
-        </div>
+  <!-- Main -->
+  <main role="main">
+    <!-- Trade Entry -->
+    <section class="card gold-outline" aria-labelledby="trade-entry">
+      <h2 id="trade-entry">Trade Entry</h2>
+      <div class="form-grid">
+        <label for="ticker">Ticker</label><input id="ticker" placeholder="e.g., SPY, ES, AAPL">
+        <label for="side">Direction</label>
+        <select id="side"><option value="">— Select —</option><option>Long</option><option>Short</option></select>
+        <label for="qty">Quantity</label><input id="qty" type="number" min="0" step="1" placeholder="e.g., 3">
+        <label for="entry">Entry Price</label><input id="entry" type="number" min="0" step="0.01" placeholder="e.g., 492.35">
+        <label for="exit">Exit Price</label><input id="exit" type="number" min="0" step="0.01" placeholder="e.g., 495.10">
+        <label for="result">Win / Loss</label>
+        <select id="result"><option value="">— Select —</option><option>Win</option><option>Loss</option><option>BE</option></select>
+        <label for="notes">Notes</label><textarea id="notes" placeholder="Reason for entry, setup, management…"></textarea>
+      </div>
+    </section>
 
-        <!-- Trade Log Table -->
-        <div class="table-container">
-            <h2>Trade Log</h2>
-            <table id="trade-table">
-                <thead>
-                    <tr>
-                        <th>Date</th>
-                        <th>Symbol</th>
-                        <th>Entry</th>
-                        <th>Exit</th>
-                        <th>Result</th>
-                        <th>Points</th>
-                        <th>P/L ($)</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <!-- Trades will populate here -->
-                </tbody>
-            </table>
-        </div>
-    </div>
+    <!-- KPIs -->
+    <section class="card gold-outline" aria-labelledby="kpis">
+      <h2 id="kpis">KPIs</h2>
+      <div class="stats">
+        <div class="stat"><div class="v" id="k1">$0</div><div class="l">PnL (Today)</div></div>
+        <div class="stat"><div class="v" id="k2">0%</div><div class="l">Win Rate</div></div>
+        <div class="stat"><div class="v" id="k3">0</div><div class="l"># Trades</div></div>
+        <div class="stat"><div class="v" id="k4">0.00</div><div class="l">Profit Factor</div></div>
+      </div>
+    </section>
 
-    <!-- Footer with Logo -->
-    <footer>
-        <img src="data:image/png;base64,PUT-YOUR-BASE64-LOGO-HERE" alt="ZenTrader Pro Logo" class="footer-logo">
-        <p>© 2025 ZenTrader Pro — Trade Smarter, Live Freer.</p>
-    </footer>
+    <!-- Recent Trades -->
+    <section class="card gold-outline" aria-labelledby="recent-trades" style="grid-column:1/-1">
+      <h2 id="recent-trades">Recent Trades</h2>
+      <table aria-label="Recent trades">
+        <thead><tr><th>Date</th><th>Symbol</th><th>Side</th><th>Qty</th><th>Entry</th><th>Exit</th><th>Result</th><th>Notes</th></tr></thead>
+        <tbody id="rows"><tr><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr></tbody>
+      </table>
+    </section>
 
-    <!-- Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script>
-        // Chart.js setup
-        const equityCtx = document.getElementById('equityChart').getContext('2d');
-        const winLossCtx = document.getElementById('winLossChart').getContext('2d');
+    <!-- Charts -->
+    <section class="card gold-outline" aria-labelledby="charts" style="grid-column:1/-1">
+      <h2 id="charts">Performance Charts</h2>
+      <div class="chart" style="margin-bottom:14px"><canvas id="pnlLine" width="1000" height="260"></canvas></div>
+      <div class="chart" style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+        <canvas id="winLossDonut" height="240"></canvas>
+        <canvas id="pnlBars" height="240"></canvas>
+      </div>
+    </section>
+  </main>
 
-        let equityChart = new Chart(equityCtx, {
-            type: 'line',
-            data: {
-                labels: [],
-                datasets: [{
-                    label: 'Equity Curve',
-                    data: [],
-                    borderColor: 'gold',
-                    backgroundColor: 'rgba(255,215,0,0.2)',
-                    fill: true,
-                }]
-            },
-            options: { responsive: true, plugins: { legend: { labels: { color: 'gold' } } }, scales: { x: { ticks: { color: 'white' } }, y: { ticks: { color: 'white' } } } }
-        });
+  <!-- Footer -->
+  <footer role="contentinfo">
+    <div id="footerLogo" class="footer-logo"></div>
+    <div>© ZenTrader Pro</div>
+  </footer>
 
-        let winLossChart = new Chart(winLossCtx, {
-            type: 'doughnut',
-            data: {
-                labels: ['Wins', 'Losses'],
-                datasets: [{
-                    data: [0, 0],
-                    backgroundColor: ['gold', 'darkred']
-                }]
-            },
-            options: { responsive: true, plugins: { legend: { labels: { color: 'white' } } } }
-        });
-	// Trade stats
-        let trades = [];
-        function addTrade(date, symbol, entry, exit, result, points, pl) {
-            trades.push({date, symbol, entry, exit, result, points, pl});
-            updateDashboard();
-        }
+  <script>
+/* ===========================================================
+   ZenTrader Pro — Single-File App (Logo + Voice + Charts)
+   =========================================================== */
 
-        function updateDashboard() {
-            let totalTrades = trades.length;
-            let wins = trades.filter(t => t.result === 'Win').length;
-            let losses = totalTrades - wins;
-            let winRate = totalTrades > 0 ? ((wins / totalTrades) * 100).toFixed(1) : 0;
-            let netProfit = trades.reduce((sum, t) => sum + t.pl, 0);
+(function(){
+  const $ = s => document.querySelector(s);
 
-            document.getElementById('total-trades').innerText = totalTrades;
-            document.getElementById('win-rate').innerText = winRate + "%";
-            document.getElementById('net-profit').innerText = "$" + netProfit.toFixed(2);
+  /* ------------------------------------
+     Ornate Gold Scales Logo (Inline SVG)
+     Z left low, cash right high, light left
+  -------------------------------------*/
+  function getLogoSVG(width) {
+    const w = width || 800, h = Math.round(w*0.45);
+    return `
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 540" width="${w}" height="${h}" role="img" aria-label="ZenTrader Pro ornate golden balance: Z left low, cash right high">
+  <defs>
+    <linearGradient id="goldGrad" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0%" stop-color="#ffd063"/>
+      <stop offset="45%" stop-color="#d4af37"/>
+      <stop offset="70%" stop-color="#b88a1c"/>
+      <stop offset="100%" stop-color="#7a5e12"/>
+    </linearGradient>
+    <radialGradient id="shine" cx="0.1" cy="0.1" r="0.9">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.55"/>
+      <stop offset="40%" stop-color="#ffe08a" stop-opacity="0.25"/>
+      <stop offset="100%" stop-color="#000000" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="drop" x="-50%" y="-50%" width="200%" height="200%">
+      <feDropShadow dx="0" dy="8" stdDeviation="8" flood-color="#000000" flood-opacity="0.55"/>
+    </filter>
+    <linearGradient id="cashGrad" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0%" stop-color="#6fdb8b"/>
+      <stop offset="50%" stop-color="#3fb37f"/>
+      <stop offset="100%" stop-color="#2e7c47"/>
+    </linearGradient>
+  </defs>
 
-            // Update trade log
-            let tbody = document.getElementById('trade-table').querySelector('tbody');
-            tbody.innerHTML = "";
-            trades.forEach(t => {
-                let row = `<tr>
-                    <td>${t.date}</td>
-                    <td>${t.symbol}</td>
-                    <td>${t.entry}</td>
-                    <td>${t.exit}</td>
-                    <td>${t.result}</td>
-                    <td>${t.points}</td>
-                    <td>${t.pl}</td>
-                </tr>`;
-                tbody.innerHTML += row;
-            });
+  <!-- Ornate base -->
+  <g filter="url(#drop)">
+    <path d="M240 480 C 380 430, 820 430, 960 480 L 980 510 C 820 520, 380 520, 220 510 Z"
+          fill="url(#goldGrad)" stroke="#b88a1c" stroke-width="4"/>
+    <path d="M260 470 C 410 420, 790 420, 940 470" fill="none" stroke="#ffe08a" stroke-opacity=".45" stroke-width="4"/>
+    <path d="M240 480 C 380 430, 820 430, 960 480" fill="none" stroke="#7a5e12" stroke-opacity=".6" stroke-width="6"/>
+  </g>
 
-            // Update charts
-            equityChart.data.labels = trades.map((t, i) => "Trade " + (i+1));
-            equityChart.data.datasets[0].data = trades.reduce((acc, t) => {
-                let last = acc.length ? acc[acc.length - 1] : 0;
-                acc.push(last + t.pl);
-                return acc;
-            }, []);
-            equityChart.update();
+  <!-- Center column -->
+  <g filter="url(#drop)">
+    <rect x="578" y="240" width="44" height="190" rx="10" fill="url(#goldGrad)" stroke="#b88a1c" stroke-width="4"/>
+    <circle cx="600" cy="236" r="26" fill="url(#goldGrad)" stroke="#b88a1c" stroke-width="4"/>
+  </g>
 
-            winLossChart.data.datasets[0].data = [wins, losses];
-            winLossChart.update();
-        }
+  <!-- Cross arm (lopsided: left down, right up) -->
+  <g filter="url(#drop)">
+    <path d="M240 200 L 960 160" stroke="url(#goldGrad)" stroke-width="18" stroke-linecap="round"/>
+    <path d="M240 200 L 960 160" stroke="#ffe08a" stroke-opacity=".35" stroke-width="6" stroke-linecap="round"/>
+    <path d="M240 200 L 960 160" stroke="#7a5e12" stroke-opacity=".35" stroke-width="3" stroke-linecap="round"/>
+  </g>
 
-        // Voice Assistant (with multiple accents including British Female)
-        function speak(text, voiceName = "Google UK English Female") {
-            const synth = window.speechSynthesis;
-            const voices = synth.getVoices();
-            const selectedVoice = voices.find(v => v.name === voiceName) || voices[0];
-            let utter = new SpeechSynthesisUtterance(text);
-            utter.voice = selectedVoice;
-            synth.speak(utter);
-        }
+  <!-- Left chains (low) -->
+  <g stroke="url(#goldGrad)" stroke-width="6" filter="url(#drop)">
+    <line x1="340" y1="183" x2="340" y2="305"/>
+    <line x1="420" y1="180" x2="420" y2="302"/>
+    <line x1="380" y1="188" x2="380" y2="308"/>
+  </g>
 
-        // Example: voice feedback after a trade
-        function announceTrade(trade) {
-            let message = `Trade on ${trade.symbol}: ${trade.result}, profit ${trade.pl} dollars.`;
-            speak(message);
-        }
+  <!-- Right chains (high) -->
+  <g stroke="url(#goldGrad)" stroke-width="6" filter="url(#drop)">
+    <line x1="820" y1="169" x2="820" y2="245"/>
+    <line x1="880" y1="166" x2="880" y2="242"/>
+    <line x1="850" y1="170" x2="850" y2="246"/>
+  </g>
 
-        // Demo trades
-        addTrade("2025-08-16", "SPY", 445.20, 447.00, "Win", 1.8, 180);
-        addTrade("2025-08-16", "AAPL", 185.50, 183.00, "Loss", -2.5, -250);
+  <!-- Left pan (very low) with ornate Z -->
+  <g filter="url(#drop)">
+    <ellipse cx="380" cy="330" rx="135" ry="26" fill="#000" fill-opacity=".28"/>
+    <g transform="translate(280,306)">
+      <path d="M0 0 h200 a18 18 0 0 1 18 18 v8 a14 14 0 0 1 -14 14 h-208 a14 14 0 0 1 -14 -14 v-8 a18 18 0 0 1 18 -18z"
+            fill="url(#goldGrad)" stroke="#b88a1c" stroke-width="4"/>
+      <path d="M-10 10 h220" stroke="#ffe08a" stroke-opacity=".45" stroke-width="4"/>
+    </g>
+    <g transform="translate(380,300)">
+      <circle r="42" fill="url(#goldGrad)" stroke="#b88a1c" stroke-width="4"/>
+      <path d="M-20,-18 h40 l-44,36 h48" fill="none" stroke="#1a2233" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M-20,-18 h40 l-44,36 h48" fill="none" stroke="#ffe08a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" opacity=".85"/>
+    </g>
+  </g>
 
-        // Announce last trade
-        announceTrade(trades[trades.length - 1]);
+  <!-- Right pan (high) with crisp cash stack -->
+  <g filter="url(#drop)">
+    <ellipse cx="850" cy="270" rx="120" ry="22" fill="#000" fill-opacity=".22"/>
+    <g transform="translate(760,246)">
+      <path d="M0 0 h180 a16 16 0 0 1 16 16 v6 a12 12 0 0 1 -12 12 h-188 a12 12 0 0 1 -12 -12 v-6 a16 16 0 0 1 16 -16z"
+            fill="url(#goldGrad)" stroke="#b88a1c" stroke-width="4"/>
+      <path d="M-6 8 h192" stroke="#ffe08a" stroke-opacity=".45" stroke-width="3"/>
+    </g>
+    <g transform="translate(820,220)">
+      <rect x="-58" y="-42" width="116" height="28" rx="4" fill="#4aa564" stroke="#153a25" stroke-width="3"/>
+      <rect x="-60" y="-16" width="120" height="28" rx="4" fill="#4aa564" stroke="#153a25" stroke-width="3"/>
+      <rect x="-62" y="10"  width="124" height="28" rx="4" fill="#4aa564" stroke="#153a25" stroke-width="3"/>
+      <rect x="-18" y="-50" width="36" height="98" fill="#f6f6f6" stroke="#c9c9c9" stroke-width="2"/>
+      <rect x="-16" y="-48" width="32" height="94" fill="#ffffff" opacity=".85"/>
+    </g>
+  </g>
 
-    </script>
+  <!-- Warm sunlight from top-left -->
+  <circle cx="0" cy="0" r="500" fill="url(#shine)" />
+</svg>`;
+  }
+
+  // Mount logo to splash, header, footer
+  function mountLogo(where, width){ const el = document.querySelector(where); if(el) el.innerHTML = getLogoSVG(width); }
+  mountLogo('#splashLogo', 560);
+  mountLogo('#brandLogo', 560);
+  (function(){ const f = document.getElementById('footerLogo'); if (f) f.innerHTML = getLogoSVG(280); })();
+
+  // Favicon (SVG data URL)
+  (function setFavicon(){
+    const svg = getLogoSVG(256);
+    const dataUrl = 'data:image/svg+xml;utf8,' + encodeURIComponent(svg);
+    const link = document.getElementById('favicon'); if (link) link.href = dataUrl;
+  })();
+
+  /* --------------------------
+     KPIs + Charts (Canvas API)
+  ---------------------------*/
+  const demo = {
+    labels:["Mon","Tue","Wed","Thu","Fri","Mon","Tue","Wed","Thu","Fri"],
+    pnlCum:[0,300,-120,450,200,680,540,900,750,1200],
+    trades:[
+      {result:"Win",pnl:220},{result:"Loss",pnl:-80},{result:"Win",pnl:160},
+      {result:"Win",pnl:340},{result:"BE",pnl:0},{result:"Win",pnl:180},
+      {result:"Loss",pnl:-120},{result:"Win",pnl:260},{result:"Win",pnl:140},
+      {result:"Win",pnl:310}
+    ]
+  };
+
+  function fmtMoney(v){ return (v<0? "-$":"$")+Math.abs(v).toLocaleString(); }
+  function calcKPIs(trades){
+    const n=trades.length, wins=trades.filter(t=>t.result==="Win"),
+          losses=trades.filter(t=>t.result==="Loss"), be=trades.filter(t=>t.result==="BE");
+    const winRate = n? Math.round(wins.length/n*100):0;
+    const totalPnL = trades.reduce((s,t)=>s+t.pnl,0);
+    const gw = wins.reduce((s,t)=>s+t.pnl,0);
+    const gl = Math.abs(losses.reduce((s,t)=>s+t.pnl,0));
+    const pf = gl? gw/gl : (gw? Infinity:0);
+    return {n, winRate, totalPnL, profitFactor: pf, wins:wins.length, losses:losses.length, be:be.length};
+  }
+  function updateKPIs(){
+    const k = calcKPIs(demo.trades);
+    const set = (id,val)=>{ const el = document.getElementById(id); if (el) el.textContent = val; };
+    set('k1', fmtMoney(k.totalPnL));
+    set('k2', k.winRate + '%');
+    set('k3', k.n);
+    set('k4', (Math.round(k.profitFactor*100)/100).toFixed(2));
+  }
+
+  function grid(ctx, x1,y1,x2,y2,steps){
+    ctx.strokeStyle='rgba(255,255,255,0.06)'; ctx.lineWidth=1;
+    for(let i=0;i<=steps;i++){ const y=y1+(y2-y1)*(i/steps); ctx.beginPath(); ctx.moveTo(x1,y); ctx.lineTo(x2,y); ctx.stroke(); }
+  }
+  function drawLine(c, labels, data){
+    const x=c.getContext('2d'),W=c.width,H=c.height;
+    x.fillStyle='#0e1524'; x.fillRect(0,0,W,H);
+    const p={l:50,r:12,t:18,b:34}, w=W-p.l-p.r, h=H-p.t-p.b;
+    const max=Math.max(...data,0), min=Math.min(...data,0), rng=(max-min)||1, y=v=>p.t+h-((v-min)/rng)*h;
+    grid(x,p.l,p.t,W-p.r,p.t+h,4);
+    x.strokeStyle='#ffe08a'; x.lineWidth=2; x.beginPath();
+    data.forEach((v,i)=>{ const X=p.l + (w/(data.length-1))*i, Y=y(v); i?x.lineTo(X,Y):x.moveTo(X,Y); }); x.stroke();
+    x.fillStyle= '#d4af37';
+    data.forEach((v,i)=>{ const X=p.l+(w/(data.length-1))*i, Y=y(v); x.beginPath(); x.arc(X,Y,3,0,6.283); x.fill(); });
+    x.fillStyle='#9db0c8'; x.font='11px system-ui,-apple-system,Segoe UI,Roboto,Arial';
+    x.fillText('PnL',8,16); x.fillText('Time →',W/2-20,H-8);
+  }
+  function drawBars(c, labels, cum){
+    const x=c.getContext('2d'),W=c.width,H=c.height;
+    x.fillStyle='#0e1524'; x.fillRect(0,0,W,H);
+    const p={l:40,r:12,t:14,b:34}, w=W-p.l-p.r, h=H-p.t-p.b;
+    const d=cum.map((v,i)=> i===0?v:cum[i]-cum[i-1]);
+    const max=Math.max(...d,0), min=Math.min(...d,0), rng=(max-min)||1, y=v=>p.t+h-((v-min)/rng)*h, bw=w/d.length*.7;
+    grid(x,p.l,p.t,W-p.r,p.t+h,4);
+    d.forEach((v,i)=>{ const X=p.l+w/d.length*i+(w/d.length-bw)/2, Y=y(v), Y0=y(0);
+      x.fillStyle=v>=0?'rgba(63,179,127,.75)':'rgba(212,91,107,.75)'; x.fillRect(X,Math.min(Y,Y0),bw,Math.abs(Y-Y0));
+      x.strokeStyle=v>=0?'#3fb37f':'#d45b6b'; x.strokeRect(X,Math.min(Y,Y0),bw,Math.abs(Y-Y0)); });
+    x.fillStyle='#9db0c8'; x.font='11px system-ui,-apple-system,Segoe UI,Roboto,Arial';
+    x.fillText('Daily PnL',8,16); x.fillText('Time →',W/2-20,H-8);
+  }
+  function drawDonut(c,w,l,b){
+    const x=c.getContext('2d'),W=c.width,H=c.height;
+    x.fillStyle='#0e1524'; x.fillRect(0,0,W,H);
+    const cx=W/2, cy=H/2, r=Math.min(W,H)/2-16, inner=r*0.6, t=w+l+b||1, parts=[
+      {v:w,color:varColor('--green'),label:'Wins'},{v:l,color:varColor('--red'),label:'Losses'},{v:b,color:'#9db0c8',label:'BE'}
+    ];
+    let a=-Math.PI/2;
+    parts.forEach(p=>{ const a1=a+(p.v/t)*Math.PI*2; x.beginPath(); x.moveTo(cx,cy); x.arc(cx,cy,r,a,a1); x.closePath(); x.fillStyle=p.color; x.fill(); a=a1; });
+    x.globalCompositeOperation='destination-out'; x.beginPath(); x.arc(cx,cy,inner,0,6.283); x.fill(); x.globalCompositeOperation='source-over';
+    x.font='12px system-ui,-apple-system,Segoe UI,Roboto,Arial'; x.fillStyle='#e8eef7'; let ly=H-10, lx=10;
+    parts.forEach(p=>{ x.fillStyle=p.color; x.fillRect(lx,ly-10,10,10); x.fillStyle='#e8eef7'; x.fillText(p.label+': '+p.v, lx+16, ly); ly-=16; });
+  }
+  function varColor(name){ return getComputedStyle(document.documentElement).getPropertyValue(name).trim() || '#ccc'; }
+
+  function renderAll(){
+    updateKPIs();
+    const pnlLine = document.getElementById('pnlLine');
+    const pnlBars = document.getElementById('pnlBars');
+    const donut   = document.getElementById('winLossDonut');
+    if (pnlLine) drawLine(pnlLine, demo.labels, demo.pnlCum);
+    if (pnlBars) drawBars(pnlBars, demo.labels, demo.pnlCum);
+    const k = calcKPIs(demo.trades);
+    if (donut) drawDonut(donut, k.wins, k.losses, k.be);
+  }
+
+  /* --------------------------
+     Splash + Voices + TTS
+  ---------------------------*/
+  const splash = $('#splash');
+  const enterBtn = $('#enterApp');
+  const testVoiceBtn = $('#testVoice');
+  const voiceSelect = $('#voiceSelect');
+  const statusEl = $('#voiceStatus');
+
+  function hideSplash(){
+    if (splash && !splash.classList.contains('hidden')) splash.classList.add('hidden');
+  }
+  // Auto-hide the splash after 1500ms (still allows manual Enter)
+  setTimeout(hideSplash, 1500);
+  enterBtn?.addEventListener('click', ()=>{ hideSplash(); speak("Welcome to ZenTrader Pro."); });
+
+  const synth = window.speechSynthesis;
+  let voicesLoaded = false;
+
+  function rankVoice(v){
+    let s=0; if(/en-GB/i.test(v.lang))s+=1000; if(/female/i.test(v.name))s+=200; if(/Google|Microsoft|Apple/i.test(v.name))s+=50;
+    if(/(Libby|Sonia|Hazel|Amy|Emma|Charlotte|Ellie|Mia|Aria|Jane|Lucy|Serena)/i.test(v.name))s+=120; return s;
+  }
+  function populateVoices(){
+    const voices = synth.getVoices();
+    if (!voices || !voices.length) return false;
+    voicesLoaded = true;
+    const sorted = voices.slice().sort((a,b)=>rankVoice(b)-rankVoice(a));
+    if (voiceSelect){
+      voiceSelect.innerHTML = '';
+      for (const v of sorted){
+        const opt = document.createElement('option');
+        opt.value = v.name; opt.textContent = `${v.name} (${v.lang})`;
+        voiceSelect.appendChild(opt);
+      }
+      if (sorted.length) voiceSelect.value = sorted[0].name;
+    }
+    return true;
+  }
+  populateVoices();
+  if (typeof speechSynthesis!=='undefined' && speechSynthesis.onvoiceschanged!==undefined){
+    speechSynthesis.onvoiceschanged = ()=>{ if (!voicesLoaded) populateVoices(); };
+  }
+  let tries=0; const tmr=setInterval(()=>{ if(voicesLoaded || tries>20){clearInterval(tmr);} else { if(populateVoices()) clearInterval(tmr); tries++; } },250);
+
+  function currentVoice(){
+    const name = voiceSelect?.value;
+    const list = synth.getVoices();
+    return (list && list.find(v=>v.name===name)) || (list && list[0]) || null;
+  }
+  function speak(text){
+    try{
+      const u = new SpeechSynthesisUtterance(text);
+      const v = currentVoice();
+      if (v) u.voice = v;
+      u.rate=1.0; u.pitch=1.0; u.volume=1.0;
+      synth.speak(u);
+    }catch(e){ console.warn('TTS error:', e); }
+  }
+  testVoiceBtn?.addEventListener('click', ()=>{ if(!voicesLoaded) populateVoices(); speak("Hello. This is the ZenTrader Pro assistant, speaking with a British accent if available."); });
+
+  /* --------------------------
+     Speech Recognition (manual start)
+  ---------------------------*/
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  const startBtn = $('#startVoice');
+  const stopBtn  = $('#stopVoice');
+
+  if (!SR){
+    if (statusEl) statusEl.textContent = "Speech recognition not supported in this browser.";
+    if (startBtn) startBtn.disabled = true;
+    if (stopBtn)  stopBtn.disabled = true;
+  } else {
+    const rec = new SR();
+    rec.lang = 'en-US';
+    rec.continuous = true;
+    rec.interimResults = true;
+    let armed = false, listening = false;
+
+    function setStatus(msg){ if (statusEl) statusEl.textContent = msg; }
+    function numFrom(s){ return parseFloat(s.replace(/point/gi,'.').replace(/[^\d.]/g,'')); }
+
+    function handleCommand(text){
+      const t = text.toLowerCase();
+      const tm = t.match(/\b(ticker|symbol)\s+([a-z]{1,5})\b/);
+      if (tm) document.getElementById('ticker').value = tm[2].toUpperCase();
+      if (/\b(long|buy)\b/.test(t))  document.getElementById('side').value = 'Long';
+      if (/\b(short|sell)\b/.test(t)) document.getElementById('side').value = 'Short';
+      const qm = t.match(/\b(quantity|qty)\s+(\d{1,6})\b/);
+      if (qm) document.getElementById('qty').value = qm[2];
+      const em = t.match(/\b(entry|enter|at)\s+(\d+(\s*point\s*\d+)?)\b/);
+      if (em) document.getElementById('entry').value = numFrom(em[2]);
+      const xm = t.match(/\b(exit|target|take\s*profit)\s+(\d+(\s*point\s*\d+)?)\b/);
+      if (xm) document.getElementById('exit').value = numFrom(xm[2]);
+      const nm = t.match(/\bnotes?\s+(.*)$/);
+      if (nm) document.getElementById('notes').value = nm[1];
+
+      if (/\b(read\s*back|confirm|repeat)\b/.test(t)) {
+        const out = {
+          ticker: document.getElementById('ticker').value || '—',
+          side:   document.getElementById('side').value   || '—',
+          qty:    document.getElementById('qty').value    || '—',
+          entry:  document.getElementById('entry').value  || '—',
+          exit:   document.getElementById('exit').value   || '—'
+        };
+        speak(`Ticker ${out.ticker}. Direction ${out.side}. Quantity ${out.qty}. Entry ${out.entry}. Exit ${out.exit}.`);
+      }
+    }
+
+    rec.onresult = (e)=>{
+      let finalText = '';
+      for(let i=e.resultIndex;i<e.results.length;i++){
+        const r = e.results[i]; const txt = r[0].transcript.trim();
+        if(r.isFinal) finalText += ' ' + txt;
+      }
+      if(!finalText) return;
+      const low = finalText.toLowerCase();
+      if(!armed && (/\bhey\s+then\b/.test(low) || /\bhey\s+zen\b/.test(low))){
+        armed = true; speak("Yes, I'm listening.");
+        setStatus('Awake. Say a command… e.g., “ticker AAPL quantity 3 entry 492 point 35”');
+        return;
+      }
+      if (armed) handleCommand(finalText);
+    };
+    rec.onstart = ()=>{ listening=true; setStatus('Listening… Say “hey then” or “hey zen”…'); };
+    rec.onend   = ()=>{ listening=false; setStatus('Stopped. Click Start Voice to resume.'); };
+
+    startBtn?.addEventListener('click', ()=>{ try{ if(!listening) rec.start(); }catch(_){} });
+    stopBtn?.addEventListener('click',  ()=>{ try{ rec.stop(); armed=false; }catch(_){} });
+  }
+
+  // Initial render
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', renderAll);
+  } else {
+    renderAll();
+  }
+
+})();
+  </script>
 </body>
 </html>
 	
 
-
-
-	
 
 	
 
