@@ -4,6 +4,12 @@
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>ZenTrader Pro — Dashboard</title>
+
+<!-- Aggressive no-cache -->
+<meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0"/>
+<meta http-equiv="Pragma" content="no-cache"/>
+<meta http-equiv="Expires" content="0"/>
+
 <meta name="color-scheme" content="dark light"/>
 <meta name="theme-color" content="#0b0f17"/>
 <style>
@@ -25,7 +31,7 @@
   .btn:hover{border-color:#3c5f94}
   select{background:#0e1524;color:var(--text);border:1px solid var(--border);border-radius:10px;padding:8px 10px}
 
-  /* Splash (no auth, just greeting/test) */
+  /* Splash */
   .splash{position:fixed;inset:0;display:grid;place-items:center;z-index:2000;
     background:radial-gradient(1000px 700px at 40% -300px,#1a2740 0%,#0b0f17 60%);transition:opacity .35s ease}
   .splash.hidden{opacity:0;pointer-events:none}
@@ -156,24 +162,14 @@
 <script>
 /* ===================== UTILITIES ===================== */
 const $ = (sel)=>document.querySelector(sel);
-const $$ = (sel)=>document.querySelectorAll(sel);
 function debounce(fn,ms){let t;return function(){const a=arguments;clearTimeout(t);t=setTimeout(()=>fn.apply(this,a),ms);};}
 
-/* Cache DOM refs (hot path) */
-const els = {};
-function cacheEls(){
-  ['splash','splashLogo','brandLogo','footerLogo','favicon','voiceSelect','testVoice','enterApp','startVoice','stopVoice','voiceStatus']
-    .forEach(id=>els[id]=$(`#${id}`));
-  els.pnlLine = $('#pnlLine'); els.pnlBars = $('#pnlBars'); els.winLossDonut = $('#winLossDonut');
-  els.k1=$('#k1'); els.k2=$('#k2'); els.k3=$('#k3'); els.k4=$('#k4');
-  els.ticker=$('#ticker'); els.side=$('#side'); els.qty=$('#qty'); els.entry=$('#entry'); els.exit=$('#exit'); els.notes=$('#notes');
-}
-
-/* ================= ORNATE LOGO (SVG) ================= */
-function getOrnateLogoSVG(width){
-  const w = width || 800, h = Math.round(w*0.45);
+/* ================== FORCED BRANDING (ALL-IN-ONE) ================== */
+/* Antique, lopsided golden scales SVG with sunlight from upper-left */
+function ZTP_ornateSVG(width){
+  const w = width || 800;
   return `
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 540" width="${w}" height="${h}" role="img" aria-label="ZenTrader Pro ornate golden balance logo">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 540" width="${w}" height="${Math.round(w*0.45)}" role="img" aria-label="ZenTrader Pro ornate golden balance logo">
   <defs>
     <linearGradient id="goldGrad" x1="0" x2="0" y1="0" y2="1">
       <stop offset="0%" stop-color="#ffd063"/>
@@ -181,9 +177,10 @@ function getOrnateLogoSVG(width){
       <stop offset="70%" stop-color="#b88a1c"/>
       <stop offset="100%" stop-color="#7a5e12"/>
     </linearGradient>
-    <radialGradient id="shine" cx="0.08" cy="0.05" r="0.9">
-      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.58"/>
-      <stop offset="40%" stop-color="#ffe08a" stop-opacity="0.25"/>
+    <!-- stronger highlight from upper-left -->
+    <radialGradient id="shine" cx="0.06" cy="0.04" r="0.95">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.70"/>
+      <stop offset="40%" stop-color="#ffe08a" stop-opacity="0.30"/>
       <stop offset="100%" stop-color="#000000" stop-opacity="0"/>
     </radialGradient>
     <linearGradient id="cashGrad" x1="0" x2="0" y1="0" y2="1">
@@ -263,21 +260,63 @@ function getOrnateLogoSVG(width){
     </g>
   </g>
 
-  <!-- Warm sunlight from top-left -->
+  <!-- Sunlight from upper-left -->
   <circle cx="0" cy="0" r="520" fill="url(#shine)"/>
 </svg>`;
 }
-function mountLogo(sel, width){ const el = $(sel); if(el) el.innerHTML = getOrnateLogoSVG(width); }
-function setFavicon(){ const svg = getOrnateLogoSVG(256); const link = $("#favicon"); if (link) link.href = 'data:image/svg+xml;utf8,' + encodeURIComponent(svg) + '#cb=' + Date.now(); }
+
+/* Optional Base64 PNG override; leave empty to use the SVG above */
+const ZTP_LOGO_PNG = "";
+
+/* Cache-buster token */
+const ZTP_CB = String(Date.now());
+
+/* Inject logo; remove any stale <img> or previous logo */
+function ZTP_mountLogo(selector, width){
+  const host = document.querySelector(selector);
+  if(!host) return;
+  host.querySelectorAll('img, svg').forEach(n=>n.remove()); /* nuke stale assets */
+  if (ZTP_LOGO_PNG){
+    const img = new Image();
+    img.alt = "ZenTrader Pro Logo";
+    img.decoding = "async";
+    img.loading = "lazy";
+    img.style.width = (width||560) + "px";
+    img.src = ZTP_LOGO_PNG + "#v=" + ZTP_CB; /* cache-bust */
+    host.appendChild(img);
+  } else {
+    host.insertAdjacentHTML('afterbegin', ZTP_ornateSVG(width));
+  }
+}
+
+/* Favicon from logo (cache-busted) */
+function ZTP_setFavicon(){
+  const link = document.getElementById('favicon') || (()=>{const l=document.createElement('link');l.id='favicon';l.rel='icon';document.head.appendChild(l);return l;})();
+  if (ZTP_LOGO_PNG){
+    link.href = ZTP_LOGO_PNG + "#v=" + ZTP_CB;
+  } else {
+    const svg = ZTP_ornateSVG(256);
+    link.href = 'data:image/svg+xml;utf8,' + encodeURIComponent(svg) + '#v=' + ZTP_CB;
+  }
+}
+
+/* One-call branding */
+function ZTP_applyBranding(){
+  ZTP_mountLogo('#splashLogo', 560);
+  ZTP_mountLogo('#brandLogo', 560);
+  ZTP_mountLogo('#footerLogo', 280);
+  ZTP_setFavicon();
+}
 
 /* ===================== DEMO DATA ===================== */
 const demo={labels:["Mon","Tue","Wed","Thu","Fri","Mon","Tue","Wed","Thu","Fri"],pnlCum:[0,300,-120,450,200,680,540,900,750,1200],trades:[{result:"Win",pnl:220},{result:"Loss",pnl:-80},{result:"Win",pnl:160},{result:"Win",pnl:340},{result:"BE",pnl:0},{result:"Win",pnl:180},{result:"Loss",pnl:-120},{result:"Win",pnl:260},{result:"Win",pnl:140},{result:"Win",pnl:310}]};
 function fmtMoney(v){return(v<0?"-$":"$")+Math.abs(v).toLocaleString()}
 function calcKPIs(T){const n=T.length,w=T.filter(t=>t.result==="Win"),l=T.filter(t=>t.result==="Loss"),b=T.filter(t=>t.result==="BE");const wr=n?Math.round(w.length/n*100):0,tp=T.reduce((s,t)=>s+t.pnl,0);const gw=w.reduce((s,t)=>s+t.pnl,0),gl=Math.abs(l.reduce((s,t)=>s+t.pnl,0));const pf=gl?gw/gl:(gw?Infinity:0);return{n,winRate:wr,totalPnL:tp,profitFactor:pf,wins:w.length,losses:l.length,be:b.length};}
-function updateKPIs(){const k=calcKPIs(demo.trades); els.k1.textContent=fmtMoney(k.totalPnL); els.k2.textContent=k.winRate+'%'; els.k3.textContent=k.n; els.k4.textContent=(Math.round(k.profitFactor*100)/100).toFixed(2);}
+function updateKPIs(){const k=calcKPIs(demo.trades); $("#k1").textContent=fmtMoney(k.totalPnL); $("#k2").textContent=k.winRate+'%'; $("#k3").textContent=k.n; $("#k4").textContent=(Math.round(k.profitFactor*100)/100).toFixed(2);}
 
 /* ===================== CHARTS ===================== */
 function sizeCanvasForDPR(canvas){
+  if(!canvas) return {ctx:null,W:0,H:0};
   const dpr = Math.max(1, window.devicePixelRatio || 1);
   const rect = canvas.getBoundingClientRect();
   const needW = Math.floor(rect.width * dpr);
@@ -285,10 +324,10 @@ function sizeCanvasForDPR(canvas){
   if (canvas.width !== needW || canvas.height !== needH){ canvas.width = needW; canvas.height = needH; }
   return {ctx:canvas.getContext('2d'), W:canvas.width, H:canvas.height};
 }
-function grid(x,x1,y1,x2,y2,s){x.strokeStyle='rgba(255,255,255,0.06)';x.lineWidth=1;for(let i=0;i<=s;i++){const y=y1+(y2-y1)*(i/s);x.beginPath();x.moveTo(x1,y);x.lineTo(x2,y);x.stroke();}}
+function grid(x,x1,y1,x2,y2,s){if(!x)return; x.strokeStyle='rgba(255,255,255,0.06)';x.lineWidth=1;for(let i=0;i<=s;i++){const y=y1+(y2-y1)*(i/s);x.beginPath();x.moveTo(x1,y);x.lineTo(x2,y);x.stroke();}}
 
 function drawLine(c,labels,data){
-  const {ctx:x,W,H}=sizeCanvasForDPR(c);
+  const {ctx:x,W,H}=sizeCanvasForDPR(c); if(!x) return;
   x.fillStyle='#0e1524';x.fillRect(0,0,W,H);
   const p={l:50,r:12,t:18,b:34},w=W-p.l-p.r,h=H-p.t-p.b;const M=Math.max(...data,0),m=Math.min(...data,0),R=(M-m)||1,y=v=>p.t+h-((v-m)/R)*h;
   grid(x,p.l,p.t,W-p.r,p.t+h,4);
@@ -298,7 +337,7 @@ function drawLine(c,labels,data){
   x.fillStyle='#9db0c8';x.font='11px system-ui,-apple-system,Segoe UI,Roboto,Arial';x.fillText('PnL',8,16);x.fillText('Time →',W/2-20,H-8);
 }
 function drawBars(c,labels,cum){
-  const {ctx:x,W,H}=sizeCanvasForDPR(c);
+  const {ctx:x,W,H}=sizeCanvasForDPR(c); if(!x) return;
   x.fillStyle='#0e1524';x.fillRect(0,0,W,H);
   const p={l:40,r:12,t:14,b:34},w=W-p.l-p.r,h=H-p.t-p.b;const d=cum.map((v,i)=>i===0?v:cum[i]-cum[i-1]);const M=Math.max(...d,0),m=Math.min(...d,0),R=(M-m)||1,y=v=>p.t+h-((v-m)/R)*h,bw=w/d.length*.7;
   grid(x,p.l,p.t,W-p.r,p.t+h,4);
@@ -306,48 +345,57 @@ function drawBars(c,labels,cum){
   x.fillStyle='#9db0c8';x.font='11px system-ui,-apple-system,Segoe UI,Roboto,Arial';x.fillText('Daily PnL',8,16);x.fillText('Time →',W/2-20,H-8);
 }
 function drawDonut(c,w,l,b){
-  const {ctx:x,W,H}=sizeCanvasForDPR(c);
+  const {ctx:x,W,H}=sizeCanvasForDPR(c); if(!x) return;
   x.fillStyle='#0e1524';x.fillRect(0,0,W,H);
   const cx=W/2,cy=H/2,r=Math.min(W,H)/2-16,i=r*.6,t=w+l+b||1,P=[{v:w,color:'#3fb37f',label:'Wins'},{v:l,color:'#d45b6b',label:'Losses'},{v:b,color:'#9db0c8',label:'BE'}];
   let a=-Math.PI/2;P.forEach(p=>{const a1=a+(p.v/t)*Math.PI*2;x.beginPath();x.moveTo(cx,cy);x.arc(cx,cy,r,a,a1);x.closePath();x.fillStyle=p.color;x.fill();a=a1});
   x.globalCompositeOperation='destination-out';x.beginPath();x.arc(cx,cy,i,0,6.283);x.fill();x.globalCompositeOperation='source-over';
   x.font='12px system-ui,-apple-system,Segoe UI,Roboto,Arial';x.fillStyle='#e8eef7';let ly=H-10,lx=10;P.forEach(p=>{x.fillStyle=p.color;x.fillRect(lx,ly-10,10,10);x.fillStyle='#e8eef7';x.fillText(p.label+': '+p.v,lx+16,ly);ly-=16});
 }
-function renderAll(){ updateKPIs(); drawLine(els.pnlLine,demo.labels,demo.pnlCum); drawBars(els.pnlBars,demo.labels,demo.pnlCum); const k=calcKPIs(demo.trades); drawDonut(els.winLossDonut,k.wins,k.losses,k.be); }
-const renderAllDebounced = debounce(()=>requestAnimationFrame(renderAll), 60);
+function renderAll(){
+  updateKPIs();
+  drawLine($("#pnlLine"),demo.labels,demo.pnlCum);
+  drawBars($("#pnlBars"),demo.labels,demo.pnlCum);
+  const k=calcKPIs(demo.trades);
+  drawDonut($("#winLossDonut"),k.wins,k.losses,k.be);
+}
+const renderAllDebounced = debounce(()=>{ requestAnimationFrame(renderAll); }, 60);
 
-/* ================== VOICE (SULTRY GB) ================== */
+/* ================== VOICE (SULTRY BRITISH) ================== */
 const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
 const synth = window.speechSynthesis;
-let rec=null,listening=false,armed=false,starting=false;
 
 function rankVoice(v){let s=0;if(/en-GB/i.test(v.lang))s+=1000;if(/female|woman|girl/i.test(v.name))s+=200;if(/Google|Microsoft|Apple/i.test(v.name))s+=50;if(/(Libby|Sonia|Hazel|Amy|Emma|Charlotte|Ellie|Mia|Aria|Jane|Lucy|Serena)/i.test(v.name))s+=120;return s;}
-function getVoicesSorted(){const list=synth?.getVoices()||[];return list.slice().sort((a,b)=>rankVoice(b)-rankVoice(a));}
+function getVoicesSorted(){try{const list=synth?.getVoices?.()||[];return list.slice().sort((a,b)=>rankVoice(b)-rankVoice(a));}catch{return[]}}
 
 let voicesReady=false, voicesTries=0;
 function populateVoices(){
   const list=getVoicesSorted();
   if(!list.length && voicesTries<24){ voicesTries++; setTimeout(populateVoices,220); return; }
-  if(!list.length){ $('#voiceHint').textContent='No system voices available.'; return; }
+  const hint = $('#voiceHint');
+  const sel = $('#voiceSelect');
+  if(!list.length){ if(hint) hint.textContent='No system voices available.'; return; }
   voicesReady=true;
-  els.voiceSelect.innerHTML="";
-  list.forEach(v=>{const o=document.createElement('option');o.value=v.name;o.textContent=`${v.name} (${v.lang})`;els.voiceSelect.appendChild(o);});
-  const saved=localStorage.getItem('ztpVoice');
-  els.voiceSelect.value = (saved && list.some(v=>v.name===saved)) ? saved : list[0].name;
-  $('#voiceHint').textContent='British female preferred. Your choice is saved.';
+  if(sel){
+    sel.innerHTML="";
+    list.forEach(v=>{const o=document.createElement('option');o.value=v.name;o.textContent=`${v.name} (${v.lang})`;sel.appendChild(o);});
+    const saved=localStorage.getItem('ztpVoice');
+    sel.value = (saved && list.some(v=>v.name===saved)) ? saved : list[0].name;
+  }
+  if(hint) hint.textContent='British female preferred. Your choice is saved.';
 }
-if(typeof speechSynthesis!=='undefined' && speechSynthesis.onvoiceschanged!==undefined){ speechSynthesis.onvoiceschanged=populateVoices; }
+if(synth && typeof synth.onvoiceschanged!=='undefined'){ synth.onvoiceschanged=populateVoices; }
 document.addEventListener('click', function once(){ if(!voicesReady) populateVoices(); document.removeEventListener('click', once, {passive:true}); }, {passive:true});
-els?.voiceSelect?.addEventListener?.('change',()=>localStorage.setItem('ztpVoice', els.voiceSelect.value));
+$('#voiceSelect')?.addEventListener('change',()=>localStorage.setItem('ztpVoice', $('#voiceSelect').value));
 
-function currentVoice(){const name=els.voiceSelect?.value;const list=synth?.getVoices()||[];return list.find(v=>v.name===name)||list[0]||null;}
+function currentVoice(){try{const name=$('#voiceSelect')?.value;const list=synth?.getVoices?.()||[];return list.find(v=>v.name===name)||list[0]||null;}catch{return null}}
 
-/* Sexy / sultry delivery (deeper + slower) */
+/* Sexy / sultry preset (deeper + slower) */
 const SULTRY = Object.freeze({ rate:0.82, pitch:0.80, volume:1.0 });
 function speak(text, style=SULTRY){
   try{
-    if(!synth) return;
-    synth.cancel(); // stop any queued utterances
+    if(!synth || !('SpeechSynthesisUtterance' in window)) return;
+    synth.cancel();
     const cleaned = String(text||'').replace(/\s+/g,' ').trim();
     if(!cleaned) return;
     const u=new SpeechSynthesisUtterance(cleaned);
@@ -356,26 +404,20 @@ function speak(text, style=SULTRY){
     synth.speak(u);
   }catch(e){ console.warn('TTS error',e); }
 }
-
-/* UI voice buttons */
-function bindVoiceUI(){
-  els.testVoice?.addEventListener('click',()=>{
-    if(!(synth && (synth.getVoices()?.length||0))) populateVoices();
-    if(!synth){ alert('This browser does not support text-to-speech.'); return; }
-    speak("Hello… this is ZenTrader Pro. I’ll guide you, in a calm, confident British tone.");
-  }, {passive:true});
-
-  els.enterApp?.addEventListener('click',()=>{
-    els.splash.classList.add('hidden'); els.splash.setAttribute('aria-hidden','true');
-    speak("Welcome to ZenTrader Pro. Let’s begin.");
-  }, {passive:true});
-}
+$('#testVoice')?.addEventListener('click',()=>{
+  if(!(synth && (getVoicesSorted().length||0))) populateVoices();
+  if(!synth){ alert('This browser does not support text-to-speech.'); return; }
+  speak("Hello… this is ZenTrader Pro. I’ll guide you, in a calm, confident British tone.");
+},{passive:true});
+$('#enterApp')?.addEventListener('click',()=>{
+  const s=$("#splash"); if(s){ s.classList.add('hidden'); s.setAttribute('aria-hidden','true'); }
+  speak("Welcome to ZenTrader Pro. Let’s begin.");
+},{passive:true});
 
 /* ===== Speech recognition (manual start; wake words) ===== */
-function setupRecognition(){
-  if(!SR) return;
+let rec=null,listening=false,armed=false,starting=false;
+if(SR){
   rec=new SR(); rec.lang='en-US'; rec.continuous=true; rec.interimResults=true;
-
   rec.onresult=(e)=>{
     let finalText='';
     for(let i=e.resultIndex;i<e.results.length;i++){
@@ -386,32 +428,30 @@ function setupRecognition(){
     const low=finalText.toLowerCase();
     if(!armed && (/\bhey[\s,.-]*then\b/.test(low)||/\bhey[\s,.-]*zen\b/.test(low))){
       armed=true; speak("Yes… I’m listening.");
-      els.voiceStatus.textContent='Awake. Try “ticker AAPL quantity three entry 492 point 35”.';
+      const vs=$('#voiceStatus'); if(vs) vs.textContent='Awake. Try “ticker AAPL quantity three entry 492 point 35”.';
       return;
     }
     if(armed){ handleCommand(finalText); }
   };
-  rec.onstart=()=>{listening=true;starting=false;els.voiceStatus.textContent='Listening… Say “hey then” or “hey zen”…';};
-  rec.onend = ()=>{listening=false;starting=false;els.voiceStatus.textContent='Stopped. Click Start Voice to resume.';};
-  rec.onerror=(ev)=>{ starting=false;
-    if(ev.error==='not-allowed'){ els.voiceStatus.textContent='Mic blocked. Allow access in site settings, then press Start.'; }
-    else if(ev.error==='aborted'){ els.voiceStatus.textContent='Listening aborted.'; }
-    else { els.voiceStatus.textContent='Voice error: '+ev.error; }
+  rec.onstart=()=>{listening=true;starting=false;const vs=$('#voiceStatus'); if(vs) vs.textContent='Listening… Say “hey then” or “hey zen”…';};
+  rec.onend = ()=>{listening=false;starting=false;const vs=$('#voiceStatus'); if(vs) vs.textContent='Stopped. Click Start Voice to resume.';};
+  rec.onerror=(ev)=>{ starting=false; const vs=$('#voiceStatus');
+    if(ev.error==='not-allowed'){ if(vs) vs.textContent='Mic blocked. Allow access in site settings, then press Start.'; }
+    else if(ev.error==='aborted'){ if(vs) vs.textContent='Listening aborted.'; }
+    else { if(vs) vs.textContent='Voice error: '+ev.error; }
   };
-
-  els.startVoice?.addEventListener('click',async ()=>{
-    if(!rec){ els.voiceStatus.textContent='Speech recognition not supported.'; return; }
-    if(listening||starting) return;
-    try{
-      if(navigator.permissions && navigator.permissions.query){
-        try{ const p = await navigator.permissions.query({name:'microphone'}); if(p.state==='denied'){ els.voiceStatus.textContent='Microphone is blocked in site settings.'; } }catch(_){}
-      }
-      starting=true; rec.start();
-    }catch(_){ starting=false; }
-  }, {passive:true});
-
-  els.stopVoice?.addEventListener('click',()=>{ if(!rec) return; armed=false; try{ rec.stop(); }catch(_){} }, {passive:true});
 }
+$('#startVoice')?.addEventListener('click',async ()=>{
+  if(!rec){ const vs=$('#voiceStatus'); if(vs) vs.textContent='Speech recognition not supported in this browser.'; return; }
+  if(listening||starting) return;
+  try{
+    if(navigator.permissions && navigator.permissions.query){
+      try{ const p = await navigator.permissions.query({name:'microphone'}); if(p.state==='denied'){ const vs=$('#voiceStatus'); if(vs) vs.textContent='Microphone is blocked in site settings.'; } }catch(_){}
+    }
+    starting=true; rec.start();
+  }catch(_){ starting=false; }
+},{passive:true});
+$('#stopVoice')?.addEventListener('click',()=>{ if(!rec) return; armed=false; try{ rec.stop(); }catch(_){} },{passive:true});
 
 /* ===== Helpers: word-numbers & robust parsing ===== */
 const WORD_NUM = Object.freeze({"zero":0,"one":1,"two":2,"three":3,"four":4,"five":5,"six":6,"seven":7,"eight":8,"nine":9,"ten":10,"eleven":11,"twelve":12,"thirteen":13,"fourteen":14,"fifteen":15,"sixteen":16,"seventeen":17,"eighteen":18,"nineteen":19,"twenty":20});
@@ -420,40 +460,38 @@ function normalizeNumberText(s){return s.replace(/\bpoint\b/gi,'.').replace(/[^\
 
 function handleCommand(t){
   const raw=t.toLowerCase(); const s = wordsToNumberToken(raw);
-  const tm=s.match(/\b(ticker|symbol)\s+([a-z]{1,6})\b/i); if(tm) els.ticker.value=tm[2].toUpperCase();
-  if(/\b(long|buy)\b/i.test(s))  els.side.value='Long';
-  if(/\b(short|sell)\b/i.test(s)) els.side.value='Short';
-  const qm=s.match(/\b(quantity|qty)\s+([a-z\d]{1,12})\b/i); if(qm){ const q=parseInt(wordsToNumberToken(qm[2]).replace(/[^\d]/g,''),10); if(Number.isFinite(q)) els.qty.value=q; }
-  const em=s.match(/\b(entry|enter|at)\s+([\d\s]*(?:point\s*\d+)?)\b/i); if(em){ const v=parseFloat(normalizeNumberText(em[2])); if(Number.isFinite(v)) els.entry.value=v; }
-  const xm=s.match(/\b(exit|target|take\s*profit)\s+([\d\s]*(?:point\s*\d+)?)\b/i); if(xm){ const v=parseFloat(normalizeNumberText(xm[2])); if(Number.isFinite(v)) els.exit.value=v; }
-  const nm=s.match(/\bnotes?\s+(.*)$/i); if(nm) els.notes.value=nm[1];
+  const tm=s.match(/\b(ticker|symbol)\s+([a-z]{1,6})\b/i); if(tm) $("#ticker").value=tm[2].toUpperCase();
+  if(/\b(long|buy)\b/i.test(s))  $("#side").value='Long';
+  if(/\b(short|sell)\b/i.test(s)) $("#side").value='Short';
+  const qm=s.match(/\b(quantity|qty)\s+([a-z\d]{1,12})\b/i); if(qm){ const q=parseInt(wordsToNumberToken(qm[2]).replace(/[^\d]/g,''),10); if(Number.isFinite(q)) $("#qty").value=q; }
+  const em=s.match(/\b(entry|enter|at)\s+([\d\s]*(?:point\s*\d+)?)\b/i); if(em){ const v=parseFloat(normalizeNumberText(em[2])); if(Number.isFinite(v)) $("#entry").value=v; }
+  const xm=s.match(/\b(exit|target|take\s*profit)\s+([\d\s]*(?:point\s*\d+)?)\b/i); if(xm){ const v=parseFloat(normalizeNumberText(xm[2])); if(Number.isFinite(v)) $("#exit").value=v; }
+  const nm=s.match(/\bnotes?\s+(.*)$/i); if(nm) $("#notes").value=nm[1];
 
   if(/\b(read\s*back|confirm|repeat)\b/i.test(s)){
-    const out={ticker:els.ticker.value||'—',side:els.side.value||'—',qty:els.qty.value||'—',entry:els.entry.value||'—',exit:els.exit.value||'—'};
+    const out={ticker:$("#ticker").value||'—',side:$("#side").value||'—',qty:$("#qty").value||'—',entry:$("#entry").value||'—',exit:$("#exit").value||'—'};
     speak(`Ticker ${out.ticker}. Direction ${out.side}. Quantity ${out.qty}. Entry ${out.entry}. Exit ${out.exit}.`);
   }
 }
 
-/* ===== Sticky header spacing (no underlap), debounced ===== */
-const fixHeaderPadding = debounce(()=>{ const h=document.querySelector('header.brand')?.getBoundingClientRect().height||160; document.body.style.paddingTop=Math.ceil(h)+'px'; }, 40);
+/* ===== Sticky header spacing (no underlap) ===== */
+const fixHeaderPadding = debounce(()=>{ try{ const h=document.querySelector('header.brand')?.getBoundingClientRect().height||160; document.body.style.paddingTop=Math.ceil(h)+'px'; }catch{} }, 40);
 window.addEventListener('resize',fixHeaderPadding,{passive:true});
 new MutationObserver(()=>fixHeaderPadding()).observe(document.documentElement,{subtree:true,childList:true,attributes:true,attributeFilter:['style','class']});
 
-/* ===== Initialize branding, charts, listeners ===== */
-function initBranding(){ mountLogo('#splashLogo',560); mountLogo('#brandLogo',560); mountLogo('#footerLogo',280); setFavicon(); }
+/* ===== Initialize everything ===== */
 function init(){
-  cacheEls();
-  initBranding();
+  ZTP_applyBranding();
   fixHeaderPadding();
   renderAll();
   window.addEventListener('resize', renderAllDebounced, {passive:true});
-  bindVoiceUI();
-  setupRecognition();
 }
 if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',init,{once:true});}else{init();}
 </script>
 </body>
 </html>
+	
+
 	
 
 	
