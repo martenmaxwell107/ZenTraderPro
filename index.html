@@ -4,7 +4,10 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>ZenTrader Pro — Dashboard</title>
-<link rel="icon" type="image/png" href="favicon.png" />
+
+<!-- Favicon will be replaced at runtime by your uploaded image; fallback is a simple gold coin Z -->
+<link id="appFavicon" rel="icon" type="image/png" href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTI4IiBoZWlnaHQ9IjEyOCIgdmlld0JveD0iMCAwIDEyOCAxMjgiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iNjQiIGN5PSI2NCIgcj0iNTYiIGZpbGw9IiNkNGFmMzciIHN0cm9rZT0iI2M4OTkzMCIgc3Ryb2tlLXdpZHRoPSI4Ii8+PHRleHQgeD0iNjQiIHk9Ijc4IiBmb250LXNpemU9IjU0IiBmb250LXdlaWdodD0iNTAwIiBmb250LWZhbWlseT0iQXJpYWwsIHNhbnMtc2VyaWYiIGZpbGw9IiMxMTEwMDIiIHRleHQtYW5jaG9yPSJtaWRkbGUiPlo8L3RleHQ+PC9zdmc+">
+
 <style>
   :root{
     --bg:#0e0e0f; --panel:#151517; --panel2:#1b1b1e; --gold:#d4af37; --muted:#a7a7ad;
@@ -12,21 +15,43 @@
   }
   *{box-sizing:border-box}
   body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,Arial,sans-serif}
-  /* HEADER: force image logo, no text */
-  header{
-    display:flex;align-items:center;justify-content:center;gap:16px;
-    background:#000;padding:14px 18px;box-shadow:0 2px 10px var(--shadow);
+
+  /* ===== UNIVERSAL LOGO OVERRIDE ===== */
+  /* Hide ANY existing theme logos or text */
+  .site-logo, .site-logo * ,
+  .custom-logo, .custom-logo-link, .custom-logo-link * ,
+  .logo, .logo * ,
+  .navbar-brand, .navbar-brand * ,
+  .site-title, .site-title * {
+    display: none !important;
+    visibility: hidden !important;
+    width: 0 !important;
+    height: 0 !important;
+    overflow: hidden !important;
   }
-  /* prevent any theme from swapping the logo for text */
-  header h1{display:none!important}
-  header .brand{display:flex;align-items:center;gap:16px}
-  header .brand img{
-    height:88px; width:auto; display:block; image-rendering:auto;
+
+  /* Our forced header/footer with your exact logo (from data URL) */
+  .ztp-header, .ztp-footer {
+    background:#000; 
+    padding:18px;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:12px;
   }
-  @media (max-width:900px){ header .brand img{height:68px} }
+  .ztp-header img#ztpLogo, .ztp-footer img#ztpLogoFooter {
+    height: 120px !important;   /* Adjust size here */
+    width: auto !important;
+    max-height: none !important;
+    object-fit: contain;
+    display:block;
+  }
+  @media (max-width:900px) {
+    .ztp-header img#ztpLogo, .ztp-footer img#ztpLogoFooter { height: 90px !important; }
+  }
+
+  /* UI */
   main{max-width:1200px;margin:0 auto;padding:20px}
-  footer{background:#000;padding:16px;display:flex;align-items:center;justify-content:center;gap:12px}
-  footer img{height:64px;width:auto}
   .card{background:linear-gradient(180deg,var(--panel),var(--panel2));border:1px solid #232327;border-radius:18px;padding:16px;margin-bottom:16px}
   h2{margin:0 0 10px;color:#e6c766}
   .grid{display:grid;gap:16px;grid-template-columns:repeat(12,1fr)}
@@ -45,116 +70,226 @@
   th,td{padding:8px 10px;border-bottom:1px solid #232327;text-align:left}
   .good{color:var(--good)} .bad{color:var(--bad)}
   .note{color:#b7b7bd;font-size:.9rem}
-  .voicebar{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
   .pill{display:inline-flex;align-items:center;gap:6px;border:1px solid #333;border-radius:999px;padding:6px 10px;font-size:.82rem}
-  .dot{width:10px;height:10px;border-radius:50%;background:#666}
-  .dot.live{background:#32d296;box-shadow:0 0 10px #32d296}
+  .brand-tools{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
 </style>
 </head>
 <body>
 
-<header>
-  <!-- EXACT HEADER LOGO -->
-  <div class="brand">
-    <img src="zentrader-logo.png" alt="ZenTrader Pro Logo">
-  </div>
+<!-- ===== HEADER: exact logo (data URL) ===== -->
+<header class="ztp-header">
+  <a href="/" class="brand">
+    <img id="ztpLogo" src="" alt="ZenTrader Pro Logo">
+  </a>
 </header>
 
 <main>
-  <div class="grid">
-    <section class="card span-12">
-      <h2>Key Performance Indicators</h2>
-      <div class="kpis">
-        <div class="kpi"><div class="label">Net P&amp;L</div><div class="value" id="k_net">0.00</div></div>
-        <div class="kpi"><div class="label">Win Rate</div><div class="value" id="k_win">0%</div></div>
-        <div class="kpi"><div class="label">Profit Factor</div><div class="value" id="k_pf">0.00</div></div>
-        <div class="kpi"><div class="label">Expectancy ($/trade)</div><div class="value" id="k_exp">0.00</div></div>
-        <div class="kpi"><div class="label">Avg Win</div><div class="value" id="k_avgw">0.00</div></div>
-        <div class="kpi"><div class="label">Avg Loss</div><div class="value" id="k_avgl">0.00</div></div>
-        <div class="kpi"><div class="label">Max Drawdown</div><div class="value" id="k_mdd">0.00</div></div>
-        <div class="kpi"><div class="label">Best / Worst</div><div class="value" id="k_bw">0 / 0</div></div>
-      </div>
-    </section>
+  <!-- Branding controls (one-time setup; stays inside the same one file) -->
+  <section class="card span-12">
+    <h2>Branding (one-time)</h2>
+    <div class="brand-tools">
+      <label class="pill" style="position:relative;overflow:hidden">
+        <span>Upload Logo PNG</span>
+        <input id="logoInput" type="file" accept="image/png,image/jpeg, image/webp, image/svg+xml"
+               style="opacity:0;position:absolute;inset:0;cursor:pointer">
+      </label>
+      <label class="pill" style="position:relative;overflow:hidden">
+        <span>Upload Favicon (optional)</span>
+        <input id="favInput" type="file" accept="image/png,image/x-icon,image/svg+xml"
+               style="opacity:0;position:absolute;inset:0;cursor:pointer">
+      </label>
+      <button class="pill btn-gold" id="bakeBtn">Bake Into File</button>
+      <span class="pill" id="brandStatus">Status: waiting for uploads…</span>
+    </div>
+    <p class="note" style="margin-top:6px">
+      Upload your exact logo once. We’ll show it in the header & footer and set it as the favicon.  
+      Click “Bake Into File” to download a **new single HTML** with the images embedded permanently.
+    </p>
+  </section>
 
-    <section class="card span-8">
-      <h2>Log a Trade</h2>
-      <div class="toolbar" style="margin-bottom:8px">
-        <button class="btn-gold" onclick="addTrade()">Add Trade</button>
-        <button onclick="clearForm()">Clear</button>
-        <button onclick="exportCSV()">Export CSV</button>
-        <label style="position:relative;overflow:hidden">
-          <span class="pill">Import CSV</span>
-          <input type="file" accept=".csv" style="opacity:0;position:absolute;inset:0" onchange="importCSV(event)">
-        </label>
-      </div>
-      <div class="voicebar">
-        <button id="btnMic" onclick="toggleMic()">🎙️ Start Voice</button>
-        <span class="pill"><span id="micDot" class="dot"></span> <span id="voiceState">Voice: idle</span></span>
-        <span class="pill">Voice: British female</span>
-      </div>
-      <p class="note" style="margin-top:6px">
-        Speak naturally. Examples:<br>
-        • “<em>Log trade symbol SPY side long qty 2 entry 500.4 exit 502.1 fees 1.2 setup RSI bounce notes quick scalp</em>”<br>
-        • “<em>Start listening</em>”, “<em>Stop listening</em>”, “<em>Read stats</em>”.
-      </p>
-      <div class="grid" style="margin-top:10px">
-        <div class="span-6"><input id="t_date" type="datetime-local"></div>
-        <div class="span-6"><input id="t_symbol" placeholder="Symbol (e.g., SPY)"></div>
-        <div class="span-6">
-          <select id="t_side"><option value="LONG">LONG</option><option value="SHORT">SHORT</option></select>
-        </div>
-        <div class="span-6"><input id="t_qty" type="number" step="1" placeholder="Qty"></div>
-        <div class="span-6"><input id="t_entry" type="number" step="0.01" placeholder="Entry Price"></div>
-        <div class="span-6"><input id="t_exit" type="number" step="0.01" placeholder="Exit Price"></div>
-        <div class="span-6"><input id="t_fees" type="number" step="0.01" placeholder="Fees/Comm"></div>
-        <div class="span-6"><input id="t_points" placeholder="Auto Points" disabled></div>
-        <div class="span-12"><input id="t_setup" placeholder="Setup (e.g., RSI bounce)"></div>
-        <div class="span-12"><textarea id="t_notes" rows="3" placeholder="Notes"></textarea></div>
-      </div>
-    </section>
+  <!-- KPIs -->
+  <section class="card span-12">
+    <h2>Key Performance Indicators</h2>
+    <div class="kpis">
+      <div class="kpi"><div class="label">Net P&amp;L</div><div class="value" id="k_net">0.00</div></div>
+      <div class="kpi"><div class="label">Win Rate</div><div class="value" id="k_win">0%</div></div>
+      <div class="kpi"><div class="label">Profit Factor</div><div class="value" id="k_pf">0.00</div></div>
+      <div class="kpi"><div class="label">Expectancy ($/trade)</div><div class="value" id="k_exp">0.00</div></div>
+      <div class="kpi"><div class="label">Avg Win</div><div class="value" id="k_avgw">0.00</div></div>
+      <div class="kpi"><div class="label">Avg Loss</div><div class="value" id="k_avgl">0.00</div></div>
+      <div class="kpi"><div class="label">Max Drawdown</div><div class="value" id="k_mdd">0.00</div></div>
+      <div class="kpi"><div class="label">Best / Worst</div><div class="value" id="k_bw">0 / 0</div></div>
+    </div>
+  </section>
 
-    <section class="card span-4">
-      <h2>Status</h2>
-      <div id="status" class="note">Ready.</div>
-      <h2 style="margin-top:16px">Charts</h2>
-      <p class="note">Equity, daily P/L, and distribution appear after you add trades.</p>
-    </section>
-
-    <section class="card span-6"><h2>Equity Curve</h2><canvas id="chartEquity" width="800" height="300"></canvas></section>
-    <section class="card span-6"><h2>Daily P&amp;L</h2><canvas id="chartDaily" width="800" height="300"></canvas></section>
-    <section class="card span-12"><h2>Trades</h2>
-      <div style="overflow:auto">
-        <table id="tbl">
-          <thead><tr>
-            <th>#</th><th>Date</th><th>Symbol</th><th>Side</th><th>Qty</th><th>Entry</th><th>Exit</th>
-            <th>Points</th><th>P&amp;L</th><th>Fees</th><th>Setup</th><th>Notes</th><th></th>
-          </tr></thead>
-          <tbody></tbody>
-        </table>
+  <!-- Trade Entry -->
+  <section class="card span-8">
+    <h2>Log a Trade</h2>
+    <div class="toolbar" style="margin-bottom:8px">
+      <button class="btn-gold" onclick="addTrade()">Add Trade</button>
+      <button onclick="clearForm()">Clear</button>
+      <button onclick="exportCSV()">Export CSV</button>
+      <label style="position:relative;overflow:hidden">
+        <span class="pill">Import CSV</span>
+        <input type="file" accept=".csv" style="opacity:0;position:absolute;inset:0" onchange="importCSV(event)">
+      </label>
+      <button onclick="toggleMic()">🎙️ Start/Stop Voice</button>
+      <span class="pill"><span id="voiceState">Voice: idle</span></span>
+      <span class="pill">Voice: British female</span>
+    </div>
+    <div class="grid" style="margin-top:10px">
+      <div class="span-6"><input id="t_date" type="datetime-local"></div>
+      <div class="span-6"><input id="t_symbol" placeholder="Symbol (e.g., SPY)"></div>
+      <div class="span-6">
+        <select id="t_side"><option value="LONG">LONG</option><option value="SHORT">SHORT</option></select>
       </div>
-    </section>
-  </div>
+      <div class="span-6"><input id="t_qty" type="number" step="1" placeholder="Qty"></div>
+      <div class="span-6"><input id="t_entry" type="number" step="0.01" placeholder="Entry Price"></div>
+      <div class="span-6"><input id="t_exit" type="number" step="0.01" placeholder="Exit Price"></div>
+      <div class="span-6"><input id="t_fees" type="number" step="0.01" placeholder="Fees/Comm"></div>
+      <div class="span-6"><input id="t_points" placeholder="Auto Points" disabled></div>
+      <div class="span-12"><input id="t_setup" placeholder="Setup (e.g., RSI bounce)"></div>
+      <div class="span-12"><textarea id="t_notes" rows="3" placeholder="Notes"></textarea></div>
+    </div>
+    <p class="note">Voice examples: “log trade symbol SPY side long qty 2 entry 500.4 exit 502.1 fees 1.2 setup RSI bounce notes quick scalp” • “read stats”.</p>
+  </section>
+
+  <!-- Status -->
+  <section class="card span-4">
+    <h2>Status</h2>
+    <div id="status" class="note">Ready.</div>
+    <h2 style="margin-top:16px">Charts</h2>
+    <p class="note">Equity, daily P/L, and distribution appear after you add trades.</p>
+  </section>
+
+  <section class="card span-6"><h2>Equity Curve</h2><canvas id="chartEquity" width="800" height="300"></canvas></section>
+  <section class="card span-6"><h2>Daily P&amp;L</h2><canvas id="chartDaily" width="800" height="300"></canvas></section>
+
+  <section class="card span-12"><h2>Trades</h2>
+    <div style="overflow:auto">
+      <table id="tbl">
+        <thead><tr>
+          <th>#</th><th>Date</th><th>Symbol</th><th>Side</th><th>Qty</th><th>Entry</th><th>Exit</th>
+          <th>Points</th><th>P&amp;L</th><th>Fees</th><th>Setup</th><th>Notes</th><th></th>
+        </tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </section>
 </main>
 
-<footer>
-  <img src="zentrader-logo.png" alt="ZenTrader Pro Logo">
-  <span style="color:#b9b9bf">© 2025 ZenTrader Pro</span>
+<!-- ===== FOOTER: exact logo (data URL) ===== -->
+<footer class="ztp-footer">
+  <img id="ztpLogoFooter" src="" alt="ZenTrader Pro Logo">
+  <span style="color:#b7b7bf">© 2025 ZenTrader Pro</span>
 </footer>
 
 <script>
-/* ==== State ==== */
+/* =========================
+   BRANDING: ONE-FILE, PERSISTENT, BAKED EXPORT
+========================= */
 const $ = s => document.querySelector(s);
+const LS_LOGO = 'ztp_logo_dataurl';
+const LS_FAV  = 'ztp_fav_dataurl';
+
+function setLogoSrc(dataUrl){
+  $('#ztpLogo').src = dataUrl;
+  $('#ztpLogoFooter').src = dataUrl;
+}
+function setFavicon(dataUrl){
+  const link = document.getElementById('appFavicon');
+  link.href = dataUrl;
+}
+
+function fileToDataURL(file){
+  return new Promise((res,rej)=>{
+    const r = new FileReader();
+    r.onload = e => res(e.target.result);
+    r.onerror = rej;
+    r.readAsDataURL(file);
+  });
+}
+
+async function handleLogoUpload(file){
+  const url = await fileToDataURL(file);
+  localStorage.setItem(LS_LOGO, url);
+  setLogoSrc(url);
+  $('#brandStatus').textContent = 'Status: logo set';
+}
+async function handleFavUpload(file){
+  const url = await fileToDataURL(file);
+  localStorage.setItem(LS_FAV, url);
+  setFavicon(url);
+  $('#brandStatus').textContent = 'Status: favicon set';
+}
+
+function initBranding(){
+  const savedLogo = localStorage.getItem(LS_LOGO);
+  const savedFav  = localStorage.getItem(LS_FAV);
+  if(savedLogo){ setLogoSrc(savedLogo); }
+  else {
+    // fallback placeholder (gold coin Z svg already set as favicon)
+    const ph = 'data:image/svg+xml;base64,'+
+      'PHN2ZyB3aWR0aD0iNjQwIiBoZWlnaHQ9IjE2MCIgdmlld0JveD0iMCAwIDY0MCAxNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+'+
+      'PHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjY0MCIgaGVpZ2h0PSIxNjAiIGZpbGw9IiMwMDAiLz48Y2lyY2xlIGN4PSIyNTAiIGN5PSI4MCIgcj0iNjAi'+
+      'IGZpbGw9IiNkNGFmMzciIHN0cm9rZT0iI2M4OTkzMCIgc3Ryb2tlLXdpZHRoPSI4Ii8+PHRleHQgeD0iMjUwIiB5PSI5NiIgZm9udC1zaXplPSI3MiIg'+
+      'Zm9udC13ZWlnaHQ9IjYwMCIgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmaWxsPSIjMTExMDAyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5a'+
+      'ZW4gVHJhZGVyIFBybzwvdGV4dD48L3N2Zz4=';
+    setLogoSrc(ph);
+  }
+  setFavicon(savedFav || document.getElementById('appFavicon').href);
+}
+$('#logoInput').addEventListener('change', e=>{
+  const f = e.target.files[0]; if(!f) return;
+  handleLogoUpload(f).catch(err=> $('#brandStatus').textContent='Logo error: '+err);
+});
+$('#favInput').addEventListener('change', e=>{
+  const f = e.target.files[0]; if(!f) return;
+  handleFavUpload(f).catch(err=> $('#brandStatus').textContent='Favicon error: '+err);
+});
+
+/* Bake: downloads THIS page with embedded data URLs inline (no localStorage needed) */
+$('#bakeBtn').addEventListener('click', ()=>{
+  // Clone the document
+  const doc = document.documentElement.cloneNode(true);
+
+  // Inject current data URLs
+  const logo = localStorage.getItem(LS_LOGO);
+  const fav  = localStorage.getItem(LS_FAV) || $('#appFavicon').href;
+
+  // Header/Footer img
+  doc.querySelector('#ztpLogo')?.setAttribute('src', logo || $('#ztpLogo').src);
+  doc.querySelector('#ztpLogoFooter')?.setAttribute('src', logo || $('#ztpLogoFooter').src);
+  // Favicon
+  const favLink = doc.querySelector('#appFavicon'); if(favLink) favLink.setAttribute('href', fav);
+
+  // Remove branding panel if you want a cleaner final file (comment out if you want to keep)
+  // const brandCard = [...doc.querySelectorAll('section.card')].find(s => s.querySelector('#logoInput'));
+  // brandCard?.parentNode?.removeChild(brandCard);
+
+  // Strip localStorage usage (optional)
+  const scriptTags = doc.querySelectorAll('script');
+  // Keep scripts; they don't require localStorage to render the images after embedding.
+
+  const htmlStr = '<!DOCTYPE html>\n' + doc.outerHTML;
+  const blob = new Blob([htmlStr], {type:'text/html'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'ZenTraderPro_onefile.html';
+  a.click();
+});
+
+/* =========================
+   DASHBOARD / KPIs / CHARTS / VOICE
+========================= */
 const tradesKey = 'ztp_trades_v2';
 let trades = JSON.parse(localStorage.getItem(tradesKey) || '[]');
 function save(){ localStorage.setItem(tradesKey, JSON.stringify(trades)); }
-
-/* ==== Helpers ==== */
 function nowISO(){ const d=new Date(); d.setMinutes(d.getMinutes()-d.getTimezoneOffset()); return d.toISOString().slice(0,16); }
 $('#t_date').value = nowISO();
 function fmt(n,d=2){ return Number(n||0).toLocaleString(undefined,{minimumFractionDigits:d,maximumFractionDigits:d}); }
 function sum(a){ return a.reduce((x,y)=>x+y,0); }
 
-/* ==== Add/Clear ==== */
 function addTrade(){
   const t = {
     date: $('#t_date').value || new Date().toISOString(),
@@ -179,7 +314,6 @@ function clearForm(){
   $('#t_date').value = nowISO();
 }
 
-/* ==== KPIs ==== */
 function calcStats(){
   const N=trades.length; const pnl=trades.map(t=>t.pnl);
   const wins=pnl.filter(x=>x>0), losses=pnl.filter(x=>x<0);
@@ -188,7 +322,6 @@ function calcStats(){
   const avgL=losses.length?sum(losses)/losses.length:0;
   const pf = Math.abs(sum(losses))>0 ? sum(wins)/Math.abs(sum(losses)) : 0;
   const exp = N ? net/N : 0;
-  // equity/mdd
   let eq=0, peak=0, mdd=0; pnl.forEach(x=>{eq+=x; peak=Math.max(peak,eq); mdd=Math.min(mdd,eq-peak);});
   const best = N? Math.max(...pnl):0, worst = N? Math.min(...pnl):0;
   return {N,net,winRate,avgW,avgL,pf,exp,mdd:Math.abs(mdd),best,worst};
@@ -203,8 +336,6 @@ function renderKPIs(s){
   $('#k_mdd').textContent = fmt(s.mdd);
   $('#k_bw').textContent = `${fmt(s.best)} / ${fmt(s.worst)}`;
 }
-
-/* ==== Table ==== */
 function renderTable(){
   const tb = $('#tbl tbody'); tb.innerHTML='';
   trades.forEach((t,i)=>{
@@ -221,19 +352,14 @@ function renderTable(){
 }
 function del(i){ const t=trades[i]; trades.splice(i,1); save(); render(); speak(`Removed trade ${i+1} ${t.symbol}.`); }
 
-/* ==== Charts (vanilla canvas) ==== */
 function lineChart(canvas, values){
   const ctx=canvas.getContext('2d'), w=canvas.width, h=canvas.height, p=30;
   ctx.clearRect(0,0,w,h);
   const min=Math.min(0,...values), max=Math.max(0,...values), R=(max-min)||1;
-  // grid
   ctx.strokeStyle='#2a2a2f';
   for(let i=0;i<=4;i++){ const y=p+i*((h-2*p)/4); ctx.beginPath(); ctx.moveTo(p,y); ctx.lineTo(w-p,y); ctx.stroke(); }
-  // axes
   ctx.strokeStyle='#555'; ctx.beginPath(); ctx.moveTo(p,p); ctx.lineTo(p,h-p); ctx.lineTo(w-p,h-p); ctx.stroke();
-  // zero
   if(min<0 && max>0){ const zy = h-p - ((0-min)/R)*(h-2*p); ctx.setLineDash([4,4]); ctx.strokeStyle='#444'; ctx.beginPath(); ctx.moveTo(p,zy); ctx.lineTo(w-p,zy); ctx.stroke(); ctx.setLineDash([]); }
-  // line
   const xs=values.map((_,i)=>p+i*((w-2*p)/Math.max(1,values.length-1)));
   const ys=values.map(v=> h-p - ((v-min)/R)*(h-2*p));
   ctx.strokeStyle='#e6c766'; ctx.lineWidth=2.2; ctx.beginPath();
@@ -254,53 +380,23 @@ function barChart(canvas, values){
     ctx.fillRect(x, Math.min(y,zero), bw, Math.abs(y-zero));
   });
 }
-
-/* ==== Render ==== */
 function render(){
-  // live points preview
   const side=$('#t_side').value, entry=+$('#t_entry').value||0, exit=+$('#t_exit').value||0;
-  const dir = side==='LONG'?1:-1; $('#t_points').value = ((exit-entry)*dir||0).toFixed(3);
-
+  const dir=side==='LONG'?1:-1; $('#t_points').value=((exit-entry)*dir||0).toFixed(3);
   renderTable();
   const s=calcStats(); renderKPIs(s);
-
   const eq=[]; let acc=0; trades.forEach(t=>{ acc+=t.pnl; eq.push(acc); });
   lineChart($('#chartEquity'), eq);
-
   const byDay={}; trades.forEach(t=>{ const d=new Date(t.date); const k=d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate(); byDay[k]=(byDay[k]||0)+t.pnl; });
   const daily = Object.entries(byDay).sort((a,b)=> new Date(a[0])-new Date(b[0])).map(e=>e[1]);
   barChart($('#chartDaily'), daily);
 }
 render();
 
-/* ==== CSV ==== */
-function exportCSV(){
-  const header=['date','symbol','side','qty','entry','exit','fees','points','pnl','setup','notes'].join(',');
-  const rows = trades.map(t=>[t.date,t.symbol,t.side,t.qty,t.entry,t.exit,t.fees,t.points,t.pnl,JSON.stringify(t.setup||''),JSON.stringify(t.notes||'')].join(','));
-  const csv=[header,...rows].join('\n'); const blob=new Blob([csv],{type:'text/csv'});
-  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='zentrader_trades.csv'; a.click();
-}
-function importCSV(e){
-  const f=e.target.files[0]; if(!f) return;
-  const r=new FileReader(); r.onload=ev=>{
-    const [head,...lines]=ev.target.result.split(/\r?\n/).filter(Boolean);
-    const cols=head.split(','); const idx=k=>cols.indexOf(k);
-    lines.forEach(row=>{
-      const c=row.split(',');
-      trades.push({
-        date:c[idx('date')], symbol:c[idx('symbol')], side:c[idx('side')], qty:+c[idx('qty')]||1,
-        entry:+c[idx('entry')]||0, exit:+c[idx('exit')]||0, fees:+c[idx('fees')]||0,
-        points:+c[idx('points')]||0, pnl:+c[idx('pnl')]||0,
-        setup:JSON.parse(c[idx('setup')]||'""'), notes:JSON.parse(c[idx('notes')]||'""')
-      });
-    });
-    save(); render(); speak('Your CSV has been imported.');
-  }; r.readAsText(f);
-}
-
-/* ==== VOICE (Recognition + British Female TTS) ==== */
+/* =========================
+   VOICE (Recognition + British Female TTS)
+========================= */
 let recog=null, listening=false, enGBVoice=null;
-
 function pickBritishVoice(){
   const voices = window.speechSynthesis.getVoices();
   const preferred = [
@@ -313,18 +409,16 @@ function pickBritishVoice(){
     const v = voices.find(v=> v.name.includes(name));
     if(v) return v;
   }
-  // fallback: any en-GB female-ish name, else any en-GB, else default
   return voices.find(v=> v.lang==='en-GB' && /female|serena|hazel|kate|sonia|libby/i.test(v.name))
       || voices.find(v=> v.lang==='en-GB')
       || voices[0] || null;
 }
 window.speechSynthesis.onvoiceschanged = ()=> { enGBVoice = pickBritishVoice(); };
-
 function speak(text){
   const u = new SpeechSynthesisUtterance(text);
   enGBVoice = enGBVoice || pickBritishVoice();
   if(enGBVoice) u.voice = enGBVoice;
-  u.lang='en-GB'; u.rate=0.98; u.pitch=0.78; u.volume=1; // sultry/softer
+  u.lang='en-GB'; u.rate=0.98; u.pitch=0.78; u.volume=1;
   window.speechSynthesis.speak(u);
 }
 
@@ -333,30 +427,26 @@ function setupRecog(){
   if(!SR){ $('#voiceState').textContent='Voice not supported in this browser.'; return null; }
   const r = new SR();
   r.lang='en-US'; r.interimResults=false; r.continuous=true;
-  r.onstart = ()=>{ listening=true; $('#micDot').classList.add('live'); $('#voiceState').textContent='Listening…'; };
-  r.onend = ()=>{ listening=false; $('#micDot').classList.remove('live'); $('#voiceState').textContent='Voice: idle'; };
+  r.onstart = ()=>{ listening=true; $('#voiceState').textContent='Listening…'; };
+  r.onend = ()=>{ listening=false; $('#voiceState').textContent='Voice: idle'; };
   r.onerror = e=>{ $('#voiceState').textContent='Voice error: '+e.error; };
   r.onresult = e=>{
-    const txt = e.results[e.results.length-1][0].transcript.trim();
+    const txt = e.results[e.results.length-1][0].transcript.trim().toLowerCase();
     $('#voiceState').textContent = 'Heard: ' + txt;
-    handleCommand(txt.toLowerCase());
+    handleCommand(txt);
   };
   return r;
 }
-
 function toggleMic(){
   if(!recog) recog = setupRecog();
   if(!recog) return;
-  if(listening){ recog.stop(); $('#btnMic').textContent='🎙️ Start Voice'; }
-  else { recog.start(); $('#btnMic').textContent='🛑 Stop Voice'; speak('Listening, go ahead.'); }
+  if(listening){ recog.stop(); }
+  else { recog.start(); speak('Listening, go ahead.'); }
 }
-
 function handleCommand(txt){
   if(/stop (listening|voice)/.test(txt)){ if(recog && listening) {recog.stop(); speak('Stopping now.');} return; }
   if(/start (listening|voice)/.test(txt)){ if(recog && !listening) {recog.start(); speak('I am listening.');} return; }
   if(/read (stats|statistics|kpis?)/.test(txt)){ readStats(); return; }
-
-  // One-shot add: "log trade symbol SPY side long qty 2 entry 500.4 exit 502.1 fees 1.2 setup r s i bounce notes quick scalp"
   if(/log trade/.test(txt) || /add trade/.test(txt)){
     const get = (key, alt=[])=>{
       const keys=[key,...alt].join('|');
@@ -369,19 +459,14 @@ function handleCommand(txt){
     const entry = parseFloat(get('entry|enter|in') || ($('#t_entry').value||'0'));
     const exit  = parseFloat(get('exit|out')  || ($('#t_exit').value||'0'));
     const fees  = parseFloat(get('fees|commission|comm') || '0');
-    // setup & notes (grab text after keywords)
     const setup = (()=>{ const m = txt.match(/setup\s+(.+?)(?:\s+notes\s+|$)/i); return m? m[1] : ''; })();
     const notes = (()=>{ const m = txt.match(/notes?\s+(.+)$/i); return m? m[1] : ''; })();
-
-    // Fill the form (so user sees it), then add
     $('#t_symbol').value=symbol; $('#t_side').value=side; $('#t_qty').value=qty;
     $('#t_entry').value=isFinite(entry)?entry:''; $('#t_exit').value=isFinite(exit)?exit:''; $('#t_fees').value=isFinite(fees)?fees:'';
     $('#t_setup').value=setup; $('#t_notes').value=notes;
     addTrade();
     return;
   }
-
-  // Quick profit/loss: "profit 80" or "loss 35"
   const m = txt.match(/(profit|loss)\s+(-?\d+(?:\.\d+)?)/);
   if(m){
     const val = parseFloat(m[2]) * (m[1]==='loss' ? -1 : 1);
@@ -389,13 +474,13 @@ function handleCommand(txt){
     save(); render(); speak(`Logged ${val>=0?'profit':'loss'} of ${Math.abs(val)} dollars.`);
   }
 }
-
 function readStats(){
   const s=calcStats();
   speak(`Here are your numbers. Net P and L ${Math.round(s.net)} dollars. Win rate ${s.winRate.toFixed(0)} percent. Profit factor ${isFinite(s.pf)?s.pf.toFixed(2):'zero'}. Expectancy ${s.exp.toFixed(2)} dollars per trade. Max drawdown ${Math.round(s.mdd)} dollars. Best trade ${Math.round(s.best)}, worst ${Math.round(s.worst)}.`);
 }
 
-/* live points calc */
+/* init */
+initBranding();
 ['t_entry','t_exit','t_side'].forEach(id=>{
   document.getElementById(id).addEventListener('input', ()=>{
     const side=$('#t_side').value, entry=+$('#t_entry').value||0, exit=+$('#t_exit').value||0;
@@ -405,6 +490,8 @@ function readStats(){
 </script>
 </body>
 </html>
+	
+
 	
 
 	
