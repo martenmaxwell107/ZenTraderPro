@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>ZenTrader Pro — Dashboard</title>
 
-<!-- Favicon will be replaced at runtime by your uploaded image; fallback is a simple gold coin Z -->
-<link id="appFavicon" rel="icon" type="image/png" href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTI4IiBoZWlnaHQ9IjEyOCIgdmlld0JveD0iMCAwIDEyOCAxMjgiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iNjQiIGN5PSI2NCIgcj0iNTYiIGZpbGw9IiNkNGFmMzciIHN0cm9rZT0iI2M4OTkzMCIgc3Ryb2tlLXdpZHRoPSI4Ii8+PHRleHQgeD0iNjQiIHk9Ijc4IiBmb250LXNpemU9IjU0IiBmb250LXdlaWdodD0iNTAwIiBmb250LWZhbWlseT0iQXJpYWwsIHNhbnMtc2VyaWYiIGZpbGw9IiMxMTEwMDIiIHRleHQtYW5jaG9yPSJtaWRkbGUiPlo8L3RleHQ+PC9zdmc+">
+<!-- Favicon will be set to the same data URL as the header/footer logo after baking -->
+<link id="appFavicon" rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgo=" />
 
 <style>
   :root{
@@ -16,41 +16,20 @@
   *{box-sizing:border-box}
   body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,Arial,sans-serif}
 
-  /* ===== UNIVERSAL LOGO OVERRIDE ===== */
-  /* Hide ANY existing theme logos or text */
-  .site-logo, .site-logo * ,
-  .custom-logo, .custom-logo-link, .custom-logo-link * ,
-  .logo, .logo * ,
-  .navbar-brand, .navbar-brand * ,
-  .site-title, .site-title * {
-    display: none !important;
-    visibility: hidden !important;
-    width: 0 !important;
-    height: 0 !important;
-    overflow: hidden !important;
+  /* Hide any theme auto-logo/text if this ends up inside a framework */
+  .site-logo, .site-logo * , .custom-logo, .custom-logo-link, .custom-logo-link * ,
+  .logo, .logo * , .navbar-brand, .navbar-brand * , .site-title, .site-title *{
+    display:none !important; width:0 !important; height:0 !important; overflow:hidden !important;
   }
 
-  /* Our forced header/footer with your exact logo (from data URL) */
-  .ztp-header, .ztp-footer {
-    background:#000; 
-    padding:18px;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    gap:12px;
+  /* Our header/footer with your exact logo */
+  header, footer{
+    background:#000; padding:18px; display:flex; justify-content:center; align-items:center; gap:12px;
+    box-shadow:0 2px 10px var(--shadow);
   }
-  .ztp-header img#ztpLogo, .ztp-footer img#ztpLogoFooter {
-    height: 120px !important;   /* Adjust size here */
-    width: auto !important;
-    max-height: none !important;
-    object-fit: contain;
-    display:block;
-  }
-  @media (max-width:900px) {
-    .ztp-header img#ztpLogo, .ztp-footer img#ztpLogoFooter { height: 90px !important; }
-  }
+  header img, footer img{ height:120px; width:auto; display:block; object-fit:contain }
+  @media (max-width:900px){ header img, footer img { height:90px } }
 
-  /* UI */
   main{max-width:1200px;margin:0 auto;padding:20px}
   .card{background:linear-gradient(180deg,var(--panel),var(--panel2));border:1px solid #232327;border-radius:18px;padding:16px;margin-bottom:16px}
   h2{margin:0 0 10px;color:#e6c766}
@@ -63,145 +42,143 @@
   .toolbar{display:flex;gap:10px;flex-wrap:wrap}
   .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
   .kpi{background:#121214;border:1px solid #222;border-radius:14px;padding:12px}
-  .kpi .label{color:var(--muted);font-size:.82rem}
+  .kpi .label{color:#a7a7ad;font-size:.82rem}
   .kpi .value{font-size:1.35rem;margin-top:4px}
   canvas{width:100%;height:280px;background:#101012;border:1px solid #222;border-radius:12px}
   table{width:100%;border-collapse:collapse;font-size:.92rem}
   th,td{padding:8px 10px;border-bottom:1px solid #232327;text-align:left}
   .good{color:var(--good)} .bad{color:var(--bad)}
   .note{color:#b7b7bd;font-size:.9rem}
-  .pill{display:inline-flex;align-items:center;gap:6px;border:1px solid #333;border-radius:999px;padding:6px 10px;font-size:.82rem}
-  .brand-tools{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+
+  /* First-run overlay (visible only before baking; goes away automatically) */
+  #firstRunOverlay{
+    position:fixed; inset:0; background:rgba(0,0,0,.84); color:#eaeaea; display:none;
+    align-items:center; justify-content:center; text-align:center; padding:24px; z-index:9999;
+  }
+  #firstRunOverlay .box{
+    background:#141416; border:1px solid #2a2a2f; border-radius:16px; padding:22px; max-width:560px;
+    box-shadow:0 10px 30px var(--shadow);
+  }
+  #firstRunOverlay button{ width:auto; margin-top:14px }
 </style>
 </head>
 <body>
 
-<!-- ===== HEADER: exact logo (data URL) ===== -->
-<header class="ztp-header">
-  <a href="/" class="brand">
-    <img id="ztpLogo" src="" alt="ZenTrader Pro Logo">
-  </a>
+<!-- ============ HEADER (uses your exact logo once baked) ============ -->
+<header>
+  <img id="logoHeader" src="" alt="ZenTrader Pro Logo">
 </header>
 
 <main>
-  <!-- Branding controls (one-time setup; stays inside the same one file) -->
-  <section class="card span-12">
-    <h2>Branding (one-time)</h2>
-    <div class="brand-tools">
-      <label class="pill" style="position:relative;overflow:hidden">
-        <span>Upload Logo PNG</span>
-        <input id="logoInput" type="file" accept="image/png,image/jpeg, image/webp, image/svg+xml"
-               style="opacity:0;position:absolute;inset:0;cursor:pointer">
-      </label>
-      <label class="pill" style="position:relative;overflow:hidden">
-        <span>Upload Favicon (optional)</span>
-        <input id="favInput" type="file" accept="image/png,image/x-icon,image/svg+xml"
-               style="opacity:0;position:absolute;inset:0;cursor:pointer">
-      </label>
-      <button class="pill btn-gold" id="bakeBtn">Bake Into File</button>
-      <span class="pill" id="brandStatus">Status: waiting for uploads…</span>
-    </div>
-    <p class="note" style="margin-top:6px">
-      Upload your exact logo once. We’ll show it in the header & footer and set it as the favicon.  
-      Click “Bake Into File” to download a **new single HTML** with the images embedded permanently.
-    </p>
-  </section>
-
-  <!-- KPIs -->
-  <section class="card span-12">
-    <h2>Key Performance Indicators</h2>
-    <div class="kpis">
-      <div class="kpi"><div class="label">Net P&amp;L</div><div class="value" id="k_net">0.00</div></div>
-      <div class="kpi"><div class="label">Win Rate</div><div class="value" id="k_win">0%</div></div>
-      <div class="kpi"><div class="label">Profit Factor</div><div class="value" id="k_pf">0.00</div></div>
-      <div class="kpi"><div class="label">Expectancy ($/trade)</div><div class="value" id="k_exp">0.00</div></div>
-      <div class="kpi"><div class="label">Avg Win</div><div class="value" id="k_avgw">0.00</div></div>
-      <div class="kpi"><div class="label">Avg Loss</div><div class="value" id="k_avgl">0.00</div></div>
-      <div class="kpi"><div class="label">Max Drawdown</div><div class="value" id="k_mdd">0.00</div></div>
-      <div class="kpi"><div class="label">Best / Worst</div><div class="value" id="k_bw">0 / 0</div></div>
-    </div>
-  </section>
-
-  <!-- Trade Entry -->
-  <section class="card span-8">
-    <h2>Log a Trade</h2>
-    <div class="toolbar" style="margin-bottom:8px">
-      <button class="btn-gold" onclick="addTrade()">Add Trade</button>
-      <button onclick="clearForm()">Clear</button>
-      <button onclick="exportCSV()">Export CSV</button>
-      <label style="position:relative;overflow:hidden">
-        <span class="pill">Import CSV</span>
-        <input type="file" accept=".csv" style="opacity:0;position:absolute;inset:0" onchange="importCSV(event)">
-      </label>
-      <button onclick="toggleMic()">🎙️ Start/Stop Voice</button>
-      <span class="pill"><span id="voiceState">Voice: idle</span></span>
-      <span class="pill">Voice: British female</span>
-    </div>
-    <div class="grid" style="margin-top:10px">
-      <div class="span-6"><input id="t_date" type="datetime-local"></div>
-      <div class="span-6"><input id="t_symbol" placeholder="Symbol (e.g., SPY)"></div>
-      <div class="span-6">
-        <select id="t_side"><option value="LONG">LONG</option><option value="SHORT">SHORT</option></select>
+  <div class="grid">
+    <section class="card span-12">
+      <h2>Key Performance Indicators</h2>
+      <div class="kpis">
+        <div class="kpi"><div class="label">Net P&amp;L</div><div class="value" id="k_net">0.00</div></div>
+        <div class="kpi"><div class="label">Win Rate</div><div class="value" id="k_win">0%</div></div>
+        <div class="kpi"><div class="label">Profit Factor</div><div class="value" id="k_pf">0.00</div></div>
+        <div class="kpi"><div class="label">Expectancy ($/trade)</div><div class="value" id="k_exp">0.00</div></div>
+        <div class="kpi"><div class="label">Avg Win</div><div class="value" id="k_avgw">0.00</div></div>
+        <div class="kpi"><div class="label">Avg Loss</div><div class="value" id="k_avgl">0.00</div></div>
+        <div class="kpi"><div class="label">Max Drawdown</div><div class="value" id="k_mdd">0.00</div></div>
+        <div class="kpi"><div class="label">Best / Worst</div><div class="value" id="k_bw">0 / 0</div></div>
       </div>
-      <div class="span-6"><input id="t_qty" type="number" step="1" placeholder="Qty"></div>
-      <div class="span-6"><input id="t_entry" type="number" step="0.01" placeholder="Entry Price"></div>
-      <div class="span-6"><input id="t_exit" type="number" step="0.01" placeholder="Exit Price"></div>
-      <div class="span-6"><input id="t_fees" type="number" step="0.01" placeholder="Fees/Comm"></div>
-      <div class="span-6"><input id="t_points" placeholder="Auto Points" disabled></div>
-      <div class="span-12"><input id="t_setup" placeholder="Setup (e.g., RSI bounce)"></div>
-      <div class="span-12"><textarea id="t_notes" rows="3" placeholder="Notes"></textarea></div>
-    </div>
-    <p class="note">Voice examples: “log trade symbol SPY side long qty 2 entry 500.4 exit 502.1 fees 1.2 setup RSI bounce notes quick scalp” • “read stats”.</p>
-  </section>
+    </section>
 
-  <!-- Status -->
-  <section class="card span-4">
-    <h2>Status</h2>
-    <div id="status" class="note">Ready.</div>
-    <h2 style="margin-top:16px">Charts</h2>
-    <p class="note">Equity, daily P/L, and distribution appear after you add trades.</p>
-  </section>
+    <section class="card span-8">
+      <h2>Log a Trade</h2>
+      <div class="toolbar" style="margin-bottom:8px">
+        <button class="btn-gold" onclick="addTrade()">Add Trade</button>
+        <button onclick="clearForm()">Clear</button>
+        <button onclick="exportCSV()">Export CSV</button>
+        <label style="position:relative;overflow:hidden">
+          <span class="note" style="padding:10px 12px;display:inline-block;border:1px dashed #333;border-radius:10px">Import CSV</span>
+          <input type="file" accept=".csv" style="opacity:0;position:absolute;inset:0" onchange="importCSV(event)">
+        </label>
+        <button onclick="toggleMic()">🎙️ Start/Stop Voice</button>
+        <span class="note" id="voiceState">Voice: idle</span>
+      </div>
+      <div class="grid" style="margin-top:10px">
+        <div class="span-6"><input id="t_date" type="datetime-local"></div>
+        <div class="span-6"><input id="t_symbol" placeholder="Symbol (e.g., SPY)"></div>
+        <div class="span-6"><select id="t_side"><option value="LONG">LONG</option><option value="SHORT">SHORT</option></select></div>
+        <div class="span-6"><input id="t_qty" type="number" step="1" placeholder="Qty"></div>
+        <div class="span-6"><input id="t_entry" type="number" step="0.01" placeholder="Entry Price"></div>
+        <div class="span-6"><input id="t_exit" type="number" step="0.01" placeholder="Exit Price"></div>
+        <div class="span-6"><input id="t_fees" type="number" step="0.01" placeholder="Fees/Comm"></div>
+        <div class="span-6"><input id="t_points" placeholder="Auto Points" disabled></div>
+        <div class="span-12"><input id="t_setup" placeholder="Setup (e.g., RSI bounce)"></div>
+        <div class="span-12"><textarea id="t_notes" rows="3" placeholder="Notes"></textarea></div>
+      </div>
+      <p class="note">Voice examples: “log trade symbol SPY side long qty 2 entry 500.4 exit 502.1 fees 1.2 setup RSI bounce notes quick scalp” • “read stats”.</p>
+    </section>
 
-  <section class="card span-6"><h2>Equity Curve</h2><canvas id="chartEquity" width="800" height="300"></canvas></section>
-  <section class="card span-6"><h2>Daily P&amp;L</h2><canvas id="chartDaily" width="800" height="300"></canvas></section>
+    <section class="card span-4">
+      <h2>Status</h2>
+      <div id="status" class="note">Ready.</div>
+      <h2 style="margin-top:16px">Charts</h2>
+      <p class="note">Equity, daily P/L, and distribution appear after you add trades.</p>
+    </section>
 
-  <section class="card span-12"><h2>Trades</h2>
-    <div style="overflow:auto">
-      <table id="tbl">
-        <thead><tr>
-          <th>#</th><th>Date</th><th>Symbol</th><th>Side</th><th>Qty</th><th>Entry</th><th>Exit</th>
-          <th>Points</th><th>P&amp;L</th><th>Fees</th><th>Setup</th><th>Notes</th><th></th>
-        </tr></thead>
-        <tbody></tbody>
-      </table>
-    </div>
-  </section>
+    <section class="card span-6"><h2>Equity Curve</h2><canvas id="chartEquity" width="800" height="300"></canvas></section>
+    <section class="card span-6"><h2>Daily P&amp;L</h2><canvas id="chartDaily" width="800" height="300"></canvas></section>
+
+    <section class="card span-12"><h2>Trades</h2>
+      <div style="overflow:auto">
+        <table id="tbl">
+          <thead><tr>
+            <th>#</th><th>Date</th><th>Symbol</th><th>Side</th><th>Qty</th><th>Entry</th><th>Exit</th>
+            <th>Points</th><th>P&amp;L</th><th>Fees</th><th>Setup</th><th>Notes</th><th></th>
+          </tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+  </div>
 </main>
 
-<!-- ===== FOOTER: exact logo (data URL) ===== -->
-<footer class="ztp-footer">
-  <img id="ztpLogoFooter" src="" alt="ZenTrader Pro Logo">
-  <span style="color:#b7b7bf">© 2025 ZenTrader Pro</span>
+<!-- ============ FOOTER (uses your exact logo once baked) ============ -->
+<footer>
+  <img id="logoFooter" src="" alt="ZenTrader Pro Logo">
+  <span style="color:#b9b9bf">© 2025 ZenTrader Pro</span>
 </footer>
 
+<!-- First-run overlay (invisible after baking) -->
+<div id="firstRunOverlay">
+  <div class="box">
+    <h3 style="margin:0 0 10px;color:#e6c766">Embed your logo once</h3>
+    <p style="margin:0 0 6px">Choose your PNG file and we’ll bake it into this file, then auto-download your final one-file app.</p>
+    <button id="chooseLogoBtn" class="btn-gold">Choose PNG…</button>
+    <input id="logoFileInput" type="file" accept="image/png,image/webp,image/jpeg,image/svg+xml" style="display:none">
+  </div>
+</div>
+
 <script>
-/* =========================
-   BRANDING: ONE-FILE, PERSISTENT, BAKED EXPORT
-========================= */
+/* =========================================================
+   ONE-FILE LOGO EMBED / AUTO-BAKE
+   - If LOGO_DATA is set, we use it and hide the overlay.
+   - If not, we prompt once to choose the PNG, then download
+     a baked copy with LOGO_DATA embedded permanently.
+========================================================= */
+
+/* ********** PASTE WILL BE WRITTEN HERE AFTER BAKING ********** */
+const LOGO_DATA = "";  // empty on first run; baked file will contain your data URL here
+/* ************************************************************** */
+
 const $ = s => document.querySelector(s);
-const LS_LOGO = 'ztp_logo_dataurl';
-const LS_FAV  = 'ztp_fav_dataurl';
+const overlay = $('#firstRunOverlay');
+const headerImg = $('#logoHeader');
+const footerImg = $('#logoFooter');
+const favLink  = document.getElementById('appFavicon');
 
-function setLogoSrc(dataUrl){
-  $('#ztpLogo').src = dataUrl;
-  $('#ztpLogoFooter').src = dataUrl;
-}
-function setFavicon(dataUrl){
-  const link = document.getElementById('appFavicon');
-  link.href = dataUrl;
+function useLogo(dataUrl){
+  if(!dataUrl) return;
+  headerImg.src = dataUrl;
+  footerImg.src = dataUrl;
+  favLink.href  = dataUrl;
 }
 
-function fileToDataURL(file){
+async function fileToDataURL(file){
   return new Promise((res,rej)=>{
     const r = new FileReader();
     r.onload = e => res(e.target.result);
@@ -210,66 +187,23 @@ function fileToDataURL(file){
   });
 }
 
-async function handleLogoUpload(file){
-  const url = await fileToDataURL(file);
-  localStorage.setItem(LS_LOGO, url);
-  setLogoSrc(url);
-  $('#brandStatus').textContent = 'Status: logo set';
-}
-async function handleFavUpload(file){
-  const url = await fileToDataURL(file);
-  localStorage.setItem(LS_FAV, url);
-  setFavicon(url);
-  $('#brandStatus').textContent = 'Status: favicon set';
-}
-
-function initBranding(){
-  const savedLogo = localStorage.getItem(LS_LOGO);
-  const savedFav  = localStorage.getItem(LS_FAV);
-  if(savedLogo){ setLogoSrc(savedLogo); }
-  else {
-    // fallback placeholder (gold coin Z svg already set as favicon)
-    const ph = 'data:image/svg+xml;base64,'+
-      'PHN2ZyB3aWR0aD0iNjQwIiBoZWlnaHQ9IjE2MCIgdmlld0JveD0iMCAwIDY0MCAxNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+'+
-      'PHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjY0MCIgaGVpZ2h0PSIxNjAiIGZpbGw9IiMwMDAiLz48Y2lyY2xlIGN4PSIyNTAiIGN5PSI4MCIgcj0iNjAi'+
-      'IGZpbGw9IiNkNGFmMzciIHN0cm9rZT0iI2M4OTkzMCIgc3Ryb2tlLXdpZHRoPSI4Ii8+PHRleHQgeD0iMjUwIiB5PSI5NiIgZm9udC1zaXplPSI3MiIg'+
-      'Zm9udC13ZWlnaHQ9IjYwMCIgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmaWxsPSIjMTExMDAyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5a'+
-      'ZW4gVHJhZGVyIFBybzwvdGV4dD48L3N2Zz4=';
-    setLogoSrc(ph);
-  }
-  setFavicon(savedFav || document.getElementById('appFavicon').href);
-}
-$('#logoInput').addEventListener('change', e=>{
-  const f = e.target.files[0]; if(!f) return;
-  handleLogoUpload(f).catch(err=> $('#brandStatus').textContent='Logo error: '+err);
-});
-$('#favInput').addEventListener('change', e=>{
-  const f = e.target.files[0]; if(!f) return;
-  handleFavUpload(f).catch(err=> $('#brandStatus').textContent='Favicon error: '+err);
-});
-
-/* Bake: downloads THIS page with embedded data URLs inline (no localStorage needed) */
-$('#bakeBtn').addEventListener('click', ()=>{
-  // Clone the document
+function bakeIntoNewFile(logoDataUrl){
+  // Clone DOM and write LOGO_DATA
   const doc = document.documentElement.cloneNode(true);
+  const scripts = doc.querySelectorAll('script');
+  // Find the script tag containing LOGO_DATA
+  scripts.forEach(tag=>{
+    if(tag.textContent.includes('const LOGO_DATA = ""')){
+      tag.textContent = tag.textContent.replace('const LOGO_DATA = ""','const LOGO_DATA = "'+logoDataUrl.replace(/"/g,'\\"')+'"');
+    }
+  });
+  // Ensure logo src & favicon in the baked file (so it renders even if JS blocks)
+  doc.querySelector('#logoHeader')?.setAttribute('src', logoDataUrl);
+  doc.querySelector('#logoFooter')?.setAttribute('src', logoDataUrl);
+  doc.querySelector('#appFavicon')?.setAttribute('href', logoDataUrl);
 
-  // Inject current data URLs
-  const logo = localStorage.getItem(LS_LOGO);
-  const fav  = localStorage.getItem(LS_FAV) || $('#appFavicon').href;
-
-  // Header/Footer img
-  doc.querySelector('#ztpLogo')?.setAttribute('src', logo || $('#ztpLogo').src);
-  doc.querySelector('#ztpLogoFooter')?.setAttribute('src', logo || $('#ztpLogoFooter').src);
-  // Favicon
-  const favLink = doc.querySelector('#appFavicon'); if(favLink) favLink.setAttribute('href', fav);
-
-  // Remove branding panel if you want a cleaner final file (comment out if you want to keep)
-  // const brandCard = [...doc.querySelectorAll('section.card')].find(s => s.querySelector('#logoInput'));
-  // brandCard?.parentNode?.removeChild(brandCard);
-
-  // Strip localStorage usage (optional)
-  const scriptTags = doc.querySelectorAll('script');
-  // Keep scripts; they don't require localStorage to render the images after embedding.
+  // Remove the overlay from the baked file
+  const ov = doc.querySelector('#firstRunOverlay'); if(ov) ov.parentNode.removeChild(ov);
 
   const htmlStr = '<!DOCTYPE html>\n' + doc.outerHTML;
   const blob = new Blob([htmlStr], {type:'text/html'});
@@ -277,67 +211,89 @@ $('#bakeBtn').addEventListener('click', ()=>{
   a.href = URL.createObjectURL(blob);
   a.download = 'ZenTraderPro_onefile.html';
   a.click();
-});
+}
 
-/* =========================
-   DASHBOARD / KPIs / CHARTS / VOICE
-========================= */
-const tradesKey = 'ztp_trades_v2';
-let trades = JSON.parse(localStorage.getItem(tradesKey) || '[]');
+/* Init: if LOGO_DATA exists (baked file), use it and hide overlay; else prompt user once */
+(function initBranding(){
+  if(LOGO_DATA && LOGO_DATA.startsWith('data:image/')){
+    useLogo(LOGO_DATA);
+    overlay.style.display = 'none';
+  } else {
+    overlay.style.display = 'flex';
+    const chooseBtn = document.getElementById('chooseLogoBtn');
+    const fileInput = document.getElementById('logoFileInput');
+    chooseBtn.addEventListener('click', ()=> fileInput.click());
+    fileInput.addEventListener('change', async (e)=>{
+      const file = e.target.files && e.target.files[0];
+      if(!file) return;
+      const dataUrl = await fileToDataURL(file);
+      useLogo(dataUrl);
+      bakeIntoNewFile(dataUrl);   // triggers download of the final one-file HTML
+      overlay.style.display = 'none'; // hide overlay in this session too
+    });
+  }
+})();
+
+/* =========================================================
+   DASHBOARD / KPIs / CHARTS / VOICE (unchanged)
+========================================================= */
+const tradesKey='ztp_trades_v2';
+let trades=JSON.parse(localStorage.getItem(tradesKey)||'[]');
 function save(){ localStorage.setItem(tradesKey, JSON.stringify(trades)); }
 function nowISO(){ const d=new Date(); d.setMinutes(d.getMinutes()-d.getTimezoneOffset()); return d.toISOString().slice(0,16); }
-$('#t_date').value = nowISO();
+document.addEventListener('DOMContentLoaded', ()=> { document.getElementById('t_date').value = nowISO(); });
+
 function fmt(n,d=2){ return Number(n||0).toLocaleString(undefined,{minimumFractionDigits:d,maximumFractionDigits:d}); }
 function sum(a){ return a.reduce((x,y)=>x+y,0); }
 
 function addTrade(){
-  const t = {
-    date: $('#t_date').value || new Date().toISOString(),
-    symbol: ($('#t_symbol').value||'SPY').toUpperCase(),
-    side: $('#t_side').value,
-    qty: +$('#t_qty').value||1,
-    entry: +$('#t_entry').value||0,
-    exit: +$('#t_exit').value||0,
-    fees: +$('#t_fees').value||0,
-    setup: $('#t_setup').value||'',
-    notes: $('#t_notes').value||''
+  const $=s=>document.querySelector(s);
+  const t={
+    date:$('#t_date').value||new Date().toISOString(),
+    symbol:($('#t_symbol').value||'SPY').toUpperCase(),
+    side:$('#t_side').value,
+    qty:+$('#t_qty').value||1,
+    entry:+$('#t_entry').value||0,
+    exit:+$('#t_exit').value||0,
+    fees:+$('#t_fees').value||0,
+    setup:$('#t_setup').value||'',
+    notes:$('#t_notes').value||''
   };
-  const dir = t.side==='LONG'?1:-1;
-  t.points = (t.exit - t.entry)*dir;
-  t.pnl = t.points*t.qty - t.fees;
+  const dir=t.side==='LONG'?1:-1;
+  t.points=(t.exit - t.entry)*dir;
+  t.pnl=t.points*t.qty - t.fees;
   trades.push(t); save(); render();
   speak(`Trade added: ${t.symbol} ${t.side}. Result ${t.pnl>=0?'plus':'minus'} ${Math.abs(t.pnl).toFixed(2)} dollars.`);
 }
 function clearForm(){
+  const $=s=>document.querySelector(s);
   $('#t_symbol').value=''; $('#t_qty').value=''; $('#t_entry').value=''; $('#t_exit').value='';
   $('#t_fees').value=''; $('#t_setup').value=''; $('#t_notes').value=''; $('#t_points').value='';
-  $('#t_date').value = nowISO();
+  document.getElementById('t_date').value=nowISO();
 }
 
 function calcStats(){
   const N=trades.length; const pnl=trades.map(t=>t.pnl);
   const wins=pnl.filter(x=>x>0), losses=pnl.filter(x=>x<0);
-  const net=sum(pnl); const winRate=N?wins.length/N*100:0;
-  const avgW=wins.length?sum(wins)/wins.length:0;
-  const avgL=losses.length?sum(losses)/losses.length:0;
-  const pf = Math.abs(sum(losses))>0 ? sum(wins)/Math.abs(sum(losses)) : 0;
-  const exp = N ? net/N : 0;
-  let eq=0, peak=0, mdd=0; pnl.forEach(x=>{eq+=x; peak=Math.max(peak,eq); mdd=Math.min(mdd,eq-peak);});
-  const best = N? Math.max(...pnl):0, worst = N? Math.min(...pnl):0;
+  const net=sum(pnl), winRate=N?wins.length/N*100:0;
+  const avgW=wins.length?sum(wins)/wins.length:0, avgL=losses.length?sum(losses)/losses.length:0;
+  const pf=Math.abs(sum(losses))>0?sum(wins)/Math.abs(sum(losses)):0, exp=N?net/N:0;
+  let eq=0,peak=0,mdd=0; pnl.forEach(x=>{eq+=x; peak=Math.max(peak,eq); mdd=Math.min(mdd,eq-peak);});
+  const best=N?Math.max(...pnl):0, worst=N?Math.min(...pnl):0;
   return {N,net,winRate,avgW,avgL,pf,exp,mdd:Math.abs(mdd),best,worst};
 }
 function renderKPIs(s){
-  $('#k_net').textContent = fmt(s.net);
-  $('#k_win').textContent = fmt(s.winRate,1)+'%';
-  $('#k_pf').textContent = (isFinite(s.pf)?s.pf:0).toFixed(2);
-  $('#k_exp').textContent = fmt(s.exp);
-  $('#k_avgw').textContent = fmt(s.avgW);
-  $('#k_avgl').textContent = fmt(Math.abs(s.avgL));
-  $('#k_mdd').textContent = fmt(s.mdd);
-  $('#k_bw').textContent = `${fmt(s.best)} / ${fmt(s.worst)}`;
+  document.getElementById('k_net').textContent=fmt(s.net);
+  document.getElementById('k_win').textContent=fmt(s.winRate,1)+'%';
+  document.getElementById('k_pf').textContent=(isFinite(s.pf)?s.pf:0).toFixed(2);
+  document.getElementById('k_exp').textContent=fmt(s.exp);
+  document.getElementById('k_avgw').textContent=fmt(s.avgW);
+  document.getElementById('k_avgl').textContent=fmt(Math.abs(s.avgL));
+  document.getElementById('k_mdd').textContent=fmt(s.mdd);
+  document.getElementById('k_bw').textContent=`${fmt(s.best)} / ${fmt(s.worst)}`;
 }
 function renderTable(){
-  const tb = $('#tbl tbody'); tb.innerHTML='';
+  const tb=document.querySelector('#tbl tbody'); tb.innerHTML='';
   trades.forEach((t,i)=>{
     const tr=document.createElement('tr');
     const cells=[
@@ -359,9 +315,9 @@ function lineChart(canvas, values){
   ctx.strokeStyle='#2a2a2f';
   for(let i=0;i<=4;i++){ const y=p+i*((h-2*p)/4); ctx.beginPath(); ctx.moveTo(p,y); ctx.lineTo(w-p,y); ctx.stroke(); }
   ctx.strokeStyle='#555'; ctx.beginPath(); ctx.moveTo(p,p); ctx.lineTo(p,h-p); ctx.lineTo(w-p,h-p); ctx.stroke();
-  if(min<0 && max>0){ const zy = h-p - ((0-min)/R)*(h-2*p); ctx.setLineDash([4,4]); ctx.strokeStyle='#444'; ctx.beginPath(); ctx.moveTo(p,zy); ctx.lineTo(w-p,zy); ctx.stroke(); ctx.setLineDash([]); }
+  if(min<0 && max>0){ const zy=h-p-((0-min)/R)*(h-2*p); ctx.setLineDash([4,4]); ctx.strokeStyle='#444'; ctx.beginPath(); ctx.moveTo(p,zy); ctx.lineTo(w-p,zy); ctx.stroke(); ctx.setLineDash([]); }
   const xs=values.map((_,i)=>p+i*((w-2*p)/Math.max(1,values.length-1)));
-  const ys=values.map(v=> h-p - ((v-min)/R)*(h-2*p));
+  const ys=values.map(v=>h-p-((v-min)/R)*(h-2*p));
   ctx.strokeStyle='#e6c766'; ctx.lineWidth=2.2; ctx.beginPath();
   ctx.moveTo(xs[0]||p, ys[0]||h-p); for(let i=1;i<ys.length;i++) ctx.lineTo(xs[i],ys[i]); ctx.stroke();
 }
@@ -369,127 +325,106 @@ function barChart(canvas, values){
   const ctx=canvas.getContext('2d'), w=canvas.width, h=canvas.height, p=30, iw=w-2*p, ih=h-2*p;
   ctx.clearRect(0,0,w,h);
   const min=Math.min(0,...values), max=Math.max(0,...values), R=(max-min)||1;
-  const zero = h-p - ((0-min)/R)*ih;
+  const zero=h-p-((0-min)/R)*ih;
   ctx.strokeStyle='#2a2a2f'; for(let i=0;i<=4;i++){ const y=p+i*(ih/4); ctx.beginPath(); ctx.moveTo(p,y); ctx.lineTo(w-p,y); ctx.stroke(); }
   ctx.strokeStyle='#555'; ctx.beginPath(); ctx.moveTo(p,p); ctx.lineTo(p,h-p); ctx.lineTo(w-p,h-p); ctx.stroke();
-  const bw = iw/Math.max(values.length,1)*.7;
+  const bw=iw/Math.max(values.length,1)*.7;
   values.forEach((v,i)=>{
-    const x = p + i*(iw/Math.max(values.length,1)) + (iw/Math.max(values.length,1)-bw)/2;
-    const y = h-p - ((v-min)/R)*ih;
-    ctx.fillStyle = v>=0 ? '#1fbf6b' : '#ff5454';
+    const x=p+i*(iw/Math.max(values.length,1))+(iw/Math.max(values.length,1)-bw)/2;
+    const y=h-p-((v-min)/R)*ih;
+    ctx.fillStyle=v>=0?'#1fbf6b':'#ff5454';
     ctx.fillRect(x, Math.min(y,zero), bw, Math.abs(y-zero));
   });
 }
+
 function render(){
-  const side=$('#t_side').value, entry=+$('#t_entry').value||0, exit=+$('#t_exit').value||0;
-  const dir=side==='LONG'?1:-1; $('#t_points').value=((exit-entry)*dir||0).toFixed(3);
-  renderTable();
-  const s=calcStats(); renderKPIs(s);
+  // live points preview
+  const side=document.getElementById('t_side').value, entry=+document.getElementById('t_entry').value||0, exit=+document.getElementById('t_exit').value||0;
+  const dir=side==='LONG'?1:-1; document.getElementById('t_points').value=((exit-entry)*dir||0).toFixed(3);
+
+  renderTable(); const s=calcStats(); renderKPIs(s);
+
   const eq=[]; let acc=0; trades.forEach(t=>{ acc+=t.pnl; eq.push(acc); });
-  lineChart($('#chartEquity'), eq);
+  lineChart(document.getElementById('chartEquity'), eq);
+
   const byDay={}; trades.forEach(t=>{ const d=new Date(t.date); const k=d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate(); byDay[k]=(byDay[k]||0)+t.pnl; });
-  const daily = Object.entries(byDay).sort((a,b)=> new Date(a[0])-new Date(b[0])).map(e=>e[1]);
-  barChart($('#chartDaily'), daily);
+  const daily=Object.entries(byDay).sort((a,b)=>new Date(a[0])-new Date(b[0])).map(e=>e[1]);
+  barChart(document.getElementById('chartDaily'), daily);
 }
 render();
 
-/* =========================
-   VOICE (Recognition + British Female TTS)
-========================= */
+/* Voice (British female preference) */
 let recog=null, listening=false, enGBVoice=null;
 function pickBritishVoice(){
-  const voices = window.speechSynthesis.getVoices();
-  const preferred = [
-    'Google UK English Female',
-    'Microsoft Sonia Online (Natural) - English (United Kingdom)',
-    'Microsoft Libby Online (Natural) - English (United Kingdom)',
-    'Serena','Hazel','Kate'
-  ];
-  for(const name of preferred){
-    const v = voices.find(v=> v.name.includes(name));
-    if(v) return v;
-  }
-  return voices.find(v=> v.lang==='en-GB' && /female|serena|hazel|kate|sonia|libby/i.test(v.name))
-      || voices.find(v=> v.lang==='en-GB')
-      || voices[0] || null;
+  const voices=window.speechSynthesis.getVoices();
+  const preferred=['Google UK English Female','Microsoft Sonia Online (Natural) - English (United Kingdom)','Microsoft Libby Online (Natural) - English (United Kingdom)','Serena','Hazel','Kate'];
+  for(const name of preferred){ const v=voices.find(v=>v.name.includes(name)); if(v) return v; }
+  return voices.find(v=> v.lang==='en-GB' && /female|serena|hazel|kate|sonia|libby/i.test(v.name)) || voices.find(v=>v.lang==='en-GB') || voices[0] || null;
 }
-window.speechSynthesis.onvoiceschanged = ()=> { enGBVoice = pickBritishVoice(); };
+window.speechSynthesis.onvoiceschanged=()=>{ enGBVoice=pickBritishVoice(); };
 function speak(text){
-  const u = new SpeechSynthesisUtterance(text);
-  enGBVoice = enGBVoice || pickBritishVoice();
-  if(enGBVoice) u.voice = enGBVoice;
-  u.lang='en-GB'; u.rate=0.98; u.pitch=0.78; u.volume=1;
-  window.speechSynthesis.speak(u);
+  const u=new SpeechSynthesisUtterance(text); enGBVoice=enGBVoice||pickBritishVoice();
+  if(enGBVoice) u.voice=enGBVoice; u.lang='en-GB'; u.rate=0.98; u.pitch=0.78; u.volume=1; window.speechSynthesis.speak(u);
 }
-
 function setupRecog(){
-  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if(!SR){ $('#voiceState').textContent='Voice not supported in this browser.'; return null; }
-  const r = new SR();
-  r.lang='en-US'; r.interimResults=false; r.continuous=true;
-  r.onstart = ()=>{ listening=true; $('#voiceState').textContent='Listening…'; };
-  r.onend = ()=>{ listening=false; $('#voiceState').textContent='Voice: idle'; };
-  r.onerror = e=>{ $('#voiceState').textContent='Voice error: '+e.error; };
-  r.onresult = e=>{
-    const txt = e.results[e.results.length-1][0].transcript.trim().toLowerCase();
-    $('#voiceState').textContent = 'Heard: ' + txt;
-    handleCommand(txt);
-  };
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition; const el=document.getElementById('voiceState');
+  if(!SR){ el.textContent='Voice not supported in this browser.'; return null; }
+  const r=new SR(); r.lang='en-US'; r.interimResults=false; r.continuous=true;
+  r.onstart=()=>{ listening=true; el.textContent='Listening…'; };
+  r.onend=()=>{ listening=false; el.textContent='Voice: idle'; };
+  r.onerror=e=>{ el.textContent='Voice error: '+e.error; };
+  r.onresult=e=>{ const txt=e.results[e.results.length-1][0].transcript.trim().toLowerCase(); el.textContent='Heard: '+txt; handleCommand(txt); };
   return r;
 }
-function toggleMic(){
-  if(!recog) recog = setupRecog();
-  if(!recog) return;
-  if(listening){ recog.stop(); }
-  else { recog.start(); speak('Listening, go ahead.'); }
-}
+function toggleMic(){ if(!recog) recog=setupRecog(); if(!recog) return; if(listening){ recog.stop(); } else { recog.start(); speak('Listening, go ahead.'); } }
 function handleCommand(txt){
-  if(/stop (listening|voice)/.test(txt)){ if(recog && listening) {recog.stop(); speak('Stopping now.');} return; }
-  if(/start (listening|voice)/.test(txt)){ if(recog && !listening) {recog.start(); speak('I am listening.');} return; }
+  if(/stop (listening|voice)/.test(txt)){ if(recog&&listening){recog.stop(); speak('Stopping now.');} return; }
+  if(/start (listening|voice)/.test(txt)){ if(recog&&!listening){recog.start(); speak('I am listening.');} return; }
   if(/read (stats|statistics|kpis?)/.test(txt)){ readStats(); return; }
   if(/log trade/.test(txt) || /add trade/.test(txt)){
-    const get = (key, alt=[])=>{
-      const keys=[key,...alt].join('|');
-      const m = txt.match(new RegExp(`${keys}\\s+([a-z0-9\\.\\-]+)`, 'i'));
-      return m? m[1] : null;
-    };
-    const symbol = (get('symbol')||'SPY').toUpperCase();
-    const side = /short/.test(txt)?'SHORT':(/long/.test(txt)?'LONG':($('#t_side').value||'LONG'));
-    const qty = parseInt(get('qty|quantity') || '1',10);
-    const entry = parseFloat(get('entry|enter|in') || ($('#t_entry').value||'0'));
-    const exit  = parseFloat(get('exit|out')  || ($('#t_exit').value||'0'));
-    const fees  = parseFloat(get('fees|commission|comm') || '0');
-    const setup = (()=>{ const m = txt.match(/setup\s+(.+?)(?:\s+notes\s+|$)/i); return m? m[1] : ''; })();
-    const notes = (()=>{ const m = txt.match(/notes?\s+(.+)$/i); return m? m[1] : ''; })();
-    $('#t_symbol').value=symbol; $('#t_side').value=side; $('#t_qty').value=qty;
-    $('#t_entry').value=isFinite(entry)?entry:''; $('#t_exit').value=isFinite(exit)?exit:''; $('#t_fees').value=isFinite(fees)?fees:'';
-    $('#t_setup').value=setup; $('#t_notes').value=notes;
-    addTrade();
-    return;
+    const get=(key,alt=[])=>{ const keys=[key,...alt].join('|'); const m=txt.match(new RegExp(`${keys}\\s+([a-z0-9\\.\\-]+)`,'i')); return m?m[1]:null; };
+    const symbol=(get('symbol')||'SPY').toUpperCase();
+    const side=/short/.test(txt)?'SHORT':(/long/.test(txt)?'LONG':(document.getElementById('t_side').value||'LONG'));
+    const qty=parseInt(get('qty|quantity')||'1',10);
+    const entry=parseFloat(get('entry|enter|in')||(document.getElementById('t_entry').value||'0'));
+    const exit =parseFloat(get('exit|out')||(document.getElementById('t_exit').value||'0'));
+    const fees =parseFloat(get('fees|commission|comm')||'0');
+    const setup=(()=>{ const m=txt.match(/setup\s+(.+?)(?:\s+notes\s+|$)/i); return m?m[1]:''; })();
+    const notes=(()=>{ const m=txt.match(/notes?\s+(.+)$/i); return m?m[1]:''; })();
+    document.getElementById('t_symbol').value=symbol;
+    document.getElementById('t_side').value=side;
+    document.getElementById('t_qty').value=qty;
+    document.getElementById('t_entry').value=isFinite(entry)?entry:'';
+    document.getElementById('t_exit').value=isFinite(exit)?exit:'';
+    document.getElementById('t_fees').value=isFinite(fees)?fees:'';
+    document.getElementById('t_setup').value=setup;
+    document.getElementById('t_notes').value=notes;
+    addTrade(); return;
   }
-  const m = txt.match(/(profit|loss)\s+(-?\d+(?:\.\d+)?)/);
+  const m=txt.match(/(profit|loss)\s+(-?\d+(?:\.\d+)?)/);
   if(m){
-    const val = parseFloat(m[2]) * (m[1]==='loss' ? -1 : 1);
+    const val=parseFloat(m[2])*(m[1]==='loss'?-1:1);
     trades.push({date:new Date().toISOString(),symbol:'SPY',side:val>=0?'LONG':'SHORT',qty:1,entry:0,exit:0,fees:0,points:0,pnl:val,setup:'Voice quick',notes:''});
-    save(); render(); speak(`Logged ${val>=0?'profit':'loss'} of ${Math.abs(val)} dollars.`);
+    localStorage.setItem(tradesKey, JSON.stringify(trades)); render();
+    speak(`Logged ${val>=0?'profit':'loss'} of ${Math.abs(val)} dollars.`);
   }
 }
-function readStats(){
-  const s=calcStats();
-  speak(`Here are your numbers. Net P and L ${Math.round(s.net)} dollars. Win rate ${s.winRate.toFixed(0)} percent. Profit factor ${isFinite(s.pf)?s.pf.toFixed(2):'zero'}. Expectancy ${s.exp.toFixed(2)} dollars per trade. Max drawdown ${Math.round(s.mdd)} dollars. Best trade ${Math.round(s.best)}, worst ${Math.round(s.worst)}.`);
-}
+function readStats(){ const s=calcStats(); speak(`Here are your numbers. Net P and L ${Math.round(s.net)} dollars. Win rate ${s.winRate.toFixed(0)} percent. Profit factor ${isFinite(s.pf)?s.pf.toFixed(2):'zero'}. Expectancy ${s.exp.toFixed(2)} dollars per trade. Max drawdown ${Math.round(s.mdd)} dollars. Best trade ${Math.round(s.best)}, worst ${Math.round(s.worst)}.`); }
 
-/* init */
-initBranding();
+/* live points calc */
 ['t_entry','t_exit','t_side'].forEach(id=>{
-  document.getElementById(id).addEventListener('input', ()=>{
-    const side=$('#t_side').value, entry=+$('#t_entry').value||0, exit=+$('#t_exit').value||0;
-    const dir=side==='LONG'?1:-1; $('#t_points').value=((exit-entry)*dir||0).toFixed(3);
+  document.addEventListener('input', (ev)=>{
+    if(ev.target && ev.target.id===id){
+      const side=document.getElementById('t_side').value, entry=+document.getElementById('t_entry').value||0, exit=+document.getElementById('t_exit').value||0;
+      const dir=side==='LONG'?1:-1; document.getElementById('t_points').value=((exit-entry)*dir||0).toFixed(3);
+    }
   });
 });
 </script>
 </body>
 </html>
+	
+
 	
 
 	
