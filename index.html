@@ -1,609 +1,412 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>ZenTrader Pro — Trading Dashboard</title>
-
-  <!-- Favicon: use cropped Z coin (square) -->
-  <link rel="icon" type="image/png" href="favicon.png" />
-
-  <style>
-    :root{
-      --bg:#0e0e0f; --panel:#151517; --panel2:#1b1b1e; --gold:#d4af37; --muted:#a7a7ad; --good:#1fbf6b; --bad:#ff5454;
-      --text:#f4f4f6; --accent:#e6c766; --shadow:rgba(0,0,0,.35);
-    }
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{
-      margin:0; background:var(--bg); color:var(--text); font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif;
-    }
-    header,footer{
-      background:#000; padding:18px 14px; display:flex; align-items:center; justify-content:center; gap:16px;
-      box-shadow:0 2px 10px var(--shadow);
-    }
-    header img, footer img{ max-height:80px; height:auto; width:auto; display:block; }
-    main{ padding:20px; max-width:1300px; margin:0 auto; }
-    .grid{
-      display:grid; gap:16px;
-      grid-template-columns: repeat(12, 1fr);
-    }
-    .card{
-      background:linear-gradient(180deg,var(--panel),var(--panel2)); border:1px solid #232327; border-radius:18px;
-      box-shadow:0 8px 24px var(--shadow); padding:16px;
-    }
-    .span-12{grid-column: span 12;}
-    .span-8{grid-column: span 8;}
-    .span-4{grid-column: span 4;}
-    .span-6{grid-column: span 6;}
-    h2,h3{margin:0 0 12px 0; font-weight:700; letter-spacing:.2px}
-    h2{font-size:1.2rem; color:var(--accent)}
-    h3{font-size:1rem; color:var(--muted)}
-    .kpis{ display:grid; grid-template-columns:repeat(4,1fr); gap:12px; }
-    .kpi{ background:#121214; border:1px solid #222; border-radius:14px; padding:12px }
-    .kpi .label{color:var(--muted); font-size:.8rem}
-    .kpi .value{font-size:1.35rem; margin-top:6px}
-    .row{display:flex; gap:10px; flex-wrap:wrap}
-    .row > *{flex:1}
-    input,select,textarea,button{
-      width:100%; background:#0f0f11; color:var(--text); border:1px solid #2a2a2f; border-radius:10px; padding:10px 12px;
-      outline:none;
-    }
-    input::placeholder, textarea::placeholder{color:#6c6c72}
-    button{
-      background:linear-gradient(180deg,#2a2a2d,#202024); border:1px solid #3a3a40; cursor:pointer; font-weight:600;
-      transition:transform .05s ease, box-shadow .2s ease;
-    }
-    button:hover{ box-shadow:0 6px 18px var(--shadow) }
-    button:active{ transform:translateY(1px) }
-    .btn-gold{background:linear-gradient(180deg,#f6d98b,#d9b449); color:#1a1302; border-color:#f0c96a}
-    .btn-outline{ background:transparent; border-style:dashed }
-    .toolbar{ display:flex; gap:10px; flex-wrap:wrap }
-    canvas{ width:100%; height:280px; background:#101012; border:1px solid #222; border-radius:12px }
-    table{ width:100%; border-collapse:collapse; font-size:.92rem }
-    th,td{ padding:8px 10px; border-bottom:1px solid #232327; text-align:left }
-    tr:hover td{ background:#121216 }
-    .tag{ display:inline-block; padding:2px 8px; border:1px solid #333; border-radius:20px; font-size:.75rem; color:#cfcfd5 }
-    .good{color:var(--good)} .bad{color:var(--bad)}
-    .note{color:#b7b7bd; font-size:.9rem}
-    .mic{display:inline-flex; align-items:center; gap:8px}
-    .dot{width:10px; height:10px; border-radius:50%; background:#555}
-    .dot.live{ background:#32d296; box-shadow:0 0 10px #32d296 }
-    @media (max-width: 980px){
-      .span-8,.span-4,.span-6{grid-column: span 12;}
-      .kpis{grid-template-columns:repeat(2,1fr)}
-      header img, footer img{max-height:64px}
-    }
-  </style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>ZenTrader Pro — Dashboard</title>
+<link rel="icon" type="image/png" href="favicon.png" />
+<style>
+  :root{
+    --bg:#0e0e0f; --panel:#151517; --panel2:#1b1b1e; --gold:#d4af37; --muted:#a7a7ad;
+    --text:#f4f4f6; --good:#1fbf6b; --bad:#ff5454; --shadow:rgba(0,0,0,.35);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,Arial,sans-serif}
+  /* HEADER: force image logo, no text */
+  header{
+    display:flex;align-items:center;justify-content:center;gap:16px;
+    background:#000;padding:14px 18px;box-shadow:0 2px 10px var(--shadow);
+  }
+  /* prevent any theme from swapping the logo for text */
+  header h1{display:none!important}
+  header .brand{display:flex;align-items:center;gap:16px}
+  header .brand img{
+    height:88px; width:auto; display:block; image-rendering:auto;
+  }
+  @media (max-width:900px){ header .brand img{height:68px} }
+  main{max-width:1200px;margin:0 auto;padding:20px}
+  footer{background:#000;padding:16px;display:flex;align-items:center;justify-content:center;gap:12px}
+  footer img{height:64px;width:auto}
+  .card{background:linear-gradient(180deg,var(--panel),var(--panel2));border:1px solid #232327;border-radius:18px;padding:16px;margin-bottom:16px}
+  h2{margin:0 0 10px;color:#e6c766}
+  .grid{display:grid;gap:16px;grid-template-columns:repeat(12,1fr)}
+  .span-12{grid-column:span 12}.span-8{grid-column:span 8}.span-4{grid-column:span 4}.span-6{grid-column:span 6}
+  @media (max-width:980px){ .span-8,.span-6,.span-4{grid-column:span 12} }
+  input,select,textarea,button{width:100%;background:#0f0f11;color:var(--text);border:1px solid #2a2a2f;border-radius:10px;padding:10px 12px}
+  button{cursor:pointer;font-weight:600;background:linear-gradient(180deg,#2a2a2d,#202024)}
+  .btn-gold{background:linear-gradient(180deg,#f6d98b,#d9b449);color:#1a1302;border-color:#f0c96a}
+  .toolbar{display:flex;gap:10px;flex-wrap:wrap}
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+  .kpi{background:#121214;border:1px solid #222;border-radius:14px;padding:12px}
+  .kpi .label{color:var(--muted);font-size:.82rem}
+  .kpi .value{font-size:1.35rem;margin-top:4px}
+  canvas{width:100%;height:280px;background:#101012;border:1px solid #222;border-radius:12px}
+  table{width:100%;border-collapse:collapse;font-size:.92rem}
+  th,td{padding:8px 10px;border-bottom:1px solid #232327;text-align:left}
+  .good{color:var(--good)} .bad{color:var(--bad)}
+  .note{color:#b7b7bd;font-size:.9rem}
+  .voicebar{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  .pill{display:inline-flex;align-items:center;gap:6px;border:1px solid #333;border-radius:999px;padding:6px 10px;font-size:.82rem}
+  .dot{width:10px;height:10px;border-radius:50%;background:#666}
+  .dot.live{background:#32d296;box-shadow:0 0 10px #32d296}
+</style>
 </head>
 <body>
 
-  <!-- Header with EXACT logo -->
-  <header>
-    <img src="zentrader-logo.png" alt="ZenTrader Pro Logo" />
-  </header>
+<header>
+  <!-- EXACT HEADER LOGO -->
+  <div class="brand">
+    <img src="zentrader-logo.png" alt="ZenTrader Pro Logo">
+  </div>
+</header>
 
-  <main>
-    <div class="grid">
-      <!-- KPIs -->
-      <section class="card span-12">
-        <h2>Key Performance Indicators</h2>
-        <div class="kpis" id="kpiGrid">
-          <div class="kpi"><div class="label">Net P&amp;L ($)</div><div class="value" id="k_net">0</div></div>
-          <div class="kpi"><div class="label">Win Rate</div><div class="value" id="k_win">0%</div></div>
-          <div class="kpi"><div class="label">Profit Factor</div><div class="value" id="k_pf">0.00</div></div>
-          <div class="kpi"><div class="label">Expectancy ($/trade)</div><div class="value" id="k_exp">0.00</div></div>
+<main>
+  <div class="grid">
+    <section class="card span-12">
+      <h2>Key Performance Indicators</h2>
+      <div class="kpis">
+        <div class="kpi"><div class="label">Net P&amp;L</div><div class="value" id="k_net">0.00</div></div>
+        <div class="kpi"><div class="label">Win Rate</div><div class="value" id="k_win">0%</div></div>
+        <div class="kpi"><div class="label">Profit Factor</div><div class="value" id="k_pf">0.00</div></div>
+        <div class="kpi"><div class="label">Expectancy ($/trade)</div><div class="value" id="k_exp">0.00</div></div>
+        <div class="kpi"><div class="label">Avg Win</div><div class="value" id="k_avgw">0.00</div></div>
+        <div class="kpi"><div class="label">Avg Loss</div><div class="value" id="k_avgl">0.00</div></div>
+        <div class="kpi"><div class="label">Max Drawdown</div><div class="value" id="k_mdd">0.00</div></div>
+        <div class="kpi"><div class="label">Best / Worst</div><div class="value" id="k_bw">0 / 0</div></div>
+      </div>
+    </section>
 
-          <div class="kpi"><div class="label">Avg Win ($)</div><div class="value" id="k_avgw">0.00</div></div>
-          <div class="kpi"><div class="label">Avg Loss ($)</div><div class="value" id="k_avgl">0.00</div></div>
-          <div class="kpi"><div class="label">Max Drawdown ($)</div><div class="value" id="k_mdd">0.00</div></div>
-          <div class="kpi"><div class="label">Best/Worst Trade ($)</div><div class="value" id="k_bw">0 / 0</div></div>
-
-          <div class="kpi"><div class="label">Total Trades</div><div class="value" id="k_trades">0</div></div>
-          <div class="kpi"><div class="label">Win/Loss Streak</div><div class="value" id="k_streak">0 / 0</div></div>
-          <div class="kpi"><div class="label">Avg R (approx.)</div><div class="value" id="k_r">0.00</div></div>
-          <div class="kpi"><div class="label">Last Update</div><div class="value" id="k_updated">—</div></div>
+    <section class="card span-8">
+      <h2>Log a Trade</h2>
+      <div class="toolbar" style="margin-bottom:8px">
+        <button class="btn-gold" onclick="addTrade()">Add Trade</button>
+        <button onclick="clearForm()">Clear</button>
+        <button onclick="exportCSV()">Export CSV</button>
+        <label style="position:relative;overflow:hidden">
+          <span class="pill">Import CSV</span>
+          <input type="file" accept=".csv" style="opacity:0;position:absolute;inset:0" onchange="importCSV(event)">
+        </label>
+      </div>
+      <div class="voicebar">
+        <button id="btnMic" onclick="toggleMic()">🎙️ Start Voice</button>
+        <span class="pill"><span id="micDot" class="dot"></span> <span id="voiceState">Voice: idle</span></span>
+        <span class="pill">Voice: British female</span>
+      </div>
+      <p class="note" style="margin-top:6px">
+        Speak naturally. Examples:<br>
+        • “<em>Log trade symbol SPY side long qty 2 entry 500.4 exit 502.1 fees 1.2 setup RSI bounce notes quick scalp</em>”<br>
+        • “<em>Start listening</em>”, “<em>Stop listening</em>”, “<em>Read stats</em>”.
+      </p>
+      <div class="grid" style="margin-top:10px">
+        <div class="span-6"><input id="t_date" type="datetime-local"></div>
+        <div class="span-6"><input id="t_symbol" placeholder="Symbol (e.g., SPY)"></div>
+        <div class="span-6">
+          <select id="t_side"><option value="LONG">LONG</option><option value="SHORT">SHORT</option></select>
         </div>
-      </section>
+        <div class="span-6"><input id="t_qty" type="number" step="1" placeholder="Qty"></div>
+        <div class="span-6"><input id="t_entry" type="number" step="0.01" placeholder="Entry Price"></div>
+        <div class="span-6"><input id="t_exit" type="number" step="0.01" placeholder="Exit Price"></div>
+        <div class="span-6"><input id="t_fees" type="number" step="0.01" placeholder="Fees/Comm"></div>
+        <div class="span-6"><input id="t_points" placeholder="Auto Points" disabled></div>
+        <div class="span-12"><input id="t_setup" placeholder="Setup (e.g., RSI bounce)"></div>
+        <div class="span-12"><textarea id="t_notes" rows="3" placeholder="Notes"></textarea></div>
+      </div>
+    </section>
 
-      <!-- Trade Entry -->
-      <section class="card span-8">
-        <h2>Log a Trade</h2>
-        <div class="row">
-          <input id="t_date" type="datetime-local" />
-          <input id="t_symbol" placeholder="Symbol (e.g., SPY)" />
-          <select id="t_side">
-            <option value="LONG">LONG</option>
-            <option value="SHORT">SHORT</option>
-          </select>
-          <input id="t_qty" type="number" step="1" placeholder="Qty" />
-        </div>
-        <div class="row">
-          <input id="t_entry" type="number" step="0.01" placeholder="Entry Price" />
-          <input id="t_exit" type="number" step="0.01" placeholder="Exit Price" />
-          <input id="t_fees" type="number" step="0.01" placeholder="Fees/Comm" />
-          <input id="t_points" type="text" placeholder="Auto: Points" disabled />
-        </div>
-        <div class="row">
-          <input id="t_setup" placeholder="Setup (e.g., RSI bounce)" />
-          <input id="t_stop" type="number" step="0.01" placeholder="Implied Risk per unit (optional)" />
-          <input id="t_target" type="number" step="0.01" placeholder="Target per unit (optional)" />
-        </div>
-        <textarea id="t_notes" rows="3" placeholder="Notes"></textarea>
-        <div class="toolbar" style="margin-top:10px">
-          <button class="btn-gold" onclick="addTrade()">Add Trade</button>
-          <button onclick="clearForm()">Clear</button>
-          <span class="mic">
-            <button id="btnMic" onclick="toggleMic()">🎙️ Voice</button>
-            <span id="micDot" class="dot" title="Mic status"></span>
-          </span>
-          <button onclick="speakStats()">🔊 Read Stats</button>
-          <button class="btn-outline" onclick="exportCSV()">Export CSV</button>
-          <label class="btn-outline" style="padding:0; overflow:hidden; position:relative">
-            <span style="display:block; padding:10px 12px; cursor:pointer">Import CSV</span>
-            <input type="file" accept=".csv" style="opacity:0; position:absolute; inset:0" onchange="importCSV(event)"/>
-          </label>
-        </div>
-        <p class="note">Tip: try voice commands like “log trade”, “read stats”, “start listening”, “stop listening”.</p>
-      </section>
+    <section class="card span-4">
+      <h2>Status</h2>
+      <div id="status" class="note">Ready.</div>
+      <h2 style="margin-top:16px">Charts</h2>
+      <p class="note">Equity, daily P/L, and distribution appear after you add trades.</p>
+    </section>
 
-      <!-- Charts -->
-      <section class="card span-4">
-        <h2>Status &amp; Voice</h2>
-        <div id="voiceStatus" class="note">Voice: idle</div>
-        <div style="margin-top:10px">
-          <span class="tag">Voice: British female (auto)</span>
-          <span class="tag">Local save</span>
-          <span class="tag">Hands-free</span>
-        </div>
-        <h3 style="margin-top:16px">Quick Actions</h3>
-        <div class="row">
-          <button onclick="quickWin()">+ Quick Win</button>
-          <button onclick="quickLoss()">− Quick Loss</button>
-        </div>
-        <p class="note" style="margin-top:8px">Quick Win/Loss logs a $+50/$−50 placeholder on SPY for testing.</p>
-      </section>
+    <section class="card span-6"><h2>Equity Curve</h2><canvas id="chartEquity" width="800" height="300"></canvas></section>
+    <section class="card span-6"><h2>Daily P&amp;L</h2><canvas id="chartDaily" width="800" height="300"></canvas></section>
+    <section class="card span-12"><h2>Trades</h2>
+      <div style="overflow:auto">
+        <table id="tbl">
+          <thead><tr>
+            <th>#</th><th>Date</th><th>Symbol</th><th>Side</th><th>Qty</th><th>Entry</th><th>Exit</th>
+            <th>Points</th><th>P&amp;L</th><th>Fees</th><th>Setup</th><th>Notes</th><th></th>
+          </tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+</main>
 
-      <section class="card span-6">
-        <h2>Equity Curve</h2>
-        <canvas id="chartEquity" width="800" height="300"></canvas>
-      </section>
-      <section class="card span-6">
-        <h2>Daily P&amp;L</h2>
-        <canvas id="chartDaily" width="800" height="300"></canvas>
-      </section>
-      <section class="card span-6">
-        <h2>Win / Loss Distribution</h2>
-        <canvas id="chartHist" width="800" height="300"></canvas>
-      </section>
+<footer>
+  <img src="zentrader-logo.png" alt="ZenTrader Pro Logo">
+  <span style="color:#b9b9bf">© 2025 ZenTrader Pro</span>
+</footer>
 
-      <!-- Trades Table -->
-      <section class="card span-12">
-        <h2>Trades</h2>
-        <div style="overflow:auto">
-          <table id="tbl">
-            <thead>
-              <tr>
-                <th>#</th><th>Date</th><th>Symbol</th><th>Side</th><th>Qty</th><th>Entry</th><th>Exit</th>
-                <th>Points</th><th>P&amp;L ($)</th><th>Fees</th><th>Setup</th><th>Notes</th><th></th>
-              </tr>
-            </thead>
-            <tbody></tbody>
-          </table>
-        </div>
-      </section>
-    </div>
-  </main>
+<script>
+/* ==== State ==== */
+const $ = s => document.querySelector(s);
+const tradesKey = 'ztp_trades_v2';
+let trades = JSON.parse(localStorage.getItem(tradesKey) || '[]');
+function save(){ localStorage.setItem(tradesKey, JSON.stringify(trades)); }
 
-  <!-- Footer with EXACT logo -->
-  <footer>
-    <img src="zentrader-logo.png" alt="ZenTrader Pro Logo" />
-    <div style="margin-left:10px; color:#b9b9bf">© 2025 ZenTrader Pro • Balance first, profit follows.</div>
-  </footer>
+/* ==== Helpers ==== */
+function nowISO(){ const d=new Date(); d.setMinutes(d.getMinutes()-d.getTimezoneOffset()); return d.toISOString().slice(0,16); }
+$('#t_date').value = nowISO();
+function fmt(n,d=2){ return Number(n||0).toLocaleString(undefined,{minimumFractionDigits:d,maximumFractionDigits:d}); }
+function sum(a){ return a.reduce((x,y)=>x+y,0); }
 
-  <script>
-  /* =======================
-     Utility & State
-  ======================== */
-  const $ = s => document.querySelector(s);
-  const tradesKey = 'ztp_trades_v1';
-  let trades = load() || [];
-
-  function nowISO(){ const d=new Date(); d.setMinutes(d.getMinutes()-d.getTimezoneOffset()); return d.toISOString().slice(0,16); }
+/* ==== Add/Clear ==== */
+function addTrade(){
+  const t = {
+    date: $('#t_date').value || new Date().toISOString(),
+    symbol: ($('#t_symbol').value||'SPY').toUpperCase(),
+    side: $('#t_side').value,
+    qty: +$('#t_qty').value||1,
+    entry: +$('#t_entry').value||0,
+    exit: +$('#t_exit').value||0,
+    fees: +$('#t_fees').value||0,
+    setup: $('#t_setup').value||'',
+    notes: $('#t_notes').value||''
+  };
+  const dir = t.side==='LONG'?1:-1;
+  t.points = (t.exit - t.entry)*dir;
+  t.pnl = t.points*t.qty - t.fees;
+  trades.push(t); save(); render();
+  speak(`Trade added: ${t.symbol} ${t.side}. Result ${t.pnl>=0?'plus':'minus'} ${Math.abs(t.pnl).toFixed(2)} dollars.`);
+}
+function clearForm(){
+  $('#t_symbol').value=''; $('#t_qty').value=''; $('#t_entry').value=''; $('#t_exit').value='';
+  $('#t_fees').value=''; $('#t_setup').value=''; $('#t_notes').value=''; $('#t_points').value='';
   $('#t_date').value = nowISO();
+}
 
-  function save(){ localStorage.setItem(tradesKey, JSON.stringify(trades)); }
-  function load(){ try{ return JSON.parse(localStorage.getItem(tradesKey)||'[]'); }catch{ return []; } }
+/* ==== KPIs ==== */
+function calcStats(){
+  const N=trades.length; const pnl=trades.map(t=>t.pnl);
+  const wins=pnl.filter(x=>x>0), losses=pnl.filter(x=>x<0);
+  const net=sum(pnl); const winRate=N?wins.length/N*100:0;
+  const avgW=wins.length?sum(wins)/wins.length:0;
+  const avgL=losses.length?sum(losses)/losses.length:0;
+  const pf = Math.abs(sum(losses))>0 ? sum(wins)/Math.abs(sum(losses)) : 0;
+  const exp = N ? net/N : 0;
+  // equity/mdd
+  let eq=0, peak=0, mdd=0; pnl.forEach(x=>{eq+=x; peak=Math.max(peak,eq); mdd=Math.min(mdd,eq-peak);});
+  const best = N? Math.max(...pnl):0, worst = N? Math.min(...pnl):0;
+  return {N,net,winRate,avgW,avgL,pf,exp,mdd:Math.abs(mdd),best,worst};
+}
+function renderKPIs(s){
+  $('#k_net').textContent = fmt(s.net);
+  $('#k_win').textContent = fmt(s.winRate,1)+'%';
+  $('#k_pf').textContent = (isFinite(s.pf)?s.pf:0).toFixed(2);
+  $('#k_exp').textContent = fmt(s.exp);
+  $('#k_avgw').textContent = fmt(s.avgW);
+  $('#k_avgl').textContent = fmt(Math.abs(s.avgL));
+  $('#k_mdd').textContent = fmt(s.mdd);
+  $('#k_bw').textContent = `${fmt(s.best)} / ${fmt(s.worst)}`;
+}
 
-  function fmt(n, d=2){ if(!isFinite(n)) return '0.00'; return Number(n).toLocaleString(undefined,{minimumFractionDigits:d, maximumFractionDigits:d}); }
-  function sum(a){ return a.reduce((x,y)=>x+y,0); }
-
-  /* =======================
-     Add / Remove Trades
-  ======================== */
-  function addTrade(){
-    const t = {
-      date: $('#t_date').value || new Date().toISOString(),
-      symbol: $('#t_symbol').value.trim() || 'SPY',
-      side: $('#t_side').value,
-      qty: +$('#t_qty').value || 1,
-      entry: +$('#t_entry').value || 0,
-      exit: +$('#t_exit').value || 0,
-      fees: +$('#t_fees').value || 0,
-      setup: $('#t_setup').value.trim(),
-      stop: +$('#t_stop').value || null,
-      target: +$('#t_target').value || null,
-      notes: $('#t_notes').value.trim()
-    };
-    const dir = t.side==='LONG' ? 1 : -1;
-    t.points = (t.exit - t.entry) * dir;
-    t.pnl = t.points * t.qty - t.fees;
-
-    trades.push(t);
-    save();
-    speak(`Trade added: ${t.symbol} ${t.side}, profit ${t.pnl>=0? 'plus' : 'minus'} ${Math.abs(t.pnl).toFixed(2)} dollars.`);
-    clearForm(false);
-    render();
-  }
-
-  function removeTrade(idx){
-    const t = trades[idx];
-    trades.splice(idx,1); save(); render();
-    speak(`Removed trade number ${idx+1} for ${t.symbol}.`);
-  }
-
-  function clearForm(resetDate=true){
-    if(resetDate) $('#t_date').value = nowISO();
-    $('#t_symbol').value=''; $('#t_qty').value=''; $('#t_entry').value=''; $('#t_exit').value='';
-    $('#t_fees').value=''; $('#t_setup').value=''; $('#t_notes').value=''; $('#t_stop').value=''; $('#t_target').value='';
-    $('#t_points').value='';
-  }
-
-  /* =======================
-     KPIs & Stats
-  ======================== */
-  function calcStats(){
-    const N = trades.length;
-    const pnl = trades.map(t=>t.pnl);
-    const wins = pnl.filter(x=>x>0), losses = pnl.filter(x=>x<0);
-    const net = sum(pnl);
-    const winRate = N? (wins.length/N*100):0;
-    const avgW = wins.length? sum(wins)/wins.length:0;
-    const avgL = losses.length? sum(losses)/losses.length:0;
-    const pf = sum(wins) / Math.abs(sum(losses)||1);
-    const exp = N? (sum(wins)/N + sum(losses)/N):0;
-
-    // Equity & Max Drawdown
-    let eq=0, peak=0, mdd=0;
-    pnl.forEach(x=>{ eq+=x; peak=Math.max(peak,eq); mdd=Math.min(mdd, eq-peak); });
-    const best = N? Math.max(...pnl):0, worst=N? Math.min(...pnl):0;
-
-    // Streaks
-    let winStreak=0, lossStreak=0, curW=0, curL=0;
-    pnl.forEach(x=>{
-      if(x>0){ curW++; curL=0; } else if(x<0){ curL++; curW=0; } else { curW=0; curL=0; }
-      winStreak=Math.max(winStreak,curW); lossStreak=Math.max(lossStreak,curL);
-    });
-
-    // Approx Avg R using provided stop if any (use median of provided stop per-unit)
-    const risks = trades.map(t=>t.stop).filter(v=>v && v>0);
-    let avgR = 0;
-    if(risks.length){
-      const medRisk = risks.sort((a,b)=>a-b)[Math.floor(risks.length/2)];
-      const Rs = trades.map(t => medRisk? (t.pnl / (medRisk * (t.qty||1))) : 0 );
-      const RsValid = Rs.filter(v=>isFinite(v));
-      avgR = RsValid.length? sum(RsValid)/RsValid.length : 0;
-    }
-
-    return {N, net, winRate, avgW, avgL, pf, exp, mdd:Math.abs(mdd), best, worst, winStreak, lossStreak, avgR};
-  }
-
-  function renderKPIs(s){
-    $('#k_net').textContent = fmt(s.net,2);
-    $('#k_win').textContent = fmt(s.winRate,1)+'%';
-    $('#k_pf').textContent = (isFinite(s.pf)? s.pf:0).toFixed(2);
-    $('#k_exp').textContent = fmt(s.exp,2);
-    $('#k_avgw').textContent = fmt(s.avgW,2);
-    $('#k_avgl').textContent = fmt(Math.abs(s.avgL),2);
-    $('#k_mdd').textContent = fmt(s.mdd,2);
-    $('#k_bw').textContent = `${fmt(s.best,2)} / ${fmt(s.worst,2)}`;
-    $('#k_trades').textContent = s.N;
-    $('#k_streak').textContent = `${s.winStreak} / ${s.lossStreak}`;
-    $('#k_r').textContent = fmt(s.avgR,2);
-    $('#k_updated').textContent = new Date().toLocaleString();
-  }
-
-  /* =======================
-     Table
-  ======================== */
-  function renderTable(){
-    const tb = $('#tbl tbody'); tb.innerHTML='';
-    trades.forEach((t,i)=>{
-      const tr = document.createElement('tr');
-      const cells = [
-        i+1,
-        new Date(t.date).toLocaleString(),
-        t.symbol, t.side, t.qty, fmt(t.entry), fmt(t.exit),
-        fmt(t.points,3),
-        `<span class="${t.pnl>=0?'good':'bad'}">${fmt(t.pnl)}</span>`,
-        fmt(t.fees), t.setup||'—', t.notes||'—',
-        `<button onclick="removeTrade(${i})">Delete</button>`
-      ];
-      cells.forEach(c=>{
-        const td=document.createElement('td'); td.innerHTML=c; tr.appendChild(td);
-      });
-      tb.appendChild(tr);
-    });
-  }
-
-  /* =======================
-     Simple Canvas Charts (no external libs)
-  ======================== */
-  function drawLineChart(canvas, values, opts={}){
-    const ctx = canvas.getContext('2d');
-    const w = canvas.width, h = canvas.height;
-    ctx.clearRect(0,0,w,h);
-    // padding
-    const p = 30;
-    const xs = values.map((_,i)=>p + i*( (w-2*p)/Math.max(1,values.length-1) ));
-    const min = Math.min(...values,0), max = Math.max(...values,0);
-    const range = (max-min)||1;
-    const ys = values.map(v => h-p - ( (v-min)/range )*(h-2*p) );
-    // grid
-    ctx.strokeStyle='#2a2a2f'; ctx.lineWidth=1;
-    for(let i=0;i<=4;i++){
-      const y = p + i*( (h-2*p)/4 );
-      ctx.beginPath(); ctx.moveTo(p,y); ctx.lineTo(w-p,y); ctx.stroke();
-    }
-    // axis
-    ctx.strokeStyle='#555'; ctx.lineWidth=1.2;
-    ctx.beginPath(); ctx.moveTo(p, p); ctx.lineTo(p, h-p); ctx.lineTo(w-p, h-p); ctx.stroke();
-    // zero line
-    if(min<0 && max>0){
-      const zy = h-p - ((0-min)/range)*(h-2*p);
-      ctx.strokeStyle='#444'; ctx.setLineDash([4,4]);
-      ctx.beginPath(); ctx.moveTo(p,zy); ctx.lineTo(w-p,zy); ctx.stroke();
-      ctx.setLineDash([]);
-    }
-    // line
-    ctx.strokeStyle='#e6c766'; ctx.lineWidth=2.2;
-    ctx.beginPath(); ctx.moveTo(xs[0]||p, ys[0]||h-p);
-    for(let i=1;i<ys.length;i++){ ctx.lineTo(xs[i], ys[i]); }
-    ctx.stroke();
-  }
-
-  function drawBarChart(canvas, values){
-    const ctx = canvas.getContext('2d');
-    const w = canvas.width, h = canvas.height;
-    ctx.clearRect(0,0,w,h);
-    const p = 30, innerW = w-2*p, innerH = h-2*p;
-    const min = Math.min(0, ...values), max = Math.max(0, ...values);
-    const range = (max-min)||1;
-    const zeroY = h-p - ((0-min)/range)*innerH;
-
-    // grid
-    ctx.strokeStyle='#2a2a2f';
-    for(let i=0;i<=4;i++){
-      const y = p + i*(innerH/4);
-      ctx.beginPath(); ctx.moveTo(p,y); ctx.lineTo(w-p,y); ctx.stroke();
-    }
-
-    // axis
-    ctx.strokeStyle='#555';
-    ctx.beginPath(); ctx.moveTo(p,p); ctx.lineTo(p,h-p); ctx.lineTo(w-p,h-p); ctx.stroke();
-
-    // bars
-    const bw = innerW / Math.max(values.length,1) * .7;
-    values.forEach((v,i)=>{
-      const x = p + i*(innerW/Math.max(values.length,1)) + (innerW/Math.max(values.length,1)-bw)/2;
-      const y = h-p - ((v-min)/range)*innerH;
-      ctx.fillStyle = v>=0? '#1fbf6b' : '#ff5454';
-      ctx.fillRect(x, Math.min(y, zeroY), bw, Math.abs(y-zeroY));
-    });
-  }
-
-  function drawHist(canvas, values, bins=12){
-    const ctx = canvas.getContext('2d');
-    const w=canvas.width, h=canvas.height, p=30, innerW=w-2*p, innerH=h-2*p;
-    ctx.clearRect(0,0,w,h);
-    if(values.length===0){ return; }
-    const min=Math.min(...values), max=Math.max(...values);
-    const step=(max-min)||1; const binW = step/bins || 1;
-    const hist = Array(bins).fill(0);
-    values.forEach(v=>{
-      let idx = Math.floor((v-min)/ ( (max-min)||1 ) * bins);
-      if(idx===bins) idx=bins-1; hist[idx]++; 
-    });
-    const peak = Math.max(...hist) || 1;
-    // axes
-    ctx.strokeStyle='#555';
-    ctx.beginPath(); ctx.moveTo(p,p); ctx.lineTo(p,h-p); ctx.lineTo(w-p,h-p); ctx.stroke();
-
-    // bars
-    const bw = innerW/bins * .9;
-    hist.forEach((c,i)=>{
-      const x = p + i*(innerW/bins) + (innerW/bins-bw)/2;
-      const barH = (c/peak)*innerH;
-      ctx.fillStyle='#7e8cff';
-      ctx.fillRect(x, h-p-barH, bw, barH);
-    });
-  }
-
-  /* =======================
-     Render All
-  ======================== */
-  function render(){
-    // Table
-    renderTable();
-
-    // KPIs
-    const s = calcStats();
-    renderKPIs(s);
-
-    // Charts
-    const eq = []; let acc=0; trades.forEach(t=>{ acc+=t.pnl; eq.push(acc); });
-    drawLineChart($('#chartEquity'), eq);
-
-    // group by day
-    const map = {};
-    trades.forEach(t=>{
-      const d = new Date(t.date); const key = d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();
-      map[key] = (map[key]||0) + t.pnl;
-    });
-    const daily = Object.entries(map).sort((a,b)=> new Date(a[0]) - new Date(b[0]) ).map(e=>e[1]);
-    drawBarChart($('#chartDaily'), daily);
-
-    drawHist($('#chartHist'), trades.map(t=>t.pnl), 14);
-  }
-
-  /* =======================
-     CSV Import/Export
-  ======================== */
-  function exportCSV(){
-    const header = ['date','symbol','side','qty','entry','exit','fees','points','pnl','setup','notes'].join(',');
-    const lines = trades.map(t=>[
-      t.date, t.symbol, t.side, t.qty, t.entry, t.exit, t.fees, t.points, t.pnl, JSON.stringify(t.setup||''), JSON.stringify(t.notes||'')
-    ].join(','));
-    const csv = [header, ...lines].join('\n');
-    const blob = new Blob([csv],{type:'text/csv'});
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = 'zentrader_trades.csv';
-    a.click();
-  }
-
-  function importCSV(evt){
-    const file = evt.target.files[0]; if(!file) return;
-    const reader = new FileReader();
-    reader.onload = e=>{
-      const text = e.target.result;
-      const [header, ...rows] = text.split(/\r?\n/).filter(Boolean);
-      const cols = header.split(',');
-      const idx = (k)=> cols.indexOf(k);
-      rows.forEach(r=>{
-        const c = r.split(',');
-        const t = {
-          date: c[idx('date')] || new Date().toISOString(),
-          symbol: c[idx('symbol')] || 'SPY',
-          side: c[idx('side')] || 'LONG',
-          qty: +c[idx('qty')] || 1,
-          entry: +c[idx('entry')]||0,
-          exit: +c[idx('exit')]||0,
-          fees: +c[idx('fees')]||0,
-          points: +c[idx('points')]||0,
-          pnl: +c[idx('pnl')]||0,
-          setup: JSON.parse(c[idx('setup')]||'""'),
-          notes: JSON.parse(c[idx('notes')]||'""')
-        };
-        trades.push(t);
-      });
-      save(); render(); speak('Your CSV was imported successfully.');
-    };
-    reader.readAsText(file);
-  }
-
-  /* =======================
-     Voice: Recognition & TTS
-  ======================== */
-  let recog=null, listening=false, enGBVoice=null;
-
-  function pickBritishVoice(){
-    const voices = window.speechSynthesis.getVoices();
-    // Try common British female voices
-    const prefNames = [
-      'Google UK English Female','Microsoft Sonia Online (Natural) - English (United Kingdom)',
-      'Serena','Kate','English (United Kingdom)'
+/* ==== Table ==== */
+function renderTable(){
+  const tb = $('#tbl tbody'); tb.innerHTML='';
+  trades.forEach((t,i)=>{
+    const tr=document.createElement('tr');
+    const cells=[
+      i+1, new Date(t.date).toLocaleString(), t.symbol, t.side, t.qty, fmt(t.entry), fmt(t.exit),
+      fmt(t.points,3), `<span class="${t.pnl>=0?'good':'bad'}">${fmt(t.pnl)}</span>`,
+      fmt(t.fees), t.setup||'—', t.notes||'—',
+      `<button onclick="del(${i})">Delete</button>`
     ];
-    for(const name of prefNames){
-      const v = voices.find(v=> v.name.includes(name) || (v.lang==='en-GB' && /female/i.test(v.name)) );
-      if(v) return v;
-    }
-    return voices.find(v=>v.lang==='en-GB') || voices[0] || null;
-  }
-  window.speechSynthesis.onvoiceschanged = ()=> { enGBVoice = pickBritishVoice(); };
-
-  function speak(text){
-    const u = new SpeechSynthesisUtterance(text);
-    enGBVoice = enGBVoice || pickBritishVoice();
-    if(enGBVoice) u.voice = enGBVoice;
-    u.lang = 'en-GB';
-    u.rate = 0.98; u.pitch = 0.8; u.volume = 1; // smooth, lower tone
-    window.speechSynthesis.speak(u);
-  }
-
-  function setupRecog(){
-    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if(!SR){ $('#voiceStatus').textContent='Voice: not supported in this browser.'; return null; }
-    const r = new SR();
-    r.lang='en-US'; r.interimResults=false; r.continuous=true;
-    r.onresult = e=>{
-      const txt = e.results[e.results.length-1][0].transcript.trim().toLowerCase();
-      $('#voiceStatus').textContent = 'Heard: ' + txt;
-      handleCommand(txt);
-    };
-    r.onstart = ()=> { listening=true; $('#micDot').classList.add('live'); $('#voiceStatus').textContent='Listening…'; };
-    r.onend = ()=> { listening=false; $('#micDot').classList.remove('live'); $('#voiceStatus').textContent='Voice: idle'; };
-    r.onerror = (e)=> { $('#voiceStatus').textContent='Voice error: '+e.error; };
-    return r;
-  }
-
-  function toggleMic(){
-    if(!recog) recog = setupRecog();
-    if(!recog) return;
-    if(listening){ recog.stop(); } else { recog.start(); }
-  }
-
-  function handleCommand(txt){
-    if(/stop (listening|voice)/.test(txt)){ if(recog && listening) recog.stop(); speak('Stopping now.'); return; }
-    if(/start (listening|voice)/.test(txt)){ if(recog && !listening) recog.start(); speak('I am listening.'); return; }
-    if(/read (stats|statistics|k p i|k p i s)/.test(txt)){ speakStats(); return; }
-    if(/log trade/.test(txt)){
-      addTrade(); return;
-    }
-    // quick numeric capture e.g. "profit fifty" / "loss twenty"
-    const m = txt.match(/(profit|loss)\s+(-?\d+(?:\.\d+)?)/);
-    if(m){
-      const val = parseFloat(m[2]) * (m[1]==='loss' ? -1 : 1);
-      const t = {date:new Date().toISOString(), symbol:'SPY', side: val>=0?'LONG':'SHORT', qty:1, entry:0, exit:0, fees:0, points:0, pnl:val, setup:'Voice quick', notes:''};
-      trades.push(t); save(); render(); speak(`Logged ${val>=0?'profit':'loss'} of ${Math.abs(val)} dollars.`);
-    }
-  }
-
-  function speakStats(){
-    const s = calcStats();
-    const msg = `Here are your numbers. Net P and L ${s.net.toFixed(0)} dollars. Win rate ${s.winRate.toFixed(0)} percent. 
-    Profit factor ${isFinite(s.pf)? s.pf.toFixed(2) : 'zero'}. 
-    Expectancy ${s.exp.toFixed(2)} dollars per trade. 
-    Max drawdown ${s.mdd.toFixed(0)} dollars. Best trade ${s.best.toFixed(0)}, worst ${s.worst.toFixed(0)}.`;
-    speak(msg);
-  }
-
-  /* =======================
-     Quick demo buttons
-  ======================== */
-  function quickWin(){
-    trades.push({date:new Date().toISOString(), symbol:'SPY', side:'LONG', qty:1, entry:0, exit:0, fees:0, points:0, pnl:50, setup:'Quick', notes:''});
-    save(); render();
-  }
-  function quickLoss(){
-    trades.push({date:new Date().toISOString(), symbol:'SPY', side:'SHORT', qty:1, entry:0, exit:0, fees:0, points:0, pnl:-50, setup:'Quick', notes:''});
-    save(); render();
-  }
-
-  // Update points live when entry/exit change
-  ['t_entry','t_exit','t_side'].forEach(id=>{
-    document.getElementById(id).addEventListener('input', ()=>{
-      const side=$('#t_side').value, entry=+$('#t_entry').value||0, exit=+$('#t_exit').value||0;
-      const dir = side==='LONG'?1:-1; const pts = (exit-entry)*dir;
-      $('#t_points').value = isFinite(pts)? pts.toFixed(3) : '';
-    });
+    cells.forEach(c=>{ const td=document.createElement('td'); td.innerHTML=c; tr.appendChild(td); });
+    tb.appendChild(tr);
   });
+}
+function del(i){ const t=trades[i]; trades.splice(i,1); save(); render(); speak(`Removed trade ${i+1} ${t.symbol}.`); }
 
-  // Initial render
-  render();
-  </script>
+/* ==== Charts (vanilla canvas) ==== */
+function lineChart(canvas, values){
+  const ctx=canvas.getContext('2d'), w=canvas.width, h=canvas.height, p=30;
+  ctx.clearRect(0,0,w,h);
+  const min=Math.min(0,...values), max=Math.max(0,...values), R=(max-min)||1;
+  // grid
+  ctx.strokeStyle='#2a2a2f';
+  for(let i=0;i<=4;i++){ const y=p+i*((h-2*p)/4); ctx.beginPath(); ctx.moveTo(p,y); ctx.lineTo(w-p,y); ctx.stroke(); }
+  // axes
+  ctx.strokeStyle='#555'; ctx.beginPath(); ctx.moveTo(p,p); ctx.lineTo(p,h-p); ctx.lineTo(w-p,h-p); ctx.stroke();
+  // zero
+  if(min<0 && max>0){ const zy = h-p - ((0-min)/R)*(h-2*p); ctx.setLineDash([4,4]); ctx.strokeStyle='#444'; ctx.beginPath(); ctx.moveTo(p,zy); ctx.lineTo(w-p,zy); ctx.stroke(); ctx.setLineDash([]); }
+  // line
+  const xs=values.map((_,i)=>p+i*((w-2*p)/Math.max(1,values.length-1)));
+  const ys=values.map(v=> h-p - ((v-min)/R)*(h-2*p));
+  ctx.strokeStyle='#e6c766'; ctx.lineWidth=2.2; ctx.beginPath();
+  ctx.moveTo(xs[0]||p, ys[0]||h-p); for(let i=1;i<ys.length;i++) ctx.lineTo(xs[i],ys[i]); ctx.stroke();
+}
+function barChart(canvas, values){
+  const ctx=canvas.getContext('2d'), w=canvas.width, h=canvas.height, p=30, iw=w-2*p, ih=h-2*p;
+  ctx.clearRect(0,0,w,h);
+  const min=Math.min(0,...values), max=Math.max(0,...values), R=(max-min)||1;
+  const zero = h-p - ((0-min)/R)*ih;
+  ctx.strokeStyle='#2a2a2f'; for(let i=0;i<=4;i++){ const y=p+i*(ih/4); ctx.beginPath(); ctx.moveTo(p,y); ctx.lineTo(w-p,y); ctx.stroke(); }
+  ctx.strokeStyle='#555'; ctx.beginPath(); ctx.moveTo(p,p); ctx.lineTo(p,h-p); ctx.lineTo(w-p,h-p); ctx.stroke();
+  const bw = iw/Math.max(values.length,1)*.7;
+  values.forEach((v,i)=>{
+    const x = p + i*(iw/Math.max(values.length,1)) + (iw/Math.max(values.length,1)-bw)/2;
+    const y = h-p - ((v-min)/R)*ih;
+    ctx.fillStyle = v>=0 ? '#1fbf6b' : '#ff5454';
+    ctx.fillRect(x, Math.min(y,zero), bw, Math.abs(y-zero));
+  });
+}
+
+/* ==== Render ==== */
+function render(){
+  // live points preview
+  const side=$('#t_side').value, entry=+$('#t_entry').value||0, exit=+$('#t_exit').value||0;
+  const dir = side==='LONG'?1:-1; $('#t_points').value = ((exit-entry)*dir||0).toFixed(3);
+
+  renderTable();
+  const s=calcStats(); renderKPIs(s);
+
+  const eq=[]; let acc=0; trades.forEach(t=>{ acc+=t.pnl; eq.push(acc); });
+  lineChart($('#chartEquity'), eq);
+
+  const byDay={}; trades.forEach(t=>{ const d=new Date(t.date); const k=d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate(); byDay[k]=(byDay[k]||0)+t.pnl; });
+  const daily = Object.entries(byDay).sort((a,b)=> new Date(a[0])-new Date(b[0])).map(e=>e[1]);
+  barChart($('#chartDaily'), daily);
+}
+render();
+
+/* ==== CSV ==== */
+function exportCSV(){
+  const header=['date','symbol','side','qty','entry','exit','fees','points','pnl','setup','notes'].join(',');
+  const rows = trades.map(t=>[t.date,t.symbol,t.side,t.qty,t.entry,t.exit,t.fees,t.points,t.pnl,JSON.stringify(t.setup||''),JSON.stringify(t.notes||'')].join(','));
+  const csv=[header,...rows].join('\n'); const blob=new Blob([csv],{type:'text/csv'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='zentrader_trades.csv'; a.click();
+}
+function importCSV(e){
+  const f=e.target.files[0]; if(!f) return;
+  const r=new FileReader(); r.onload=ev=>{
+    const [head,...lines]=ev.target.result.split(/\r?\n/).filter(Boolean);
+    const cols=head.split(','); const idx=k=>cols.indexOf(k);
+    lines.forEach(row=>{
+      const c=row.split(',');
+      trades.push({
+        date:c[idx('date')], symbol:c[idx('symbol')], side:c[idx('side')], qty:+c[idx('qty')]||1,
+        entry:+c[idx('entry')]||0, exit:+c[idx('exit')]||0, fees:+c[idx('fees')]||0,
+        points:+c[idx('points')]||0, pnl:+c[idx('pnl')]||0,
+        setup:JSON.parse(c[idx('setup')]||'""'), notes:JSON.parse(c[idx('notes')]||'""')
+      });
+    });
+    save(); render(); speak('Your CSV has been imported.');
+  }; r.readAsText(f);
+}
+
+/* ==== VOICE (Recognition + British Female TTS) ==== */
+let recog=null, listening=false, enGBVoice=null;
+
+function pickBritishVoice(){
+  const voices = window.speechSynthesis.getVoices();
+  const preferred = [
+    'Google UK English Female',
+    'Microsoft Sonia Online (Natural) - English (United Kingdom)',
+    'Microsoft Libby Online (Natural) - English (United Kingdom)',
+    'Serena','Hazel','Kate'
+  ];
+  for(const name of preferred){
+    const v = voices.find(v=> v.name.includes(name));
+    if(v) return v;
+  }
+  // fallback: any en-GB female-ish name, else any en-GB, else default
+  return voices.find(v=> v.lang==='en-GB' && /female|serena|hazel|kate|sonia|libby/i.test(v.name))
+      || voices.find(v=> v.lang==='en-GB')
+      || voices[0] || null;
+}
+window.speechSynthesis.onvoiceschanged = ()=> { enGBVoice = pickBritishVoice(); };
+
+function speak(text){
+  const u = new SpeechSynthesisUtterance(text);
+  enGBVoice = enGBVoice || pickBritishVoice();
+  if(enGBVoice) u.voice = enGBVoice;
+  u.lang='en-GB'; u.rate=0.98; u.pitch=0.78; u.volume=1; // sultry/softer
+  window.speechSynthesis.speak(u);
+}
+
+function setupRecog(){
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if(!SR){ $('#voiceState').textContent='Voice not supported in this browser.'; return null; }
+  const r = new SR();
+  r.lang='en-US'; r.interimResults=false; r.continuous=true;
+  r.onstart = ()=>{ listening=true; $('#micDot').classList.add('live'); $('#voiceState').textContent='Listening…'; };
+  r.onend = ()=>{ listening=false; $('#micDot').classList.remove('live'); $('#voiceState').textContent='Voice: idle'; };
+  r.onerror = e=>{ $('#voiceState').textContent='Voice error: '+e.error; };
+  r.onresult = e=>{
+    const txt = e.results[e.results.length-1][0].transcript.trim();
+    $('#voiceState').textContent = 'Heard: ' + txt;
+    handleCommand(txt.toLowerCase());
+  };
+  return r;
+}
+
+function toggleMic(){
+  if(!recog) recog = setupRecog();
+  if(!recog) return;
+  if(listening){ recog.stop(); $('#btnMic').textContent='🎙️ Start Voice'; }
+  else { recog.start(); $('#btnMic').textContent='🛑 Stop Voice'; speak('Listening, go ahead.'); }
+}
+
+function handleCommand(txt){
+  if(/stop (listening|voice)/.test(txt)){ if(recog && listening) {recog.stop(); speak('Stopping now.');} return; }
+  if(/start (listening|voice)/.test(txt)){ if(recog && !listening) {recog.start(); speak('I am listening.');} return; }
+  if(/read (stats|statistics|kpis?)/.test(txt)){ readStats(); return; }
+
+  // One-shot add: "log trade symbol SPY side long qty 2 entry 500.4 exit 502.1 fees 1.2 setup r s i bounce notes quick scalp"
+  if(/log trade/.test(txt) || /add trade/.test(txt)){
+    const get = (key, alt=[])=>{
+      const keys=[key,...alt].join('|');
+      const m = txt.match(new RegExp(`${keys}\\s+([a-z0-9\\.\\-]+)`, 'i'));
+      return m? m[1] : null;
+    };
+    const symbol = (get('symbol')||'SPY').toUpperCase();
+    const side = /short/.test(txt)?'SHORT':(/long/.test(txt)?'LONG':($('#t_side').value||'LONG'));
+    const qty = parseInt(get('qty|quantity') || '1',10);
+    const entry = parseFloat(get('entry|enter|in') || ($('#t_entry').value||'0'));
+    const exit  = parseFloat(get('exit|out')  || ($('#t_exit').value||'0'));
+    const fees  = parseFloat(get('fees|commission|comm') || '0');
+    // setup & notes (grab text after keywords)
+    const setup = (()=>{ const m = txt.match(/setup\s+(.+?)(?:\s+notes\s+|$)/i); return m? m[1] : ''; })();
+    const notes = (()=>{ const m = txt.match(/notes?\s+(.+)$/i); return m? m[1] : ''; })();
+
+    // Fill the form (so user sees it), then add
+    $('#t_symbol').value=symbol; $('#t_side').value=side; $('#t_qty').value=qty;
+    $('#t_entry').value=isFinite(entry)?entry:''; $('#t_exit').value=isFinite(exit)?exit:''; $('#t_fees').value=isFinite(fees)?fees:'';
+    $('#t_setup').value=setup; $('#t_notes').value=notes;
+    addTrade();
+    return;
+  }
+
+  // Quick profit/loss: "profit 80" or "loss 35"
+  const m = txt.match(/(profit|loss)\s+(-?\d+(?:\.\d+)?)/);
+  if(m){
+    const val = parseFloat(m[2]) * (m[1]==='loss' ? -1 : 1);
+    trades.push({date:new Date().toISOString(),symbol:'SPY',side:val>=0?'LONG':'SHORT',qty:1,entry:0,exit:0,fees:0,points:0,pnl:val,setup:'Voice quick',notes:''});
+    save(); render(); speak(`Logged ${val>=0?'profit':'loss'} of ${Math.abs(val)} dollars.`);
+  }
+}
+
+function readStats(){
+  const s=calcStats();
+  speak(`Here are your numbers. Net P and L ${Math.round(s.net)} dollars. Win rate ${s.winRate.toFixed(0)} percent. Profit factor ${isFinite(s.pf)?s.pf.toFixed(2):'zero'}. Expectancy ${s.exp.toFixed(2)} dollars per trade. Max drawdown ${Math.round(s.mdd)} dollars. Best trade ${Math.round(s.best)}, worst ${Math.round(s.worst)}.`);
+}
+
+/* live points calc */
+['t_entry','t_exit','t_side'].forEach(id=>{
+  document.getElementById(id).addEventListener('input', ()=>{
+    const side=$('#t_side').value, entry=+$('#t_entry').value||0, exit=+$('#t_exit').value||0;
+    const dir=side==='LONG'?1:-1; $('#t_points').value=((exit-entry)*dir||0).toFixed(3);
+  });
+});
+</script>
 </body>
 </html>
+	
+
 	
 
 	
