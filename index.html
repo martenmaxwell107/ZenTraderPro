@@ -1,98 +1,79 @@
-
-	<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>ZenTrader Pro — v5.0 (Full, robust)</title>
-
-<!-- =========================== STYLES =========================== -->
+<title>ZenTrader Pro — v5.3 (single-file, offline)</title>
 <style>
-:root{
-  --bg:#0b0b0b; --card:#111827; --text:#e5e7eb; --muted:#9aa4b2; --accent:#16a34a;
-  --good:#22c55e; --bad:#ef4444; --line:#1f2937;
-}
+:root{--bg:#0b0b0b;--panel:#111827;--text:#e5e7eb;--muted:#9aa4b2;--accent:#16a34a;--good:#22c55e;--bad:#ef4444;--line:#1f2937}
 *{box-sizing:border-box}
 html,body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,Segoe UI,Roboto,Arial,sans-serif}
 a{color:#93c5fd}
 .mono{font-family:ui-monospace,Menlo,Consolas,monospace}
-
-.banner{
-  display:flex;align-items:center;justify-content:center;gap:14px;
-  padding:18px 16px;background:#000;border-bottom:1px solid var(--line)
-}
-.yinyang{width:56px;height:56px;border-radius:50%;
-  background:radial-gradient(circle at 50% 25%,#000 0 9px,#fff 10px 50%),
-             radial-gradient(circle at 50% 75%,#fff 0 9px,#000 10px 50%),
-             linear-gradient(90deg,#000 50%,#fff 0)}
+.banner{display:flex;align-items:center;justify-content:center;gap:14px;padding:18px 16px;background:#000;border-bottom:1px solid var(--line)}
 .title{font-size:40px;font-weight:800;letter-spacing:.3px;min-width:0}
-
-.controls{
-  position:sticky;top:0;z-index:5;display:flex;flex-wrap:wrap;gap:10px;
-  justify-content:space-between;align-items:center;
-  padding:10px 16px;background:rgba(17,24,39,.98);
-  backdrop-filter:blur(6px);border-bottom:1px solid var(--line);min-width:0
-}
-.controls > div{display:flex;gap:8px;flex-wrap:wrap;align-items:center;min-width:0}
+.controls{position:sticky;top:0;z-index:50;display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;align-items:center;padding:10px 16px;background:rgba(17,24,39,.98);backdrop-filter:blur(6px);border-bottom:1px solid var(--line);min-width:0}
+.controls>div{display:flex;gap:8px;flex-wrap:wrap;align-items:center;min-width:0}
 .pill{display:inline-flex;align-items:center;gap:6px;border:1px solid #334155;background:#0b1220;color:#cbd5e1;border-radius:999px;padding:6px 10px;font-size:12px;min-width:0}
 button{background:var(--accent);color:#fff;border:none;border-radius:10px;padding:10px 14px;cursor:pointer}
 button.ghost{background:#0b1220;color:#fff;border:1px solid #374151}
 button.danger{background:#ef4444}
 button[disabled]{opacity:.6;cursor:not-allowed}
 select,input{background:#0b1220;color:#e5e7eb;border:1px solid #374151;border-radius:10px;padding:10px;min-width:0;max-width:100%}
-input[type="time"],input[type="date"]{width:100%}
-
+input[type=time],input[type=date]{width:100%}
 .wrap{max-width:1200px;margin:18px auto 24px;padding:0 16px;overflow-x:hidden;min-width:0}
 .grid{display:grid;grid-template-columns:1.15fr .85fr;gap:16px;min-width:0}
-.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;box-shadow:0 10px 30px rgba(0,0,0,.25);min-width:0}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px;box-shadow:0 10px 30px rgba(0,0,0,.25);min-width:0}
 h2{margin:6px 0 12px;color:#d1fae5}
-
 .row{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;min-width:0}
 .row-3{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;min-width:0}
 .row-2{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;min-width:0}
-
 .actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;min-width:0}
 pre{background:#0b1220;border:1px dashed #374151;border-radius:10px;padding:10px;max-height:200px;overflow:auto;white-space:pre-wrap;word-break:break-word}
-
 .dot{width:10px;height:10px;border-radius:50%;background:#6b7280;border:1px solid #374151}
 .dot.live{background:#22c55e}
-
 .badge{display:inline-block;padding:2px 8px;border-radius:999px;font-size:11px;border:1px solid #374151;background:#0b1220;color:#e5e7eb}
 .badge.good{border-color:#14532d;color:#86efac;background:#052e16}
-
 .table{width:100%;border-collapse:separate;border-spacing:0 6px;min-width:0}
 .table th{font-weight:600;color:#9ca3af;text-align:left;padding:6px 8px}
 .table td{background:#0b1220;border:1px solid #1f2937;padding:8px;border-left:none;border-right:none;max-width:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-
 .rowbar{display:flex;gap:6px;flex-wrap:wrap}
-
 .kgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;min-width:0}
 .kcard{background:#0b1220;border:1px solid #1f2937;border-radius:12px;padding:12px;min-width:0}
 .klabel{color:#93a3b8;font-size:12px}
 .kvalue{font-size:22px;margin-top:4px;min-width:0}
-
 .warn{display:none;background:#7c2d12;color:#fff;padding:8px 12px;border-bottom:1px solid #78350f;font-size:14px}
 .footerVer{opacity:.6;font-size:12px;text-align:right;margin-top:6px}
-
 .chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;min-width:0}
 .chip{border:1px solid #334155;background:#0b1220;color:#cbd5e1;border-radius:999px;padding:4px 8px;font-size:12px;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .chip.ok{border-color:#14532d;color:#86efac;background:#052e16}
-
 canvas{display:block;width:100% !important;height:auto;max-width:100%}
-
 @media(max-width:1050px){.grid{grid-template-columns:1fr}.title{font-size:34px}}
+#debugPanel{display:none;margin-top:10px}
 </style>
 </head>
 <body>
-<div class="warn" id="browserWarn">⚠️ Voice features require <b>Chrome</b> or Edge over HTTPS.</div>
+<div class="warn" id="browserWarn">⚠️ Voice features require <b>Chrome</b> or Edge over HTTPS (or local file).</div>
 
-<!-- =========================== HEADER =========================== -->
+<!-- HEADER with baked-in SVG logo -->
 <div class="banner">
-  <div class="yinyang" aria-hidden="true"></div>
+  <svg id="brandLogo" viewBox="0 0 520 80" style="height:56px;border-radius:6px">
+    <defs>
+      <linearGradient id="g" x1="0" x2="1" y1="0" y2="0">
+        <stop offset="0" stop-color="#16a34a"/><stop offset="1" stop-color="#22c55e"/>
+      </linearGradient>
+    </defs>
+    <rect x="0" y="0" width="520" height="80" rx="10" fill="#0b0b0b" stroke="#1f2937"/>
+    <circle cx="52" cy="40" r="22" fill="none" stroke="url(#g)" stroke-width="8"/>
+    <circle cx="52" cy="40" r="6" fill="url(#g)"/>
+    <text x="90" y="50" fill="#ffffff" font-size="34" font-family="Georgia, 'Times New Roman', serif" style="letter-spacing:.5px">
+      ZenTrader Pro
+    </text>
+  </svg>
   <div class="title">ZenTrader Pro</div>
 </div>
 
-<!-- ========================== CONTROLS ========================== -->
+<!-- CONTROLS -->
 <div class="controls">
   <div>
     <label class="pill" title="Per-side commission ($)">
@@ -121,6 +102,12 @@ canvas{display:block;width:100% !important;height:auto;max-width:100%}
     </label>
   </div>
   <div>
+    <label class="pill">
+      <input type="file" id="logoFile" accept="image/*" style="display:none">
+      <span id="logoPick" style="cursor:pointer">Upload Logo</span>
+    </label>
+    <button class="ghost" id="logoResetBtn" title="Reset to baked-in logo">Reset Logo</button>
+
     <button class="ghost" id="exportBtn">Export CSV</button>
     <label class="pill"><input type="file" id="importFile" accept=".csv" style="display:none"><span id="importBtn" style="cursor:pointer">Import CSV</span></label>
     <select id="lang">
@@ -134,52 +121,46 @@ canvas{display:block;width:100% !important;height:auto;max-width:100%}
     <label class="pill"><input type="checkbox" id="liveFill" checked> Live fill</label>
     <label class="pill"><input type="checkbox" id="ttsToggle" checked> 🔈 Speak on review & save</label>
     <span class="pill" id="envPill">env: …</span>
-    <span class="pill">ZTP v5.0</span>
+    <button id="debugToggle" class="ghost" title="Show debug">Debug</button>
+    <span class="pill">ZTP v5.3</span>
   </div>
 </div>
 
-<!-- =========================== BODY ============================ -->
 <div class="wrap">
   <div class="grid">
-    <!-- ========== FORM CARD ========== -->
+    <!-- FORM -->
     <div class="card">
       <h2>Add / Edit Trade</h2>
-
       <div class="row-3">
         <div><label>Date</label><input type="date" id="date"></div>
         <div><label>Symbol</label><input id="symbol" placeholder="ES, NQ, AAPL"></div>
         <div><label>Direction</label><select id="direction"><option>Long</option><option>Short</option></select></div>
       </div>
-
       <div class="row">
         <div><label>Qty</label><input id="qty" type="number" value="1" step="1" min="1"></div>
         <div><label>Entry Price</label><input id="entry" type="number" step="0.01" placeholder="5000"></div>
         <div><label>Exit Price</label><input id="exit" type="number" step="0.01" placeholder="5010"></div>
         <div><label>Commission ($ total)</label><input id="commission" type="number" step="0.01" value=""></div>
       </div>
-
       <div class="row-3">
         <div><label>Entry Time</label><input id="entryTime" type="time" placeholder="09:35"></div>
         <div><label>Exit Time</label><input id="exitTime" type="time" placeholder="10:12"></div>
         <div><label>Duration (min)</label><input id="duration" type="number" step="1" placeholder="auto"></div>
       </div>
-
       <div class="chips" id="chipBar"></div>
-
       <div class="actions">
         <button id="addBtn">Add Trade</button>
         <button class="ghost" id="updateBtn" disabled>Update Selected</button>
         <button class="ghost" id="clearFormBtn">Clear Form</button>
         <button class="danger" id="wipeBtn">Wipe All</button>
       </div>
-
+      <div id="debugPanel" class="mono"><pre id="vLog"></pre></div>
       <div style="margin-top:8px;color:#93c5fd">
         Engine: <span id="vEngine">?</span> — Status: <span id="vStatus">idle</span>
       </div>
-      <pre id="vLog" class="mono" style="margin-top:8px"></pre>
     </div>
 
-    <!-- ========== KPIs CARD ========== -->
+    <!-- KPIs -->
     <div class="card">
       <h2>KPIs</h2>
       <div class="kgrid">
@@ -191,12 +172,10 @@ canvas{display:block;width:100% !important;height:auto;max-width:100%}
     </div>
   </div>
 
-  <!-- ========== CHARTS ========== -->
+  <!-- CHARTS -->
   <div class="card">
     <h2>P&L Trend</h2>
-    <div class="row-2" style="margin-bottom:8px">
-      <div class="badge">Per-period + cumulative</div><div></div>
-    </div>
+    <div class="row-2" style="margin-bottom:8px"><div class="badge">Per-period + cumulative</div><div></div></div>
     <canvas id="plChart" height="180"></canvas>
   </div>
 
@@ -205,7 +184,7 @@ canvas{display:block;width:100% !important;height:auto;max-width:100%}
     <canvas id="commChart" height="180"></canvas>
   </div>
 
-  <!-- ========== TABLE ========== -->
+  <!-- TABLE -->
   <div class="card">
     <h2>Trades</h2>
     <table class="table" id="tradeTable">
@@ -220,21 +199,18 @@ canvas{display:block;width:100% !important;height:auto;max-width:100%}
     </table>
   </div>
 
-  <div class="footerVer">ZTP v5.0</div>
+  <div class="footerVer">ZTP v5.3</div>
 </div>
 
-<!-- =========================== SCRIPTS =========================== -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
 "use strict";
 
-/* -------------------------- ENV / STATUS -------------------------- */
+/* ---------- ENV ---------- */
 const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
 const envPill = document.getElementById('envPill');
-envPill.textContent = (window.isSecureContext?'HTTPS':'NOT-HTTPS') + ' · SR:' + (SR?'yes':'no');
+envPill.textContent = (window.isSecureContext?'HTTPS/local':'NOT-HTTPS') + ' · SR:' + (SR?'yes':'no');
 if(!SR){ document.getElementById('browserWarn').style.display='block'; }
 document.getElementById('vEngine').textContent = SR ? (window.SpeechRecognition?'SpeechRecognition':'webkitSpeechRecognition') : 'None';
-
 const log=(m)=>{const el=document.getElementById('vLog'); if(!el) return; el.textContent+=(new Date()).toLocaleTimeString()+': '+m+'\\n'; el.scrollTop=el.scrollHeight;};
 const setStatus=(s)=>{const n=document.getElementById('vStatus'); if(n) n.textContent=s;};
 const fmt=(x)=>Number(x).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
@@ -242,7 +218,34 @@ const signed=(x)=>{const s=Number(x);const c=s>=0?'good':'bad';return `<span cla
 const parseNum=(v)=>{const n=Number(v);return isFinite(n)?n:0;}
 const uuid=()=> (crypto?.randomUUID?.() || 'id_'+Math.random().toString(36).slice(2));
 
-/* ------------------------ DURATION / HELPERS ---------------------- */
+/* ---------- Logo (upload or reset to baked-in SVG) ---------- */
+const logoPick = document.getElementById('logoPick');
+const logoFile = document.getElementById('logoFile');
+const logoResetBtn = document.getElementById('logoResetBtn');
+const LOGO_KEY = 'ztp_logo_dataurl';
+function applyLogoFromStorage(){
+  try{
+    const dataUrl = localStorage.getItem(LOGO_KEY);
+    if(dataUrl){
+      const img = new Image(); img.onload=()=>{ document.getElementById('brandLogo').replaceWith(img); img.id='brandLogo'; img.style.height='56px'; img.style.borderRadius='6px'; };
+      img.src = dataUrl;
+    } // else keep inline SVG default
+  }catch{}
+}
+applyLogoFromStorage();
+logoPick?.addEventListener('click', ()=>logoFile?.click());
+logoFile?.addEventListener('change', (e)=>{
+  const f=e.target.files?.[0]; if(!f) return;
+  const rdr=new FileReader();
+  rdr.onload=()=>{ 
+    try{ localStorage.setItem(LOGO_KEY, String(rdr.result)); location.reload(); }
+    catch(err){ alert('Could not save logo: '+err.message); } 
+  };
+  rdr.readAsDataURL(f);
+});
+logoResetBtn?.addEventListener('click', ()=>{ localStorage.removeItem(LOGO_KEY); location.reload(); });
+
+/* ---------- Duration helper ---------- */
 function computeDurationMin(entryD,entryT,exitD,exitT){
   if(!entryT||!exitT)return'';
   const sd=entryD||new Date().toISOString().slice(0,10);
@@ -254,22 +257,20 @@ function computeDurationMin(entryD,entryT,exitD,exitT){
   return Math.max(0,Math.round(ms/60000));
 }
 
-/* -------------------- STORAGE & COMMISSION LOGIC ------------------ */
+/* ---------- Storage & commission ---------- */
 const storeKey='zt_trades_v1',gcRateKey='zt_gc_rate',gcAutoKey='zt_gc_auto';
 let trades=[]; try{trades=JSON.parse(localStorage.getItem(storeKey)||'[]');}catch{trades=[];}
 function saveTrades(v){try{localStorage.setItem(storeKey,JSON.stringify(v));}catch{}}
-
 function loadGcRate(){const v=localStorage.getItem(gcRateKey);return v?Number(v):null;}
 function saveGcRate(v){localStorage.setItem(gcRateKey,String(v));}
 function loadGcAuto(){return localStorage.getItem(gcAutoKey)!=='false';}
 function saveGcAuto(f){localStorage.setItem(gcAutoKey,f?'true':'false');}
 let gcRate=loadGcRate(),gcAuto=loadGcAuto(),lastAutoCommission=null;
-
 function computeCommissionFromGlobal(qty){
   if(!gcAuto)return null;
   if(gcRate==null||!isFinite(gcRate))return null;
   const q=Number(qty); if(!isFinite(q)||q<=0)return null;
-  return gcRate*2*q; // per side × 2 × qty
+  return gcRate*2*q;
 }
 function maybeAutoFillCommission(){
   const e=document.getElementById('commission'),q=document.getElementById('qty');
@@ -283,7 +284,7 @@ function maybeAutoFillCommission(){
   }
 }
 
-/* ---------------------------- FILTERS ----------------------------- */
+/* ---------- Filters ---------- */
 function filterByRange(arr,range){
   if(range==='all')return[...arr];
   const now=new Date();const start=new Date(now);
@@ -294,8 +295,51 @@ function filterByRange(arr,range){
   return arr;
 }
 
-/* ---------------------------- CHARTS ------------------------------ */
-let plChart=null,commChart=null;
+/* ---------- Tiny Charts (offline) ---------- */
+function drawLineChart(canvas, labels, series, cumulative){
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width = canvas.clientWidth * (window.devicePixelRatio||1);
+  const H = canvas.height = 200 * (window.devicePixelRatio||1);
+  ctx.clearRect(0,0,W,H);
+  const all = series.concat(cumulative||[]);
+  const min = Math.min(...all, 0);
+  const max = Math.max(...all, 0);
+  const pad = 24*(window.devicePixelRatio||1);
+  const xStep = (W - pad*2) / Math.max(1, labels.length-1);
+  const y = v => H - pad - ( (v - min) / Math.max(1,(max-min)||1) ) * (H - pad*2);
+  ctx.strokeStyle = "#1f2937"; ctx.lineWidth = 1;
+  ctx.beginPath(); for(let i=0;i<5;i++){ const gy = pad + i*(H-2*pad)/4; ctx.moveTo(pad, gy); ctx.lineTo(W-pad, gy); } ctx.stroke();
+  ctx.strokeStyle = "#93c5fd"; ctx.lineWidth = 2;
+  ctx.beginPath();
+  series.forEach((v,i)=>{ const x=pad + i*xStep; const yy=y(v); if(i===0) ctx.moveTo(x,yy); else ctx.lineTo(x,yy); });
+  ctx.stroke();
+  if(cumulative){ ctx.strokeStyle = "#16a34a"; ctx.lineWidth = 2; ctx.beginPath();
+    cumulative.forEach((v,i)=>{ const x=pad + i*xStep; const yy=y(v); if(i===0) ctx.moveTo(x,yy); else ctx.lineTo(x,yy); });
+    ctx.stroke();
+  }
+  ctx.fillStyle = "#9ca3af"; ctx.font = (12*(window.devicePixelRatio||1))+"px system-ui";
+  const tickCount = Math.min(6, labels.length);
+  for(let i=0;i<tickCount;i++){ const idx = Math.round(i*(labels.length-1)/(tickCount-1||1)); const x=pad + idx*xStep; ctx.fillText(String(labels[idx]||''), x-10, H-6); }
+}
+function drawBarChart(canvas, labels, series){
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width = canvas.clientWidth * (window.devicePixelRatio||1);
+  const H = canvas.height = 200 * (window.devicePixelRatio||1);
+  ctx.clearRect(0,0,W,H);
+  const max = Math.max(...series, 0);
+  const pad = 24*(window.devicePixelRatio||1);
+  const bw = (W - pad*2) / Math.max(1, series.length);
+  const y = v => H - pad - ( (v) / Math.max(1,(max)||1) ) * (H - pad*2);
+  ctx.strokeStyle = "#1f2937"; ctx.lineWidth = 1;
+  ctx.beginPath(); for(let i=0;i<5;i++){ const gy = pad + i*(H-2*pad)/4; ctx.moveTo(pad, gy); ctx.lineTo(W-pad, gy); } ctx.stroke();
+  ctx.fillStyle = "#93c5fd";
+  series.forEach((v,i)=>{ const x=pad + i*bw + bw*0.1; const barW=bw*0.8; const yy=y(v); ctx.fillRect(x, yy, barW, (H-pad - yy)); });
+  ctx.fillStyle = "#9ca3af"; ctx.font = (12*(window.devicePixelRatio||1))+"px system-ui";
+  const tickCount = Math.min(6, labels.length);
+  for(let i=0;i<tickCount;i++){ const idx = Math.round(i*(labels.length-1)/(tickCount-1||1)); const x=pad + idx*bw; ctx.fillText(String(labels[idx]||''), x, H-6); }
+}
+
+/* ---------- KPIs / render ---------- */
 function groupBy(arr,gran,metric='net'){
   const map=new Map();
   const keyFor=(t)=>{
@@ -316,34 +360,6 @@ function groupBy(arr,gran,metric='net'){
 }
 function cumulative(vals){const out=[];let s=0;for(const v of vals){s+=v;out.push(s);}return out;}
 
-function drawCharts(filtered){
-  const gran=document.getElementById('granSelect').value,metric=document.getElementById('metricSelect').value;
-  const pl=groupBy(filtered,gran,metric);
-  const cc=groupBy(filtered,gran,'commission');
-
-  if(plChart)plChart.destroy();
-  plChart=new Chart(document.getElementById('plChart'),{
-    type:'line',
-    data:{labels:pl.labels,datasets:[
-      {label:metric.toUpperCase(),data:pl.data},
-      {label:'Cumulative '+metric.toUpperCase(),data:cumulative(pl.data),yAxisID:'y2'}
-    ]},
-    options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{display:true}},scales:{
-      x:{ticks:{color:'#9ca3af'}},
-      y:{ticks:{color:'#9ca3af'}},
-      y2:{position:'right',grid:{drawOnChartArea:false},ticks:{color:'#9ca3af'}}
-    }}
-  });
-
-  if(commChart)commChart.destroy();
-  commChart=new Chart(document.getElementById('commChart'),{
-    type:'bar',
-    data:{labels:cc.labels,datasets:[{label:'Commissions',data:cc.data}]},
-    options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{display:true}},scales:{x:{ticks:{color:'#9ca3af'}},y:{ticks:{color:'#9ca3af'}}}}
-  });
-}
-
-/* ---------------------- KPIs / RENDER PIPELINE -------------------- */
 function render(){
   const range=document.getElementById('rangeSelect').value;
   const filtered=filterByRange(trades,range);
@@ -358,18 +374,24 @@ function render(){
   document.getElementById('kAvgWin').textContent=fmt(avgWin);
   document.getElementById('kComm').textContent=fmt(comm);
 
-  drawCharts(filtered);
+  const gran=document.getElementById('granSelect').value,metric=document.getElementById('metricSelect').value;
+  const pl=groupBy(filtered,gran,metric);
+  const cc=groupBy(filtered,gran,'commission');
+  const cum = cumulative(pl.data);
+
+  drawLineChart(document.getElementById('plChart'), pl.labels, pl.data, cum);
+  drawBarChart(document.getElementById('commChart'), cc.labels, cc.data);
+
   drawTable(filtered);
 }
 
-/* ------------------------- TABLE & EDITING ------------------------ */
+/* ---------- Table & editing ---------- */
 let selectedId=null;
-
 function sortByDateTime(arr){
   return [...arr].sort((a,b)=>{
     const ad=a.date+'T'+(a.entryTime||'00:00');
     const bd=b.date+'T'+(b.entryTime||'00:00');
-    return bd.localeCompare(ad); // newest first
+    return bd.localeCompare(ad);
   });
 }
 function drawTable(filtered){
@@ -377,14 +399,8 @@ function drawTable(filtered){
   tbody.innerHTML='';
   for(const t of sortByDateTime(filtered)){
     const tr=document.createElement('tr');
-    const cells=[
-      t.date, t.symbol, t.direction, t.qty,
-      fmt(t.entry), fmt(t.exit), fmt(t.points), fmt(t.gross), fmt(t.commission), fmt(t.net),
-      t.entryTime||'', t.exitTime||'', t.duration||''
-    ];
-    for(const c of cells){
-      const td=document.createElement('td'); td.title=String(c); td.innerHTML=String(c); tr.appendChild(td);
-    }
+    const cells=[t.date,t.symbol,t.direction,t.qty,fmt(t.entry),fmt(t.exit),fmt(t.points),fmt(t.gross),fmt(t.commission),fmt(t.net),t.entryTime||'',t.exitTime||'',t.duration||''];
+    for(const c of cells){const td=document.createElement('td'); td.title=String(c); td.innerHTML=String(c); tr.appendChild(td);}
     const td=document.createElement('td');
     const editBtn=document.createElement('button'); editBtn.className='ghost'; editBtn.textContent='Edit';
     const delBtn=document.createElement('button'); delBtn.className='danger'; delBtn.textContent='Delete';
@@ -395,7 +411,6 @@ function drawTable(filtered){
     tbody.appendChild(tr);
   }
 }
-
 function populateForm(t){
   const set=(id,val)=>{const el=document.getElementById(id); if(!el) return; if(el.tagName==='SELECT'){const i=[...el.options].findIndex(o=>o.value===val); el.selectedIndex=(i>=0?i:0);} else {el.value=val??'';}};
   set('date',t.date); set('symbol',t.symbol); set('direction',t.direction);
@@ -404,14 +419,13 @@ function populateForm(t){
   refreshChips();
 }
 
-/* --------------------------- ADD/UPDATE --------------------------- */
+/* ---------- Add / Update ---------- */
 function addTrade(obj){
   let commissionVal=obj.commission;
   const qtyNum=parseInt(obj.qty||1,10);
   const commissionEl=document.getElementById('commission');
   const looksManual=commissionEl&&commissionEl.value!==''&&(lastAutoCommission==null||Number(commissionEl.value)!==Number(lastAutoCommission));
   if(!looksManual){const calc=computeCommissionFromGlobal(qtyNum);if(calc!=null)commissionVal=calc;}
-
   const t={
     id:uuid(),
     date:obj.date||new Date().toISOString().slice(0,10),
@@ -427,9 +441,8 @@ function addTrade(obj){
   };
   const sign=t.direction==='Long'?1:-1;
   t.points=(t.exit-t.entry)*sign;
-  t.gross=t.points*t.qty; // assume $1/point
+  t.gross=t.points*t.qty;
   t.net=t.gross - t.commission;
-
   trades.push(t); saveTrades(trades); render();
 }
 function updateTrade(obj){
@@ -441,7 +454,6 @@ function updateTrade(obj){
   const commissionEl=document.getElementById('commission');
   const looksManual=commissionEl&&commissionEl.value!==''&&(lastAutoCommission==null||Number(commissionEl.value)!==Number(lastAutoCommission));
   if(!looksManual){const calc=computeCommissionFromGlobal(qtyNum);if(calc!=null)commissionVal=calc;}
-
   const t=trades[i];
   t.date=obj.date||t.date; t.symbol=(obj.symbol||t.symbol).toUpperCase(); t.direction=obj.direction||t.direction;
   t.qty=parseInt(obj.qty||t.qty,10); t.entry=parseNum(obj.entry||t.entry); t.exit=parseNum(obj.exit||t.exit);
@@ -450,32 +462,28 @@ function updateTrade(obj){
   t.duration=obj.duration||computeDurationMin(t.date,t.entryTime,t.date,t.exitTime);
   const sign=t.direction==='Long'?1:-1;
   t.points=(t.exit-t.entry)*sign; t.gross=t.points*t.qty; t.net=t.gross-t.commission;
-
   saveTrades(trades); render();
 }
 
-/* ------------------------- CHIP SUMMARY -------------------------- */
+/* ---------- Chips ---------- */
 function refreshChips(){
   const bar=document.getElementById('chipBar');
   const g=id=>document.getElementById(id);
   const chip=(k,v)=>`<span class="chip ${v?'ok':''}">${k}: ${v||'—'}</span>`;
   bar.innerHTML=[
-    chip('Date',g('date').value),
-    chip('Symbol',g('symbol').value),
-    chip('Dir',g('direction').value),
-    chip('Qty',g('qty').value),
-    chip('Entry',g('entry').value),
-    chip('Exit',g('exit').value),
-    chip('Comm',g('commission').value),
-    chip('E.Time',g('entryTime').value),
+    chip('Date',g('date').value), chip('Symbol',g('symbol').value),
+    chip('Dir',g('direction').value), chip('Qty',g('qty').value),
+    chip('Entry',g('entry').value), chip('Exit',g('exit').value),
+    chip('Comm',g('commission').value), chip('E.Time',g('entryTime').value),
     chip('X.Time',g('exitTime').value),
   ].join(' ');
 }
 ['date','symbol','direction','qty','entry','exit','commission','entryTime','exitTime','duration'].forEach(id=>{
-  const el=document.getElementById(id); el.addEventListener('input', ()=>{ if(id==='qty') maybeAutoFillCommission(); refreshChips(); });
+  const el=document.getElementById(id);
+  el.addEventListener('input', ()=>{ if(id==='qty') maybeAutoFillCommission(); refreshChips(); });
 });
 
-/* ------------------------- CSV IMPORT/EXPORT --------------------- */
+/* ---------- CSV Import/Export ---------- */
 document.getElementById('exportBtn').onclick=()=>{
   const rows=[['date','symbol','direction','qty','entry','exit','commission','entryTime','exitTime','duration','points','gross','net','id']];
   for(const t of trades){rows.push([t.date,t.symbol,t.direction,t.qty,t.entry,t.exit,t.commission,t.entryTime,t.exitTime,t.duration,t.points,t.gross,t.net,t.id]);}
@@ -493,112 +501,102 @@ document.getElementById('importFile').onchange=(e)=>{
     const out=[];
     for(const line of lines){
       const c=line.split(',');
-      const t={date:c[idx('date')],symbol:c[idx('symbol')],direction:c[idx('direction')],qty:+c[idx('qty')],entry:+c[idx('entry')],exit:+c[idx('exit')],commission:+c[idx('commission')],entryTime:c[idx('entryTime')],exitTime:c[idx('exitTime')],duration:+c[idx('duration')],points:+c[idx('points')],gross:+c[idx('gross')],net:+c[idx('net')],id:c[idx('id')]||uuid()};
+      const t={date:c[idx('date')],symbol=c[idx('symbol')],direction=c[idx('direction')],qty:+c[idx('qty')],entry:+c[idx('entry')],exit:+c[idx('exit')],commission:+c[idx('commission')],entryTime=c[idx('entryTime')],exitTime=c[idx('exitTime')],duration:+c[idx('duration')],points:+c[idx('points')],gross:+c[idx('gross')],net:+c[idx('net')],id:c[idx('id')]||uuid()};
       out.push(t);
     }
     trades=out; saveTrades(trades); render();
-  }catch(err){alert('Import failed: '+err.message);}};
-  reader.readAsText(f);
+  }catch(err){alert('Import failed: '+err.message);}}; reader.readAsText(f);
 };
 
-/* -------------------- GLOBAL COMMISSION INPUTS ------------------- */
-if(gcRate!=null){ gcRateInput.value = Number(gcRate).toFixed(2); }
-gcAutoToggle.checked = gcAuto;
-gcRateInput.oninput=()=>{ const v=Number(gcRateInput.value); if(isFinite(v)){ gcRate=v; saveGcRate(gcRate); maybeAutoFillCommission(); }};
-gcAutoToggle.onchange=()=>{ const on=gcAutoToggle.checked; saveGcAuto(on); gcAuto=on; maybeAutoFillCommission(); };
-
-/* ----------------------------- VOICE ----------------------------- */
+/* ---------- Voice engine (stable flow) ---------- */
 const voiceBtn=document.getElementById('voiceBtn'),
       voiceDot=document.getElementById('voiceDot'),
       keepAlive=document.getElementById('keepAlive'),
       primeBtn=document.getElementById('primeMicBtn'),
       langSel=document.getElementById('lang');
 
-let rec=null,listening=false,wantListen=false,lastResultAt=0,watchdogId=null;
-
-navigator.permissions?.query?.({name:'microphone'}).then(p=>log('Mic permission state: '+p.state));
+let rec=null,listening=false,wantListen=false,lastResultAt=0,watchdogId=null,primed=false;
 
 async function primeMic(){
   try{
     const s=await navigator.mediaDevices.getUserMedia({audio:true});
     s.getTracks().forEach(t=>t.stop());
-    log('Mic primed.'); return true;
+    primed=true; log('Mic primed.');
+    return true;
   }catch(e){
-    log('Mic permission error: '+e.name+' '+e.message);
-    alert('Allow microphone (lock icon → Site settings → Microphone: Allow), then reload.');
+    primed=false; log('Mic permission error: '+e.name+' '+e.message);
+    alert('Click the “tune/lock” icon in the address bar → Microphone: Allow → reload.');
     return false;
   }
 }
 primeBtn.onclick=primeMic;
 
 voiceBtn.onclick = async ()=>{
-  if(!SR){alert('Voice requires Chrome/Edge.');return;}
-  const ok=await primeMic(); if(!ok) return;
+  if(!SR){ alert('Voice requires Chrome/Edge.'); return; }
+  if(!primed){ const ok=await primeMic(); if(!ok) return; }
   if(listening) stopRecognizer(); else startRecognizer();
 };
 
 function startRecognizer(){
   if(!SR) return;
-  if(rec){try{rec.onresult=rec.onend=rec.onerror=null;rec.stop();}catch{} rec=null;}
+  if(rec){ try{rec.onresult=rec.onend=rec.onerror=null; rec.stop();}catch{} rec=null; }
   rec=new SR(); rec.lang=langSel.value||'en-US'; rec.interimResults=true; rec.continuous=true;
-
   rec.onstart=()=>{listening=true;wantListen=true;voiceDot.classList.add('live');setStatus('listening');log('onstart');lastResultAt=Date.now();};
-  rec.onend=()=>{listening=false;voiceDot.classList.remove('live');setStatus('idle');log('onend'); if(wantListen&&keepAlive.checked){setTimeout(()=>{log('auto-restart');startRecognizer();},600);} };
-  rec.onerror=(e)=>{log('onerror '+(e.error||'')+': '+(e.message||'')); if(wantListen&&keepAlive.checked){try{rec.stop();}catch{} setTimeout(()=>startRecognizer(),800);} if((e.error||'')==='not-allowed'){wantListen=false;alert('Microphone blocked.');}};
-
-  rec.onresult=(ev)=>{
-    for(let i=ev.resultIndex;i<ev.results.length;i++){
-      const seg=ev.results[i][0].transcript;
-      const isFinal=ev.results[i].isFinal;
-      log((isFinal?'final: ':'interim: ')+seg);
-      handleUtterance(seg,isFinal);
-      lastResultAt=Date.now();
-    }
-  };
-
+  rec.onend=()=>{listening=false;voiceDot.classList.remove('live');setStatus('idle');log('onend'); if(wantListen&&keepAlive.checked){setTimeout(()=>{log('auto-restart');startRecognizer();},700);} };
+  rec.onerror=(e)=>{log('onerror '+(e.error||'')+': '+(e.message||'')); if(wantListen&&keepAlive.checked){try{rec.stop();}catch{} setTimeout(()=>startRecognizer(),900);} if((e.error||'')==='not-allowed'){wantListen=false;alert('Microphone blocked.');}};
+  rec.onresult=(ev)=>{ for(let i=ev.resultIndex;i<ev.results.length;i++){ const seg=ev.results[i][0].transcript; const isFinal=ev.results[i].isFinal; log((isFinal?'final: ':'interim: ')+seg); handleUtterance(seg,isFinal); lastResultAt=Date.now(); } };
   try{rec.start();}catch(e){log('start error: '+e.message);}
   if(watchdogId)clearInterval(watchdogId);
   watchdogId=setInterval(()=>{ if(wantListen&&keepAlive.checked&&listening && Date.now()-lastResultAt>20000){ log('watchdog idle → restart'); try{rec.stop();}catch{} startRecognizer(); } },5000);
 }
-function stopRecognizer(){
-  wantListen=false;
-  if(watchdogId){clearInterval(watchdogId);watchdogId=null;}
-  if(rec){try{rec.stop();}catch{}}
-  listening=false;voiceDot.classList.remove('live');setStatus('idle');log('stopped');
-}
+function stopRecognizer(){ wantListen=false; if(watchdogId){clearInterval(watchdogId);watchdogId=null;} if(rec){try{rec.stop();}catch{}} listening=false;voiceDot.classList.remove('live');setStatus('idle');log('stopped'); }
 
-/* ------------------- VOICE PARSING / LIVE FILL ------------------- */
-const WORDNUM={zero:0,one:1,two:2,three:3,four:4,five:5,six:6,seven:7,eight:8,nine:9,ten:10,eleven:11,twelve:12,thirteen:13,fourteen:14,fifteen:15,sixteen:16,seventeen:17,eighteen:18,nineteen:19,twenty:20,thirty:30,forty:40,fifty:50,sixty:60,seventy:70,eighty:80,ninety:90,hundred:100,thousand:1000};
+/* ---- Voice cursor + locking ---- */
+const FIELD_ORDER = ['date','symbol','direction','qty','entry','exit','commission','entryTime','exitTime','duration'];
+let fieldLock = { date:false,symbol:false,direction:false,qty:false,entry:false,exit:false,commission:false,entryTime:false,exitTime:false,duration:false };
+let currentField = null;
+function nextField(){ if(!currentField){ currentField = FIELD_ORDER[0]; return currentField; } const idx=FIELD_ORDER.indexOf(currentField); currentField=FIELD_ORDER[Math.min(idx+1,FIELD_ORDER.length-1)]; return currentField; }
+function prevField(){ if(!currentField){ currentField = FIELD_ORDER[0]; return currentField; } const idx=FIELD_ORDER.indexOf(currentField); currentField=FIELD_ORDER[Math.max(idx-1,0)]; return currentField; }
+function lockField(name){ fieldLock[name]=true; }
+function unlockField(name){ fieldLock[name]=false; }
+function isLocked(name){ return !!fieldLock[name]; }
+
+/* ---- number words → numeric ---- */
+const WORDNUM={zero:0,one:1,two:2,three:3,four:4,five:5,six:6,seven:7,eight:8,nine:9,ten:10,eleven:11,twelve:12,thirteen:13,fourteen:14,fifteen:15,sixteen:16,seventeen:17,eighteen:18,nineteen:19,twenty:20,thirty:30,forty:40,fifty:50,sixty:60,seventy:70,eighty:80,ninety:90,hundred:100,thousand:1000,oh:0,o:0};
 function wordsToNumber(str){
   if(!str) return null;
-  str=str.toLowerCase().replace(/[,]/g,' ').replace(/ +/g,' ').trim();
-  if(/^[0-9]+(\.[0-9]+)?$/.test(str)) return Number(str);
-  let total=0, current=0, seen=false;
-  const parts=str.split(/\s+/);
-  for(let idx=0; idx<parts.length; idx++){
-    const w=parts[idx];
+  str=String(str).toLowerCase().replace(/[,]/g,' ').replace(/\\s+/g,' ').trim();
+  if(/^[0-9]+(\\.[0-9]+)?$/.test(str)) return Number(str);
+  const parts=str.split(' ');
+  const pIdx = parts.indexOf('point')!==-1 ? parts.indexOf('point') : parts.indexOf('dot');
+  if(pIdx!==-1){
+    const intPart = wordsToNumber(parts.slice(0,pIdx).join(' '));
+    const decDigits = parts.slice(pIdx+1).map(w=> (w in WORDNUM && WORDNUM[w]<10)?WORDNUM[w]:w.replace(/\\D/g,'')).join('');
+    if(intPart==null) return null; return Number(String(intPart)+'.'+decDigits.replace(/[^\\d]/g,''));
+  }
+  let total=0,current=0,seen=false;
+  for(const w of parts){
+    if(w==='and') continue;
     if(w in WORDNUM){
       seen=true; const val=WORDNUM[w];
-      if(val===100||val===1000){ if(current===0) current=1; current*=val; if(val===1000){ total+=current; current=0; } }
-      else current+=val;
-    }else if(w==='point'||w==='dot'){
-      const intPart = total+current;
-      const decStr = parts.slice(idx+1).map(x=>WORDNUM[x]??x).join('');
-      return Number(String(intPart)+'.'+decStr.replace(/\D/g,''));
-    }else{ return null; }
+      if(val===100){ if(current===0) current=1; current*=100; }
+      else if(val===1000){ if(current===0) current=1; total+=current*1000; current=0; }
+      else{ current+=val; }
+    }else if(/^\\d+$/.test(w)){ seen=true; current+=Number(w); }
+    else{ return null; }
   }
   if(!seen) return null;
   return total+current;
 }
 function toTime24(s){
   if(!s) return null;
-  s=s.replace(/\./g,':').replace(/\s+/g,' ').toLowerCase().trim();
-  const wordTime=s.match(/^([a-z]+)(?:\s+([a-z]+))?\s*(am|pm)?$/);
+  s=s.replace(/\\./g,':').replace(/\\s+/g,' ').toLowerCase().trim();
+  const wordTime=s.match(/^([a-z]+)(?:\\s+([a-z]+))?\\s*(am|pm)?$/);
   if(wordTime){
     const h=wordsToNumber(wordTime[1]); const m=wordsToNumber(wordTime[2]||'zero');
     if(h!=null && m!=null){ let hh=h,mm=m; if(wordTime[3]==='am'&&hh===12)hh=0; if(wordTime[3]==='pm'&&hh<12)hh+=12; if(hh<=23&&mm<=59) return String(hh).padStart(2,'0')+':'+String(mm).padStart(2,'0'); }
   }
-  const m=s.match(/^(\d{1,2}):?(\d{2})?(?:\s*(am|pm))?$/); if(!m) return null;
+  const m=s.match(/^(\\d{1,2}):?(\\d{2})?(?:\\s*(am|pm))?$/); if(!m) return null;
   let h=parseInt(m[1],10),min=m[2]?parseInt(m[2],10):0; const ap=m[3];
   if(ap==='am'&&h===12)h=0; if(ap==='pm'&&h<12)h+=12; if(h>23||min>59)return null;
   return String(h).padStart(2,'0')+':'+String(min).padStart(2,'0');
@@ -606,21 +604,20 @@ function toTime24(s){
 const MONTHS=['january','february','march','april','may','june','july','august','september','october','november','december'];
 function parseDatePhrase(t){
   t=t.toLowerCase().trim();
-  if(/\btoday\b/.test(t)) return new Date().toISOString().slice(0,10);
-  if(/\byesterday\b/.test(t)) return new Date(Date.now()-86400000).toISOString().slice(0,10);
-  let m=t.match(/\b(\d{4})-(\d{2})-(\d{2})\b/); if(m) return `${m[1]}-${m[2]}-${m[3]}`;
-  m=t.match(/\b(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})\b/);
+  if(/\\btoday\\b/.test(t)) return new Date().toISOString().slice(0,10);
+  if(/\\byesterday\\b/.test(t)) return new Date(Date.now()-86400000).toISOString().slice(0,10);
+  let m=t.match(/\\b(\\d{4})-(\\d{2})-(\\d{2})\\b/); if(m) return `${m[1]}-${m[2]}-${m[3]}`;
+  m=t.match(/\\b(\\d{1,2})[\\/\\-](\\d{1,2})[\\/\\-](\\d{2,4})\\b/);
   if(m){let y=m[3]; if(y.length===2){y=(+y<70?'20'+y:'19'+y);} const mm=String(+m[1]).padStart(2,'0'); const dd=String(+m[2]).padStart(2,'0'); return `${y}-${mm}-${dd}`;}
   const monthRegex=new RegExp(`\\b(${MONTHS.join('|')})\\s+(\\d{1,2})(?:,\\s*(\\d{4}))?`);
   m=t.match(monthRegex); if(m){const month=String(MONTHS.indexOf(m[1])+1).padStart(2,'0'); const day=String(+m[2]).padStart(2,'0'); const year=m[3]||String(new Date().getFullYear()); return `${year}-${month}-${day}`;}
   const dayMonthRegex=new RegExp(`\\b(\\d{1,2})\\s+(${MONTHS.join('|')})(?:,\\s*(\\d{4}))?`);
-  m=t.match(dayMonthRegex); if(m){const month=String(MONTHS.indexOf(m[2])+1).padStart(2,'0'); const day=String(+m[1]).padStart(2,'0'); const year=m[3]||String(new Date().getFullYear()); return `${year}-${month}-${day}`;}
+  m=t.match(dayMonthRegex); if(m){const month=String(MONTHS.indexOf(m[2])+1).padStart(2,'0'); const day=String(+m[1]).padPad=String(+m[1]).padStart(2,'0'); const year=m[3]||String(new Date().getFullYear()); return `${year}-${month}-${day}`;}
   return null;
 }
 
-/* live draft object */
+/* ---- Live draft ---- */
 let draft={date:'',symbol:'',direction:'',qty:'',entry:'',exit:'',commission:'',entryTime:'',exitTime:'',duration:''};
-
 function applyDraftToForm(){
   const g=id=>document.getElementById(id);
   if(draft.symbol){g('symbol').value=draft.symbol;}
@@ -635,56 +632,118 @@ function applyDraftToForm(){
   refreshChips();
 }
 
+/* ---- Utterance handler (stable field targeting) ---- */
 function handleUtterance(raw,isFinal){
-  const tRaw=raw.trim(); const t=tRaw.toLowerCase();
+  const tRaw = raw.trim();
+  const t = tRaw.toLowerCase();
 
-  // Commands
-  if(/\b(cancel|reset|clear)\b/.test(t)){
+  if(/\\b(cancel|reset|clear)\\b/.test(t)){
     draft={date:'',symbol:'',direction:'',qty:'',entry:'',exit:'',commission:'',entryTime:'',exitTime:'',duration:''};
+    fieldLock = { date:false,symbol:false,direction:false,qty:false,entry:false,exit:false,commission:false,entryTime:false,exitTime:false,duration:false };
+    currentField = null;
     setStatus('draft cleared'); applyDraftToForm(); return;
   }
-  if(/\b(review|read back|recap)\b/.test(t)){
+  if(/\\b(next|continue)\\b/.test(t)){ nextField(); setStatus('field: '+currentField); return; }
+  if(/\\b(prev(ious)?|back)\\b/.test(t)){ prevField(); setStatus('field: '+currentField); return; }
+
+  if(/\\b(review|read back|recap)\\b/.test(t)){
     const summary = `Draft: ${draft.symbol||'[symbol]'} ${draft.direction||'[dir]'} qty ${draft.qty||'[qty]'} entry ${draft.entry||'[entry]'} exit ${draft.exit||'[exit]'}${draft.entryTime?(', entry '+draft.entryTime):''}${draft.exitTime?(', exit '+draft.exitTime):''}${draft.date?(', date '+draft.date):''}.`;
     setStatus('review'); if(document.getElementById('ttsToggle').checked){ try{speechSynthesis.cancel(); speechSynthesis.speak(new SpeechSynthesisUtterance(summary));}catch{} }
     return;
   }
-  if(/\b(confirm|submit(\s+trade)?|save(\s+trade)?)\b/.test(t)){
+  if(/\\b(confirm|submit(\\s+trade)?|save(\\s+trade)?)\\b/.test(t)){
     const obj={date:date.value||draft.date,symbol:symbol.value||draft.symbol,direction:direction.value||draft.direction,qty:qty.value||draft.qty,entry:entry.value||draft.entry,exit:exit.value||draft.exit,commission:commission.value||draft.commission,entryTime:entryTime.value||draft.entryTime,exitTime:exitTime.value||draft.exitTime,duration:duration.value||draft.duration};
     addTrade(obj);
     if(document.getElementById('ttsToggle').checked){ try{speechSynthesis.cancel(); speechSynthesis.speak(new SpeechSynthesisUtterance(`Saved ${obj.symbol||''} ${obj.direction||''} qty ${obj.qty||''}.`));}catch{} }
     draft={date:'',symbol:'',direction:'',qty:'',entry:'',exit:'',commission:'',entryTime:'',exitTime:'',duration:''};
+    fieldLock = { date:false,symbol:false,direction:false,qty:false,entry:false,exit:false,commission:false,entryTime:false,exitTime:false,duration:false };
+    currentField = null;
     applyDraftToForm(); return;
   }
 
-  // Global per-side voice: “per side one point two five”
-  let gcm=t.match(/per[-\s]?side\s+([a-z0-9\. ]+)/);
-  if(gcm){ const val=wordsToNumber(gcm[1]) ?? Number(gcm[1]); if(isFinite(val)){ gcRate=val; saveGcRate(gcRate); gcRateInput.value=gcRate.toFixed(2); setStatus('per-side set'); }}
+  const safeSet = (name, value, opts={})=>{
+    const {force=false, advance=true} = opts;
+    if(value===null || value===undefined || value==='') return false;
+    if(isLocked(name) && !force) return false;
+    draft[name] = String(value);
+    if(advance){ currentField = name; lockField(name); nextField(); }
+    return true;
+  };
 
-  // Slot fill
-  let changed=false;
-  let m=t.match(/(?:symbol|ticker)\s+([a-z0-9\.]+)/) || t.match(/^\s*([a-z]{1,5})(?:\s|$)/);
-  if(m){ draft.symbol=(m[1]||m[0]).toUpperCase(); changed=true; }
-  if(/\bshort\b/.test(t)){ draft.direction='Short'; changed=true; }
-  if(/\blong\b/.test(t)){ draft.direction='Long'; changed=true; }
-  let q=t.match(/(?:qty|quantity|size|contracts?)\s+([a-z0-9]+)/) || t.match(/\b([a-z0-9]+)\s+(?:contracts?|contract|lots?)\b/);
-  if(q){ const n=wordsToNumber(q[1]) ?? Number(q[1]); if(isFinite(n)) { draft.qty=String(n); changed=true; } }
-  let e=t.match(/\bentry\b(?:\s+price)?(?:\s+at)?\s+([a-z0-9\. ]+)/);
-  if(e){ const v=wordsToNumber(e[1]) ?? Number(e[1]); if(isFinite(v)) { draft.entry=String(v); changed=true; } }
-  let x=t.match(/\bexit\b(?:\s+price)?(?:\s+at)?\s+([a-z0-9\. ]+)/);
-  if(x){ const v=wordsToNumber(x[1]) ?? Number(x[1]); if(isFinite(v)) { draft.exit=String(v); changed=true; } }
-  let c=t.match(/\bcommission\b\s+([a-z0-9\. ]+)/);
-  if(c){ const v=wordsToNumber(c[1]) ?? Number(c[1]); if(isFinite(v)) { draft.commission=String(v); changed=true; } }
-  const mET=t.match(/\bentry\s*time\s+([a-z0-9:\.\s]+(?:am|pm)?)\b/);
-  if(mET){ const v=toTime24(mET[1]); if(v){ draft.entryTime=v; changed=true; } }
-  const mXT=t.match(/\bexit\s*time\s+([a-z0-9:\.\s]+(?:am|pm)?)\b/);
-  if(mXT){ const v=toTime24(mXT[1]); if(v){ draft.exitTime=v; changed=true; } }
-  const mDate=t.match(/\bdate\b(.*)$/);
-  if(mDate){ const parsed=parseDatePhrase(mDate[1]); if(parsed){ draft.date=parsed; changed=true; } }
+  const changeCmd = t.match(/\\b(change|set)\\s+(date|symbol|direction|qty|quantity|entry(?:\\s+price)?|exit(?:\\s+price)?|commission|entry\\s*time|exit\\s*time|duration)\\s*(?:to|at)?\\s*(.*)$/);
+  if(changeCmd){
+    const slotRaw = changeCmd[2];
+    let payload = changeCmd[3]?.trim() || '';
+    const map = { 'qty':'qty','quantity':'qty','entry price':'entry','entry':'entry','exit price':'exit','exit':'exit','entry time':'entryTime','exit time':'exitTime' };
+    const slot = map[slotRaw] || slotRaw.replace(/\\s+/g,'');
+    unlockField(slot);
+    let val=null;
+    if(slot==='date'){ val = parseDatePhrase(payload); }
+    else if(slot==='direction'){ val = /\\bshort\\b/.test(payload)?'Short': (/\\blong\\b/.test(payload)?'Long':null); }
+    else if(slot==='entryTime'||slot==='exitTime'){ val = toTime24(payload); }
+    else if(slot==='qty'||slot==='duration'){ val = wordsToNumber(payload) ?? Number(payload); }
+    else if(slot==='entry'||slot==='exit'||slot==='commission'){ val = wordsToNumber(payload) ?? Number(payload); }
+    else if(slot==='symbol'){ val = payload.replace(/[^a-z0-9\\.]/gi,'').toUpperCase(); }
+    if(val!=null && val!==''){ safeSet(slot,val,{force:true}); applyDraftToForm(); setStatus(`set ${slot}`); }
+    return;
+  }
 
-  if(isFinal && changed && document.getElementById('liveFill').checked){ applyDraftToForm(); setStatus('live filled'); }
+  const slotFirst = t.match(/\\b(date|symbol|direction|qty|quantity|entry(?:\\s+price)?|exit(?:\\s+price)?|commission|entry\\s*time|exit\\s*time|duration)\\b\\s*(.*)$/);
+  if(slotFirst){
+    let slotRaw = slotFirst[1], payload = slotFirst[2]?.trim() || '';
+    const map = { 'qty':'qty','quantity':'qty','entry price':'entry','entry':'entry','exit price':'exit','exit':'exit','entry time':'entryTime','exit time':'exitTime' };
+    const slot = map[slotRaw] || slotRaw.replace(/\\s+/g,'');
+    if(!isLocked(slot)){
+      let val=null;
+      if(slot==='date'){ val = parseDatePhrase(payload); }
+      else if(slot==='direction'){ val = /\\bshort\\b/.test(payload)?'Short': (/\\blong\\b/.test(payload)?'Long':null); }
+      else if(slot==='entryTime'||slot==='exitTime'){ val = toTime24(payload); }
+      else if(slot==='qty'||slot==='duration'){ val = wordsToNumber(payload) ?? Number(payload); }
+      else if(slot==='entry'||slot==='exit'||slot==='commission'){ val = wordsToNumber(payload) ?? Number(payload); }
+      else if(slot==='symbol'){ val = payload.replace(/[^a-z0-9\\.]/gi,'').toUpperCase(); }
+      if(val!=null && val!==''){ safeSet(slot,val); applyDraftToForm(); setStatus(`filled ${slot}`); }
+    }
+    return;
+  }
+
+  if(/\\bshort\\b/.test(t) && !isLocked('direction')) safeSet('direction','Short');
+  if(/\\blong\\b/.test(t) && !isLocked('direction')) safeSet('direction','Long');
+  const mSym = t.match(/\\b(?:symbol|ticker)\\s+([a-z0-9\\.]+)\\b/);
+  if(mSym && !isLocked('symbol')){ const val=(mSym[1]||'').replace(/[^a-z0-9\\.]/gi,'').toUpperCase(); if(val) safeSet('symbol',val); }
+
+  const mQty = t.match(/\\b(?:qty|quantity|size|contracts?)\\s+([a-z0-9\\.]+)\\b/) || t.match(/\\b([a-z0-9\\.]+)\\s+(?:contracts?|contract|lots?)\\b/);
+  if(mQty && !isLocked('qty')){ const n=wordsToNumber(mQty[1]) ?? Number(mQty[1]); if(isFinite(n)) safeSet('qty',n); }
+
+  let mEntry = t.match(/\\bentry\\b(?:\\s+price)?(?:\\s+at)?\\s+([a-z0-9\\. ]+)\\b/);
+  if(mEntry && !isLocked('entry')){
+    let raw=(mEntry[1]||'').trim(); let v=wordsToNumber(raw);
+    if(v==null){ const n=(raw.match(/[0-9]+(?:\\.[0-9]+)?/)||[])[0]; if(n!=null) v=Number(n); }
+    if(isFinite(v)) safeSet('entry',v);
+  }
+  let mExit = t.match(/\\bexit\\b(?:\\s+price)?(?:\\s+at)?\\s+([a-z0-9\\. ]+)\\b/);
+  if(mExit && !isLocked('exit')){
+    let raw=(mExit[1]||'').trim(); let v=wordsToNumber(raw);
+    if(v==null){ const n=(raw.match(/[0-9]+(?:\\.[0-9]+)?/)||[])[0]; if(n!=null) v=Number(n); }
+    if(isFinite(v)) safeSet('exit',v);
+  }
+  let mCom = t.match(/\\bcommission\\b\\s+([a-z0-9\\. ]+)\\b/);
+  if(mCom && !isLocked('commission')){
+    const v=wordsToNumber(mCom[1]) ?? Number(mCom[1]); if(isFinite(v)) safeSet('commission',v);
+  }
+  const mET=t.match(/\\bentry\\s*time\\s+([a-z0-9:\\.\\s]+(?:am|pm)?)\\b/);
+  if(mET && !isLocked('entryTime')){ const v=toTime24(mET[1]); if(v) safeSet('entryTime',v); }
+  const mXT=t.match(/\\bexit\\s*time\\s+([a-z0-9:\\.\\s]+(?:am|pm)?)\\b/);
+  if(mXT && !isLocked('exitTime')){ const v=toTime24(mXT[1]); if(v) safeSet('exitTime',v); }
+  if(/\\bdate\\b/.test(t) && !isLocked('date')){
+    const parsed = parseDatePhrase(t.replace(/\\bdate\\b/,'')); if(parsed) safeSet('date',parsed);
+  }
+
+  if(isFinal && document.getElementById('liveFill').checked){
+    applyDraftToForm(); setStatus('live filled');
+  }
 }
 
-/* ----------------------------- BUTTONS --------------------------- */
+/* ---------- Buttons ---------- */
 document.getElementById('addBtn').onclick=()=>{
   const obj={date:date.value,symbol:symbol.value,direction:direction.value,qty:qty.value,entry:entry.value,exit:exit.value,commission:commission.value,entryTime:entryTime.value,exitTime:exitTime.value,duration:duration.value};
   addTrade(obj);
@@ -697,24 +756,41 @@ document.getElementById('clearFormBtn').onclick=()=>{
   ['date','symbol','direction','qty','entry','exit','commission','entryTime','exitTime','duration'].forEach(id=>{
     const el=document.getElementById(id); if(el.tagName==='SELECT'){el.selectedIndex=0;} else {el.value='';}
   });
+  draft={date:'',symbol:'',direction:'',qty:'',entry:'',exit:'',commission:'',entryTime:'',exitTime:'',duration:''};
+  fieldLock = { date:false,symbol:false,direction:false,qty:false,entry:false,exit:false,commission:false,entryTime:false,exitTime:false,duration:false };
+  currentField=null;
   selectedId=null; document.getElementById('updateBtn').disabled=true; refreshChips();
 };
-document.getElementById('wipeBtn').onclick=()=>{
-  if(confirm('Delete ALL trades?')){trades=[];saveTrades(trades);render();}
-};
+document.getElementById('wipeBtn').onclick=()=>{ if(confirm('Delete ALL trades?')){trades=[];saveTrades(trades);render();} };
 document.getElementById('rangeSelect').onchange=render;
 document.getElementById('granSelect').onchange=()=>render();
 document.getElementById('metricSelect').onchange=()=>render();
 
-/* ------------------------------ INIT ----------------------------- */
-if(gcRate!=null){ gcRateInput.value = Number(gcRate).toFixed(2); }
-gcAutoToggle.checked = gcAuto;
+/* ---------- Global commission UI ---------- */
+const gcRateInput=document.getElementById('gcRateInput');
+const gcAutoToggle=document.getElementById('gcAutoToggle');
+if(loadGcRate()!=null){ gcRateInput.value = Number(loadGcRate()).toFixed(2); }
+gcAutoToggle.checked = loadGcAuto();
+gcRate = loadGcRate(); gcAuto = loadGcAuto();
+gcRateInput.oninput=()=>{ const v=Number(gcRateInput.value); if(isFinite(v)){ gcRate=v; saveGcRate(v); maybeAutoFillCommission(); }};
+gcAutoToggle.onchange=()=>{ gcAuto = gcAutoToggle.checked; saveGcAuto(gcAuto); maybeAutoFillCommission(); };
+
+/* ---------- INIT ---------- */
 refreshChips();
 render();
+
+/* ---------- Debug toggle ---------- */
+document.getElementById('debugToggle').onclick=()=>{
+  const p=document.getElementById('debugPanel');
+  p.style.display=(p.style.display==='none'||!p.style.display)?'block':'none';
+};
 </script>
 </body>
 </html>
 	
+
+	
+
 
 
 	
